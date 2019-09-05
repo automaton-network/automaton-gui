@@ -30,3 +30,31 @@
 *.exe
 *.out
 *.app
+
+# Automaton
+*.log
+
+# JUCE
+build/
+
+# Xcode
+
+## User settings
+xcuserdata/
+
+*.xcscmblueprint
+*.xccheckout
+build/
+DerivedData/
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+## Xcode Patch
+*.xcodeproj/*
+/*.gcno
+
+*.plist
