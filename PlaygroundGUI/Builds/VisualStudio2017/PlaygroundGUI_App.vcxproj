@@ -138,10 +138,11 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Network\NetworkView.cpp"/>
     <ClCompile Include="..\..\Source\Demos\DemoSimNet.cpp"/>
-    <ClCompile Include="..\..\Source\Demos\DemosMainComponent.cpp"/>
     <ClCompile Include="..\..\Source\Demos\DemoMiner.cpp"/>
     <ClCompile Include="..\..\Source\Miner\Miner.cpp"/>
+    <ClCompile Include="..\..\Source\Components\FormMaker.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_AbstractFifo.cpp">
@@ -987,9 +988,6 @@
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GridItem.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GridUnitTests.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -1332,10 +1330,11 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Network\NetworkView.h"/>
     <ClInclude Include="..\..\Source\Demos\DemoSimNet.h"/>
-    <ClInclude Include="..\..\Source\Demos\DemosMainComponent.h"/>
     <ClInclude Include="..\..\Source\Demos\DemoMiner.h"/>
     <ClInclude Include="..\..\Source\Miner\Miner.h"/>
+    <ClInclude Include="..\..\Source\Components\FormMaker.h"/>
     <ClInclude Include="..\..\Source\MainComponent.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_AbstractFifo.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_Array.h"/>
@@ -1456,6 +1455,7 @@
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\time\juce_RelativeTime.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\time\juce_Time.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\unit_tests\juce_UnitTest.h"/>
+    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\unit_tests\juce_UnitTestCategories.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\xml\juce_XmlDocument.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\xml\juce_XmlElement.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\zip\zlib\crc32.h"/>
@@ -1552,6 +1552,7 @@
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\jpglib\transupp.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\png.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngconf.h"/>
+    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngdebug.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pnginfo.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngpriv.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngstruct.h"/>
@@ -1739,7 +1740,6 @@
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h"/>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Resources\BIG_A_BLACK_CIRCLE_BACK_1000x1000.png"/>
     <None Include="..\..\..\..\automaton\media\fonts\play\Play-Bold.ttf"/>
     <None Include="..\..\..\..\automaton\media\fonts\play\Play-Regular.ttf"/>
     <None Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\native\java\README.txt"/>

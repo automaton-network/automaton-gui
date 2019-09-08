@@ -20,28 +20,21 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 
-#include "automaton/core/crypto/cryptopp/secure_random_cryptopp.h"
-#include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
-#include "automaton/core/io/io.h"
-
-class DemoMiner:
+//==============================================================================
+/*
+*/
+class FormMaker:
   public Component,
   public Button::Listener,
-  private Timer {
+  public TextEditor::Listener {
  public:
-  //==============================================================================
-  DemoMiner();
-  ~DemoMiner();
+  FormMaker();
+  ~FormMaker();
 
-  void paint(Graphics& g) override;
+  void paint(Graphics&) override;
   void resized() override;
 
-  void update();
-
-  // Button::Listener overrides.
-  void buttonClicked(Button* btn) override;
-
- private:
+ protected:
   OwnedArray<Component> components;
 
   void addComponent(Component* c) {
@@ -87,52 +80,20 @@ class DemoMiner:
     addComponent(lbl);
     lbl->setBounds(x, y, w, h);
     lbl->setColour(Label::textColourId, Colours::white);
-    lbl->setJustificationType(Justification::centred);
     return lbl;
   }
 
-  struct slot {
-    Colour bg;
-    Colour fg;
-    std::string diff;
-    int owner;
-    int tm;
-    uint32_t bits;
-    slot()
-      : diff(32, 0)
-      , bits(0) {}
-  };
+  TextEditor* TXT(String name, int x, int y, int w, int h) {
+    TextEditor* txt = new TextEditor(name);
+    txt->addListener(this);
+    addComponent(txt);
+    txt->setBounds(x, y, w, h);
+    // txt->setColour(TextEditor::backgroundColourId, Colours::black);
+    // txt->setColour(TextEditor::textColourId, Colours::white);
+    // txt->setJustificationType(Justification::centred);
+    return txt;
+  }
 
-  automaton::core::crypto::cryptopp::secure_random_cryptopp secure_rand;
-
-  const uint64 supply_cap = 1UL << 40;
-  uint32 m = 32;
-  uint32 n = 32;
-  uint32 sz = 8;
-  uint32 gap = 1;
-
-  uint64 reward_per_period = 1280000;
-  double periods_per_day = 1.0;
-  uint32 mask1 = 0;
-  uint32 mask2 = 0;
-  uint32 mask3 = 0;
-
-  slot slots[256][256];
-  uint64 total_balance = 0;
-  uint64 total_supply = 0;
-
-  unsigned int max_leading_bits = 4;
-  unsigned int min_leading_bits = 0;
-  unsigned int initial_difficulty_bits = 4;
-  uint64 tx_count = 0;
-
-  unsigned int t;
-
-  uint32 mining_power = 0;
-
-  void timerCallback() override;
-
-  static int mp[];
-
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemoMiner)
+ private:
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FormMaker)
 };

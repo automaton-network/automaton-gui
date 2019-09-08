@@ -1,15 +1,32 @@
+/*
+ * Automaton Playground
+ * Copyright (C) 2019 Asen Kovachev (@asenski, GitHub: akovachev)
+ *
+ * Automaton Playground is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Automaton Playground is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "../Components/FormMaker.h"
 
 #include "automaton/core/crypto/cryptopp/secure_random_cryptopp.h"
 #include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
 #include "automaton/core/io/io.h"
 
 class Miner:
-  public Component,
-  public Button::Listener,
-  public TextEditor::Listener,
+  public FormMaker,
   private Timer {
  public:
   //==============================================================================
@@ -76,7 +93,6 @@ class Miner:
   unsigned char minerAddress[32];
 
   // UI
-  OwnedArray<Component> components;
   TextEditor* txtRpcServer;
   Button* btnContract;
   TextEditor* txtContract;
@@ -89,63 +105,6 @@ class Miner:
   TextEditor* txtSlotsNum;
   TableListBox* tblSlots;
   TextEditor* txtClaim;
-
-  void addComponent(Component* c) {
-    components.add(c);
-    addAndMakeVisible(c);
-  }
-
-  TextButton* TB(String text, int x, int y, int w, int h) {
-    TextButton* tb = new TextButton(text);
-    tb->addListener(this);
-    addComponent(tb);
-    tb->setBounds(x, y, w, h);
-
-    tb->setColour(TextButton::textColourOffId,  Colours::black);
-    tb->setColour(TextButton::textColourOnId,   Colours::black);
-    tb->setColour(TextButton::buttonColourId,   Colours::white);
-    tb->setColour(TextButton::buttonOnColourId, Colours::cyan.brighter());
-
-    return tb;
-  }
-
-  int GTB(int gid, int def, StringArray texts, int x, int y, int w, int h) {
-    int firstButtonIndex = components.size();
-    for (unsigned int i = 0; i < texts.size(); i++) {
-      String text = texts[i];
-      TextButton* tb = TB(text, x, y, w, h);
-      tb->setClickingTogglesState(true);
-      tb->setRadioGroupId(gid);
-      if (i == def) {
-        tb->setToggleState(true, dontSendNotification);
-      }
-
-      tb->setConnectedEdges(
-          ((i == 0) ? 0 : Button::ConnectedOnLeft) |
-          ((i == (texts.size() - 1)) ? 0 : Button::ConnectedOnRight));
-
-      x += w;
-    }
-  }
-
-  Label* LBL(String text, int x, int y, int w, int h) {
-    Label* lbl = new Label("", text);
-    addComponent(lbl);
-    lbl->setBounds(x, y, w, h);
-    lbl->setColour(Label::textColourId, Colours::white);
-    return lbl;
-  }
-
-  TextEditor* TXT(String name, int x, int y, int w, int h) {
-    TextEditor* txt = new TextEditor(name);
-    txt->addListener(this);
-    addComponent(txt);
-    txt->setBounds(x, y, w, h);
-    // txt->setColour(TextEditor::backgroundColourId, Colours::black);
-    // txt->setColour(TextEditor::textColourId, Colours::white);
-    // txt->setJustificationType(Justification::centred);
-    return txt;
-  }
 
   void timerCallback() override;
 

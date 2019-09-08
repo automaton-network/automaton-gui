@@ -1,3 +1,21 @@
+/*
+ * Automaton Playground
+ * Copyright (C) 2019 Asen Kovachev (@asenski, GitHub: akovachev)
+ *
+ * Automaton Playground is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Automaton Playground is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "Miner.h"
 
 #include "secp256k1/include/secp256k1_recovery.h"
@@ -202,68 +220,6 @@ class TableSlots: public TableListBox, TableListBoxModel {
   Font font  { 12.0f };
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TableSlots)
-};
-
-class ReadContractThread: public ThreadWithProgressWindow {
- public:
-  ReadContractThread() : ThreadWithProgressWindow("Reading Contract...", true, true) {
-    setStatusMessage("Getting ready...");
-  }
-
-  struct task {
-    double progress;
-    std::string msg;
-    int tm;
-  };
-
-  task tasks[16] = {
-      {-1.0, "Connecting to Ethereum Network...", 20},
-      {-1.0, "Reading Mask...", 10},
-      {-1.0, "Reading Number of Slots...", 10},
-      { 0.0, "Reading Slots Difficulty...", 5},
-      { 0.1, "Reading Slots Difficulty...", 5},
-      { 0.2, "Reading Slots Difficulty...", 5},
-      { 0.3, "Reading Slots Difficulty...", 5},
-      { 0.4, "Reading Slots Difficulty...", 5},
-      { 0.5, "Reading Slots Difficulty...", 5},
-      { 0.6, "Reading Slots Difficulty...", 5},
-      { 0.7, "Reading Slots Difficulty...", 5},
-      { 0.8, "Reading Slots Difficulty...", 5},
-      { 0.9, "Reading Slots Difficulty...", 5},
-      { 1.0, "Reading Slots Difficulty...", 5},
-      {-1.0, "Finishing off the last few bits and pieces!", 10},
-      {10.0, "Done", 0},
-  };
-
-  void run() override {
-    for (int i = 0; tasks[i].progress <= 1.0; i++) {
-      setProgress(tasks[i].progress);
-      setStatusMessage(tasks[i].msg);
-      for (int t = 0; t < tasks[i].tm; t++) {
-        if (threadShouldExit()) {
-          return;
-        }
-        wait(100);
-      }
-    }
-  }
-
-  // This method gets called on the message thread once our thread has finished..
-  void threadComplete(bool userPressedCancel) override {
-    if (userPressedCancel) {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Progress window",
-                                       "You pressed cancel!");
-    } else {
-      // thread finished normally..
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Progress window",
-                                       "Thread finished ok!");
-    }
-
-    // ..and clean up by deleting our thread object..
-    delete this;
-  }
 };
 
 static unsigned int leading_bits_char(char x) {
@@ -487,9 +443,6 @@ void Miner::textEditorTextChanged(TextEditor & txt) {
 
 void Miner::buttonClicked(Button* btn) {
   auto txt = btn->getButtonText();
-  if (txt == "Read Contract") {
-    (new ReadContractThread())->launchThread();
-  }
   if (txt == "Add Miner") {
     addMinerThread();
   }

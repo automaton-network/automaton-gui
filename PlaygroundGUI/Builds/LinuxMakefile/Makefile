@@ -35,13 +35,13 @@ ifeq ($(CONFIG),Debug)
     TARGET_ARCH := -march=native
   endif
 
-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=0.0.1 -DJUCE_APP_VERSION_HEX=0x1 $(shell pkg-config --cflags freetype2 x11 xext xinerama libcurl) -pthread -I../../JuceLibraryCode -I../../../../automaton/src/local_third_party/JUCE/modules $(CPPFLAGS)
+  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=0.0.1 -DJUCE_APP_VERSION_HEX=0x1 $(shell pkg-config --cflags x11 xinerama xext freetype2 libcurl) -pthread -I../../JuceLibraryCode -I../../../../automaton/src/local_third_party/JUCE/modules $(CPPFLAGS)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := PlaygroundGUI
 
-  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 -I ../../../../.. -I ../../../../../local_third_party/bitcoin/src -I ../../../../../local_third_party/boost -I ../../../../../local_third_party/cryptopp -I ../../../../../local_third_party/g3log/src -I ../../../../../local_third_party/g3log/build/include -I ../../../../../local_third_party/lua -I ../../../../../local_third_party/protobuf/src -I ../../../../../local_third_party/sol2/single/sol $(CFLAGS)
+  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 -I $(SRCROOT)/../../../../automaton/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/bitcoin/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/boost -I $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/cryptopp -I $(SRCROOT)/../../../../automaton/src/local_third_party/curl/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/ed25519/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/build/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/gmp -I $(SRCROOT)/../../../../automaton/src/local_third_party/googletest/googlemock/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/googletest/googletest/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/json -I $(SRCROOT)/../../../../automaton/src/local_third_party/lua -I $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/replxx/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/sol2/single/sol -I $(SRCROOT)/../../../../automaton/src/local_third_party/zlib $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS)
-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs freetype2 x11 xext xinerama libcurl) ../../../../../build/libautomaton-core.a ../../../../../build/libblockchain_cpp_node.a ../../../../../build/libkoh-miner.a ../../../../../local_third_party/gmp/.libs/libgmp.a ../../../../../local_third_party/bitcoin/src/secp256k1/.libs/libsecp256k1.a ../../../../../local_third_party/g3log/build/libg3logger.a ../../../../../local_third_party/protobuf/src/.libs/libprotobuf.a ../../../../../local_third_party/protobuf/src/.libs/libprotobuf-lite.a ../../../../../local_third_party/cryptopp/libcryptopp.a ../../../../../local_third_party/lua/liblua.a ../../../../../local_third_party/boost/stage/lib/libboost_system.a ../../../../../local_third_party/boost/stage/lib/libboost_filesystem.a ../../../../../local_third_party/boost/stage/lib/libboost_iostreams.a -ldl -lpthread -lrt -lgmp $(LDFLAGS)
+  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2 libcurl) $(SRCROOT)/../../../../automaton/src/build/libautomaton-core.a $(SRCROOT)/../../../../automaton/src/build/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton/src/build/libkoh-miner.a $(SRCROOT)/../../../../automaton/src/local_third_party/bitcoin/src/secp256k1/.libs/libsecp256k1.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_system.a $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/libssl.a $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/libcrypto.a $(SRCROOT)/../../../../automaton/src/local_third_party/cryptopp/libcryptopp.a $(SRCROOT)/../../../../automaton/src/local_third_party/curl/lib/.libs/libcurl.a $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/build/libg3logger.a $(SRCROOT)/../../../../automaton/src/local_third_party/gmp/.libs/libgmp.a $(SRCROOT)/../../../../automaton/src/local_third_party/lua/liblua.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf.a $(SRCROOT)/../../../../automaton/src/local_third_party/replxx/build/libreplxx.a $(SRCROOT)/../../../../automaton/src/local_third_party/zlib/libz.a -lrt -ldl -lpthread -lgmp $(LDFLAGS)
 
   CLEANCMD = rm -rf $(JUCE_OUTDIR)/$(TARGET) $(JUCE_OBJDIR)
 endif
@@ -56,22 +56,23 @@ ifeq ($(CONFIG),Release)
     TARGET_ARCH := -march=native
   endif
 
-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=0.0.1 -DJUCE_APP_VERSION_HEX=0x1 $(shell pkg-config --cflags freetype2 x11 xext xinerama libcurl) -pthread -I../../JuceLibraryCode -I../../../../automaton/src/local_third_party/JUCE/modules $(CPPFLAGS)
+  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=0.0.1 -DJUCE_APP_VERSION_HEX=0x1 $(shell pkg-config --cflags x11 xinerama xext freetype2 libcurl) -pthread -I../../JuceLibraryCode -I../../../../automaton/src/local_third_party/JUCE/modules $(CPPFLAGS)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := PlaygroundGUI
 
-  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O3 -I ../../../../.. -I ../../../../../local_third_party/bitcoin/src -I ../../../../../local_third_party/boost -I ../../../../../local_third_party/cryptopp -I ../../../../../local_third_party/g3log/src -I ../../../../../local_third_party/g3log/build/include -I ../../../../../local_third_party/lua -I ../../../../../local_third_party/protobuf/src -I ../../../../../local_third_party/sol2/single/sol $(CFLAGS)
+  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O3 -I $(SRCROOT)/../../../../automaton/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/bitcoin/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/boost -I $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/cryptopp -I $(SRCROOT)/../../../../automaton/src/local_third_party/curl/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/ed25519/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/build/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/gmp -I $(SRCROOT)/../../../../automaton/src/local_third_party/googletest/googlemock/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/googletest/googletest/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/json -I $(SRCROOT)/../../../../automaton/src/local_third_party/lua -I $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/replxx/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/sol2/single/sol -I $(SRCROOT)/../../../../automaton/src/local_third_party/zlib $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS)
-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs freetype2 x11 xext xinerama libcurl) -fvisibility=hidden ../../../../../build/libautomaton-core.a ../../../../../build/libblockchain_cpp_node.a ../../../../../build/libkoh-miner.a ../../../../../local_third_party/gmp/.libs/libgmp.a ../../../../../local_third_party/bitcoin/src/secp256k1/.libs/libsecp256k1.a ../../../../../local_third_party/g3log/build/libg3logger.a ../../../../../local_third_party/protobuf/src/.libs/libprotobuf.a ../../../../../local_third_party/protobuf/src/.libs/libprotobuf-lite.a ../../../../../local_third_party/cryptopp/libcryptopp.a ../../../../../local_third_party/lua/liblua.a ../../../../../local_third_party/boost/stage/lib/libboost_system.a ../../../../../local_third_party/boost/stage/lib/libboost_filesystem.a ../../../../../local_third_party/boost/stage/lib/libboost_iostreams.a -ldl -lpthread -lrt -lgmp $(LDFLAGS)
+  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2 libcurl) -fvisibility=hidden $(SRCROOT)/../../../../automaton/src/build/libautomaton-core.a $(SRCROOT)/../../../../automaton/src/build/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton/src/build/libkoh-miner.a $(SRCROOT)/../../../../automaton/src/local_third_party/bitcoin/src/secp256k1/.libs/libsecp256k1.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_system.a $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/libssl.a $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/libcrypto.a $(SRCROOT)/../../../../automaton/src/local_third_party/cryptopp/libcryptopp.a $(SRCROOT)/../../../../automaton/src/local_third_party/curl/lib/.libs/libcurl.a $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/build/libg3logger.a $(SRCROOT)/../../../../automaton/src/local_third_party/gmp/.libs/libgmp.a $(SRCROOT)/../../../../automaton/src/local_third_party/lua/liblua.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf.a $(SRCROOT)/../../../../automaton/src/local_third_party/replxx/build/libreplxx.a $(SRCROOT)/../../../../automaton/src/local_third_party/zlib/libz.a -lrt -ldl -lpthread -lgmp $(LDFLAGS)
 
   CLEANCMD = rm -rf $(JUCE_OUTDIR)/$(TARGET) $(JUCE_OBJDIR)
 endif
 
 OBJECTS_APP := \
+  $(JUCE_OBJDIR)/NetworkView_2d1f0d3.o \
   $(JUCE_OBJDIR)/DemoSimNet_f027b031.o \
-  $(JUCE_OBJDIR)/DemosMainComponent_abc8e8dc.o \
   $(JUCE_OBJDIR)/DemoMiner_b95613be.o \
   $(JUCE_OBJDIR)/Miner_521421b0.o \
+  $(JUCE_OBJDIR)/FormMaker_de6ddb10.o \
   $(JUCE_OBJDIR)/MainComponent_a6ffb4a5.o \
   $(JUCE_OBJDIR)/Main_90ebc5c2.o \
   $(JUCE_OBJDIR)/BinaryData_ce4232d4.o \
@@ -88,21 +89,21 @@ all : $(JUCE_OUTDIR)/$(JUCE_TARGET_APP)
 
 $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
 	@command -v pkg-config >/dev/null 2>&1 || { echo >&2 "pkg-config not installed. Please, install it."; exit 1; }
-	@pkg-config --print-errors freetype2 x11 xext xinerama libcurl
+	@pkg-config --print-errors x11 xinerama xext freetype2 libcurl
 	@echo Linking "PlaygroundGUI - App"
 	-$(V_AT)mkdir -p $(JUCE_BINDIR)
 	-$(V_AT)mkdir -p $(JUCE_LIBDIR)
 	-$(V_AT)mkdir -p $(JUCE_OUTDIR)
 	$(V_AT)$(CXX) -o $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) $(OBJECTS_APP) $(JUCE_LDFLAGS) $(JUCE_LDFLAGS_APP) $(RESOURCES) $(TARGET_ARCH)
 
+$(JUCE_OBJDIR)/NetworkView_2d1f0d3.o: ../../Source/Network/NetworkView.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling NetworkView.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
 $(JUCE_OBJDIR)/DemoSimNet_f027b031.o: ../../Source/Demos/DemoSimNet.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling DemoSimNet.cpp"
-	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
-
-$(JUCE_OBJDIR)/DemosMainComponent_abc8e8dc.o: ../../Source/Demos/DemosMainComponent.cpp
-	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling DemosMainComponent.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/DemoMiner_b95613be.o: ../../Source/Demos/DemoMiner.cpp
@@ -113,6 +114,11 @@ $(JUCE_OBJDIR)/DemoMiner_b95613be.o: ../../Source/Demos/DemoMiner.cpp
 $(JUCE_OBJDIR)/Miner_521421b0.o: ../../Source/Miner/Miner.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling Miner.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/FormMaker_de6ddb10.o: ../../Source/Components/FormMaker.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling FormMaker.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/MainComponent_a6ffb4a5.o: ../../Source/MainComponent.cpp

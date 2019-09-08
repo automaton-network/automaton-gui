@@ -1,17 +1,25 @@
 /*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic startup code for a JUCE application.
-
-  ==============================================================================
-*/
+ * Automaton Playground
+ * Copyright (C) 2019 Asen Kovachev (@asenski, GitHub: akovachev)
+ *
+ * Automaton Playground is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Automaton Playground is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-// #include "MainComponent.h"
-#include "Demos/DemosMainComponent.h"
+#include "MainComponent.h"
 
+#include <curl/curl.h>
 
 class EmbeddedFonts {
  private:
@@ -41,6 +49,8 @@ class PlaygroundGUIApplication: public JUCEApplication {
 
   //==============================================================================
   void initialise(const String& commandLine) override {
+    curl_global_init(CURL_GLOBAL_ALL);
+
     mainWindow.reset(new MainWindow(getApplicationName()));
 
     // const Font& fontPlay = fonts.getPlay();
@@ -49,8 +59,9 @@ class PlaygroundGUIApplication: public JUCEApplication {
   }
 
   void shutdown() override {
-    // Add your application's shutdown code here..
-    mainWindow = nullptr;  // (deletes our window)
+    mainWindow = nullptr;
+
+    curl_global_cleanup();
   }
 
   //==============================================================================

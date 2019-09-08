@@ -41,13 +41,13 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
+		474A5E736DC9996D96CBC820 = {
+			isa = PBXBuildFile;
+			fileRef = 08D1D043B252AE5AA9E7A223;
+		};
 		72A5DC1947B05EC06287675C = {
 			isa = PBXBuildFile;
 			fileRef = 86E313C97F6DB40B327704DB;
-		};
-		82B3EBE62FF38456224895EE = {
-			isa = PBXBuildFile;
-			fileRef = 5C7617C7C652F8CC0E959D1E;
 		};
 		EED2358D21B09846AA8B17BD = {
 			isa = PBXBuildFile;
@@ -56,6 +56,10 @@
 		6C764B7D3E1A849226C54B02 = {
 			isa = PBXBuildFile;
 			fileRef = BEF8E95313BF13AE8C0A6AC7;
+		};
+		88D3B11922D089AF4E26BDC0 = {
+			isa = PBXBuildFile;
+			fileRef = EB48C8B94DF3F88534EF2E02;
 		};
 		9A3C098021D839B8BA421107 = {
 			isa = PBXBuildFile;
@@ -112,6 +116,13 @@
 			lastKnownFileType = image.png;
 			name = "BIG_A_BLACK_CIRCLE_BACK_1000x1000.png";
 			path = "../../Resources/BIG_A_BLACK_CIRCLE_BACK_1000x1000.png";
+			sourceTree = "SOURCE_ROOT";
+		};
+		08D1D043B252AE5AA9E7A223 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = NetworkView.cpp;
+			path = ../../Source/Network/NetworkView.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		0A5C667446871EEB5E066CD5 = {
@@ -184,6 +195,13 @@
 			path = System/Library/Frameworks/WebKit.framework;
 			sourceTree = SDKROOT;
 		};
+		510F04B2A4332278F5F209C3 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = FormMaker.h;
+			path = ../../Source/Components/FormMaker.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		5728D1E3817FA39768DC53B3 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.icns;
@@ -196,13 +214,6 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = DemoMiner.h;
 			path = ../../Source/Demos/DemoMiner.h;
-			sourceTree = "SOURCE_ROOT";
-		};
-		5C7617C7C652F8CC0E959D1E = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = DemosMainComponent.cpp;
-			path = ../../Source/Demos/DemosMainComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		674DB7AB7B8ED07B0A8F11AF = {
@@ -268,13 +279,6 @@
 			path = ../../Source/Main.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
-		AE69AE1C64B6D9C79B3C501E = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = DemosMainComponent.h;
-			path = ../../Source/Demos/DemosMainComponent.h;
-			sourceTree = "SOURCE_ROOT";
-		};
 		BEF8E95313BF13AE8C0A6AC7 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -301,6 +305,13 @@
 			lastKnownFileType = text.plist.xml;
 			name = "Info-App.plist";
 			path = "Info-App.plist";
+			sourceTree = "SOURCE_ROOT";
+		};
+		D0E6A5F1B630686C8DA092DC = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = NetworkView.h;
+			path = ../../Source/Network/NetworkView.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		D2896F2FBEFBC7DB297DCD12 = {
@@ -345,6 +356,13 @@
 			path = System/Library/Frameworks/IOKit.framework;
 			sourceTree = SDKROOT;
 		};
+		EB48C8B94DF3F88534EF2E02 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = FormMaker.cpp;
+			path = ../../Source/Components/FormMaker.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		EBA2A5F2D5046950426683C5 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -375,13 +393,20 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		6BBA852623D8A64A3A5A7043 = {
+			isa = PBXGroup;
+			children = (
+				08D1D043B252AE5AA9E7A223,
+				D0E6A5F1B630686C8DA092DC,
+			);
+			name = Network;
+			sourceTree = "<group>";
+		};
 		D42076CCB651D5CCB42A7F0D = {
 			isa = PBXGroup;
 			children = (
 				86E313C97F6DB40B327704DB,
 				D752613D5D9683073A9F79DD,
-				5C7617C7C652F8CC0E959D1E,
-				AE69AE1C64B6D9C79B3C501E,
 				F87EDB042F4AD000D575BE55,
 				599AF11CF454D6AA3ED99DE3,
 			);
@@ -397,11 +422,22 @@
 			name = Miner;
 			sourceTree = "<group>";
 		};
+		F9E1BF6AB0C4E7F511EFC866 = {
+			isa = PBXGroup;
+			children = (
+				EB48C8B94DF3F88534EF2E02,
+				510F04B2A4332278F5F209C3,
+			);
+			name = Components;
+			sourceTree = "<group>";
+		};
 		883895BF3FD94AEF68720830 = {
 			isa = PBXGroup;
 			children = (
+				6BBA852623D8A64A3A5A7043,
 				D42076CCB651D5CCB42A7F0D,
 				32CC0634FEFEA14E371BC412,
+				F9E1BF6AB0C4E7F511EFC866,
 				F37DC7F8EC888D82E793ED31,
 				D2896F2FBEFBC7DB297DCD12,
 				960F41F1CCAE949D7CDBFC7B,
@@ -528,8 +564,8 @@
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(HOME)/Applications";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				OTHER_CPLUSPLUSFLAGS = "-I ../../../../automaton/src -I ../../../../automaton/src/local_third_party/bitcoin/src -I ../../../../automaton/src/local_third_party/boost -I ../../../../automaton/src/local_third_party/cryptopp -I ../../../../automaton/src/local_third_party/g3log/src -I ../../../../automaton/src/local_third_party/g3log/build/include -I ../../../../automaton/src/local_third_party/lua -I ../../../../automaton/src/local_third_party/protobuf/src -I ../../../../automaton/src/local_third_party/sol2/single/sol";
-				OTHER_LDFLAGS = "../../../../automaton/src/build/libautomaton-core.a ../../../../automaton/src/build/libblockchain_cpp_node.a ../../../../automaton/src/build/libkoh-miner.a ../../../../automaton/src/local_third_party/gmp/.libs/libgmp.a ../../../../automaton/src/local_third_party/bitcoin/src/secp256k1/.libs/libsecp256k1.a ../../../../automaton/src/local_third_party/g3log/build/libg3logger.a ../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf.a ../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a ../../../../automaton/src/local_third_party/cryptopp/libcryptopp.a ../../../../automaton/src/local_third_party/lua/liblua.a ../../../../automaton/src/local_third_party/boost/stage/lib/libboost_system.a ../../../../automaton/src/local_third_party/boost/stage/lib/libboost_filesystem.a ../../../../automaton/src/local_third_party/boost/stage/lib/libboost_iostreams.a";
+				OTHER_CPLUSPLUSFLAGS = "-I $(SRCROOT)/../../../../automaton/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/bitcoin/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/boost -I $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/cryptopp -I $(SRCROOT)/../../../../automaton/src/local_third_party/curl/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/ed25519/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/build/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/gmp -I $(SRCROOT)/../../../../automaton/src/local_third_party/googletest/googlemock/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/googletest/googletest/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/json -I $(SRCROOT)/../../../../automaton/src/local_third_party/lua -I $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/replxx/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/sol2/single/sol -I $(SRCROOT)/../../../../automaton/src/local_third_party/zlib";
+				OTHER_LDFLAGS = "$(SRCROOT)/../../../../automaton/src/build/libautomaton-core.a $(SRCROOT)/../../../../automaton/src/build/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton/src/build/libkoh-miner.a $(SRCROOT)/../../../../automaton/src/local_third_party/bitcoin/src/secp256k1/.libs/libsecp256k1.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_system.a $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/libssl.a $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/libcrypto.a $(SRCROOT)/../../../../automaton/src/local_third_party/cryptopp/libcryptopp.a $(SRCROOT)/../../../../automaton/src/local_third_party/curl/lib/.libs/libcurl.a $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/build/libg3logger.a $(SRCROOT)/../../../../automaton/src/local_third_party/gmp/.libs/libgmp.a $(SRCROOT)/../../../../automaton/src/local_third_party/lua/liblua.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf.a $(SRCROOT)/../../../../automaton/src/local_third_party/replxx/build/libreplxx.a $(SRCROOT)/../../../../automaton/src/local_third_party/zlib/libz.a -lLDAP";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Liberatix.PlaygroundGUI;
 				PRODUCT_NAME = "PlaygroundGUI";
 				USE_HEADERMAP = NO;
@@ -574,8 +610,8 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				OTHER_CPLUSPLUSFLAGS = "-I ../../../../automaton/src -I ../../../../automaton/src/local_third_party/bitcoin/src -I ../../../../automaton/src/local_third_party/boost -I ../../../../automaton/src/local_third_party/cryptopp -I ../../../../automaton/src/local_third_party/g3log/src -I ../../../../automaton/src/local_third_party/g3log/build/include -I ../../../../automaton/src/local_third_party/lua -I ../../../../automaton/src/local_third_party/protobuf/src -I ../../../../automaton/src/local_third_party/sol2/single/sol";
-				OTHER_LDFLAGS = "../../../../automaton/src/build/libautomaton-core.a ../../../../automaton/src/build/libblockchain_cpp_node.a ../../../../automaton/src/build/libkoh-miner.a ../../../../automaton/src/local_third_party/gmp/.libs/libgmp.a ../../../../automaton/src/local_third_party/bitcoin/src/secp256k1/.libs/libsecp256k1.a ../../../../automaton/src/local_third_party/g3log/build/libg3logger.a ../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf.a ../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a ../../../../automaton/src/local_third_party/cryptopp/libcryptopp.a ../../../../automaton/src/local_third_party/lua/liblua.a ../../../../automaton/src/local_third_party/boost/stage/lib/libboost_system.a ../../../../automaton/src/local_third_party/boost/stage/lib/libboost_filesystem.a ../../../../automaton/src/local_third_party/boost/stage/lib/libboost_iostreams.a";
+				OTHER_CPLUSPLUSFLAGS = "-I $(SRCROOT)/../../../../automaton/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/bitcoin/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/boost -I $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/cryptopp -I $(SRCROOT)/../../../../automaton/src/local_third_party/curl/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/ed25519/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/build/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/gmp -I $(SRCROOT)/../../../../automaton/src/local_third_party/googletest/googlemock/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/googletest/googletest/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/json -I $(SRCROOT)/../../../../automaton/src/local_third_party/lua -I $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src -I $(SRCROOT)/../../../../automaton/src/local_third_party/replxx/include -I $(SRCROOT)/../../../../automaton/src/local_third_party/sol2/single/sol -I $(SRCROOT)/../../../../automaton/src/local_third_party/zlib";
+				OTHER_LDFLAGS = "$(SRCROOT)/../../../../automaton/src/build/libautomaton-core.a $(SRCROOT)/../../../../automaton/src/build/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton/src/build/libkoh-miner.a $(SRCROOT)/../../../../automaton/src/local_third_party/bitcoin/src/secp256k1/.libs/libsecp256k1.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton/src/local_third_party/boost/stage/lib/libboost_system.a $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/libssl.a $(SRCROOT)/../../../../automaton/src/local_third_party/openssl/libcrypto.a $(SRCROOT)/../../../../automaton/src/local_third_party/cryptopp/libcryptopp.a $(SRCROOT)/../../../../automaton/src/local_third_party/curl/lib/.libs/libcurl.a $(SRCROOT)/../../../../automaton/src/local_third_party/g3log/build/libg3logger.a $(SRCROOT)/../../../../automaton/src/local_third_party/gmp/.libs/libgmp.a $(SRCROOT)/../../../../automaton/src/local_third_party/lua/liblua.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/protobuf/src/.libs/libprotobuf.a $(SRCROOT)/../../../../automaton/src/local_third_party/replxx/build/libreplxx.a $(SRCROOT)/../../../../automaton/src/local_third_party/zlib/libz.a -lLDAP";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Liberatix.PlaygroundGUI;
 				PRODUCT_NAME = "PlaygroundGUI";
 				USE_HEADERMAP = NO;
@@ -708,10 +744,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				474A5E736DC9996D96CBC820,
 				72A5DC1947B05EC06287675C,
-				82B3EBE62FF38456224895EE,
 				EED2358D21B09846AA8B17BD,
 				6C764B7D3E1A849226C54B02,
+				88D3B11922D089AF4E26BDC0,
 				9A3C098021D839B8BA421107,
 				0721950C61ADA44331EC5DB3,
 				EF0B0FEE0E3E3DF8F720110A,
@@ -754,7 +791,7 @@
 		3B0BCA4A8E40EFBF9E23EF17 = {
 			isa = PBXProject;
 			buildConfigurationList = B8E4B3104706358F87877F35;
-			attributes = { LastUpgradeCheck = 0930; ORGANIZATIONNAME = "Liberatix"; TargetAttributes = { DB46D2865E4EFA1B60F9E95A = { SystemCapabilities = {com.apple.ApplicationGroups.iOS = { enabled = 0; }; com.apple.InAppPurchase = { enabled = 0; }; com.apple.InterAppAudio = { enabled = 0; }; com.apple.Push = { enabled = 0; }; com.apple.Sandbox = { enabled = 0; }; com.apple.HardenedRuntime = { enabled = 0; }; }; }; }; };
+			attributes = { LastUpgradeCheck = 1100; ORGANIZATIONNAME = "Liberatix"; TargetAttributes = { DB46D2865E4EFA1B60F9E95A = { SystemCapabilities = {com.apple.ApplicationGroups.iOS = { enabled = 0; }; com.apple.InAppPurchase = { enabled = 0; }; com.apple.InterAppAudio = { enabled = 0; }; com.apple.Push = { enabled = 0; }; com.apple.Sandbox = { enabled = 0; }; com.apple.HardenedRuntime = { enabled = 0; }; }; }; }; };
 			compatibilityVersion = "Xcode 3.2";
 			hasScannedForEncodings = 0;
 			mainGroup = 2D493CFE9FEB5B02EB5E1518;
