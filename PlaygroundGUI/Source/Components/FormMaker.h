@@ -56,8 +56,7 @@ class FormMaker:
     return tb;
   }
 
-  int GTB(int gid, int def, StringArray texts, int x, int y, int w, int h) {
-    int firstButtonIndex = components.size();
+  void GTB(int gid, int def, StringArray texts, int x, int y, int w, int h) {
     for (unsigned int i = 0; i < texts.size(); i++) {
       String text = texts[i];
       TextButton* tb = TB(text, x, y, w, h);

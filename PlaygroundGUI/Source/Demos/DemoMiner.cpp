@@ -336,7 +336,7 @@ void DemoMiner::paint(Graphics& g) {
 
   for (int x = 0; x < m; x++) {
     for (int y = 0; y < n; y++) {
-      int i = y * 256 + x;
+      // int i = y * 256 + x;
       double lb = 1.0 * (slots[x][y].bits - min_leading_bits) / (max_leading_bits - min_leading_bits);
       slots[x][y].bg = HSV(slots[x][y].owner ? 30 : 200, 1.0 - lb, 0.5 + 0.4 * lb);
       if (slots[x][y].bits == 0) {

@@ -54,7 +54,7 @@ class DemosMainComponent:
 
   void menuItemSelected(int /*menuItemID*/, int /*topLevelMenuIndex*/) override {}
 
-  ApplicationCommandTarget* getNextCommandTarget() {
+  ApplicationCommandTarget* getNextCommandTarget() override {
     return nullptr;
   }
 

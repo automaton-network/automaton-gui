@@ -41,9 +41,13 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
-		474A5E736DC9996D96CBC820 = {
+		88D3B11922D089AF4E26BDC0 = {
 			isa = PBXBuildFile;
-			fileRef = 08D1D043B252AE5AA9E7A223;
+			fileRef = EB48C8B94DF3F88534EF2E02;
+		};
+		C04966EEAA0333308456359D = {
+			isa = PBXBuildFile;
+			fileRef = B64797D3D8C773778F4625FB;
 		};
 		72A5DC1947B05EC06287675C = {
 			isa = PBXBuildFile;
@@ -57,9 +61,9 @@
 			isa = PBXBuildFile;
 			fileRef = BEF8E95313BF13AE8C0A6AC7;
 		};
-		88D3B11922D089AF4E26BDC0 = {
+		474A5E736DC9996D96CBC820 = {
 			isa = PBXBuildFile;
-			fileRef = EB48C8B94DF3F88534EF2E02;
+			fileRef = 08D1D043B252AE5AA9E7A223;
 		};
 		9A3C098021D839B8BA421107 = {
 			isa = PBXBuildFile;
@@ -279,6 +283,20 @@
 			path = ../../Source/Main.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		A21E8A52E54BAB407CE8D405 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = AutomatonContractData.h;
+			path = ../../Source/Data/AutomatonContractData.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		B64797D3D8C773778F4625FB = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = AutomatonContractData.cpp;
+			path = ../../Source/Data/AutomatonContractData.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		BEF8E95313BF13AE8C0A6AC7 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -305,6 +323,13 @@
 			lastKnownFileType = text.plist.xml;
 			name = "Info-App.plist";
 			path = "Info-App.plist";
+			sourceTree = "SOURCE_ROOT";
+		};
+		CA768AB0754F7EEE97816FDE = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = KingAutomatonABI.h;
+			path = ../../Source/Data/KingAutomatonABI.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		D0E6A5F1B630686C8DA092DC = {
@@ -393,13 +418,23 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		6BBA852623D8A64A3A5A7043 = {
+		F9E1BF6AB0C4E7F511EFC866 = {
 			isa = PBXGroup;
 			children = (
-				08D1D043B252AE5AA9E7A223,
-				D0E6A5F1B630686C8DA092DC,
+				EB48C8B94DF3F88534EF2E02,
+				510F04B2A4332278F5F209C3,
 			);
-			name = Network;
+			name = Components;
+			sourceTree = "<group>";
+		};
+		2B6DFF850E82EF2A271142A2 = {
+			isa = PBXGroup;
+			children = (
+				B64797D3D8C773778F4625FB,
+				A21E8A52E54BAB407CE8D405,
+				CA768AB0754F7EEE97816FDE,
+			);
+			name = Data;
 			sourceTree = "<group>";
 		};
 		D42076CCB651D5CCB42A7F0D = {
@@ -422,22 +457,23 @@
 			name = Miner;
 			sourceTree = "<group>";
 		};
-		F9E1BF6AB0C4E7F511EFC866 = {
+		6BBA852623D8A64A3A5A7043 = {
 			isa = PBXGroup;
 			children = (
-				EB48C8B94DF3F88534EF2E02,
-				510F04B2A4332278F5F209C3,
+				08D1D043B252AE5AA9E7A223,
+				D0E6A5F1B630686C8DA092DC,
 			);
-			name = Components;
+			name = Network;
 			sourceTree = "<group>";
 		};
 		883895BF3FD94AEF68720830 = {
 			isa = PBXGroup;
 			children = (
-				6BBA852623D8A64A3A5A7043,
+				F9E1BF6AB0C4E7F511EFC866,
+				2B6DFF850E82EF2A271142A2,
 				D42076CCB651D5CCB42A7F0D,
 				32CC0634FEFEA14E371BC412,
-				F9E1BF6AB0C4E7F511EFC866,
+				6BBA852623D8A64A3A5A7043,
 				F37DC7F8EC888D82E793ED31,
 				D2896F2FBEFBC7DB297DCD12,
 				960F41F1CCAE949D7CDBFC7B,
@@ -744,11 +780,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				474A5E736DC9996D96CBC820,
+				88D3B11922D089AF4E26BDC0,
+				C04966EEAA0333308456359D,
 				72A5DC1947B05EC06287675C,
 				EED2358D21B09846AA8B17BD,
 				6C764B7D3E1A849226C54B02,
-				88D3B11922D089AF4E26BDC0,
+				474A5E736DC9996D96CBC820,
 				9A3C098021D839B8BA421107,
 				0721950C61ADA44331EC5DB3,
 				EF0B0FEE0E3E3DF8F720110A,

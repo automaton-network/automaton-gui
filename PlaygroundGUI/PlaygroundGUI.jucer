@@ -12,9 +12,17 @@
             file="../../automaton/media/fonts/play/Play-Regular.ttf"/>
     </GROUP>
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
-      <GROUP id="{F1D607D1-F524-496A-9278-B3EDBE19C280}" name="Network">
-        <FILE id="zxKSKI" name="NetworkView.cpp" compile="1" resource="0" file="Source/Network/NetworkView.cpp"/>
-        <FILE id="zDEJP7" name="NetworkView.h" compile="0" resource="0" file="Source/Network/NetworkView.h"/>
+      <GROUP id="{D62FB906-6D23-F538-9E50-51D60BE97FA9}" name="Components">
+        <FILE id="PjEPSz" name="FormMaker.cpp" compile="1" resource="0" file="Source/Components/FormMaker.cpp"/>
+        <FILE id="TI8gpa" name="FormMaker.h" compile="0" resource="0" file="Source/Components/FormMaker.h"/>
+      </GROUP>
+      <GROUP id="{5E706FC3-ED10-D0D1-94B1-CD8403AD0C54}" name="Data">
+        <FILE id="TNCWPH" name="AutomatonContractData.cpp" compile="1" resource="0"
+              file="Source/Data/AutomatonContractData.cpp"/>
+        <FILE id="kZvXeA" name="AutomatonContractData.h" compile="0" resource="0"
+              file="Source/Data/AutomatonContractData.h"/>
+        <FILE id="wymDEN" name="KingAutomatonABI.h" compile="0" resource="0"
+              file="Source/Data/KingAutomatonABI.h"/>
       </GROUP>
       <GROUP id="{A93C79BF-CA8F-22F3-0EDD-09BDADF361D1}" name="Demos">
         <FILE id="KRBHkg" name="DemoSimNet.cpp" compile="1" resource="0" file="Source/Demos/DemoSimNet.cpp"/>
@@ -26,9 +34,9 @@
         <FILE id="Nf58cF" name="Miner.cpp" compile="1" resource="0" file="Source/Miner/Miner.cpp"/>
         <FILE id="asWXDO" name="Miner.h" compile="0" resource="0" file="Source/Miner/Miner.h"/>
       </GROUP>
-      <GROUP id="{D62FB906-6D23-F538-9E50-51D60BE97FA9}" name="Components">
-        <FILE id="PjEPSz" name="FormMaker.cpp" compile="1" resource="0" file="Source/Components/FormMaker.cpp"/>
-        <FILE id="TI8gpa" name="FormMaker.h" compile="0" resource="0" file="Source/Components/FormMaker.h"/>
+      <GROUP id="{F1D607D1-F524-496A-9278-B3EDBE19C280}" name="Network">
+        <FILE id="zxKSKI" name="NetworkView.cpp" compile="1" resource="0" file="Source/Network/NetworkView.cpp"/>
+        <FILE id="zDEJP7" name="NetworkView.h" compile="0" resource="0" file="Source/Network/NetworkView.h"/>
       </GROUP>
       <FILE id="f60Dju" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="dBsD3K" name="MainComponent.cpp" compile="1" resource="0"

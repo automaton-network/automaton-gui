@@ -18,6 +18,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
+#include "Data/AutomatonContractData.h"
 
 #include <curl/curl.h>
 
@@ -59,6 +60,8 @@ class PlaygroundGUIApplication: public JUCEApplication {
   }
 
   void shutdown() override {
+    AutomatonContractData::deleteInstance();
+
     mainWindow = nullptr;
 
     curl_global_cleanup();

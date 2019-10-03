@@ -45,19 +45,11 @@ class Miner:
   void textEditorTextChanged(TextEditor &) override;
 
   // Mining
-  struct slot {
+  struct mined_slot {
     std::string difficulty;
-    std::string owner;
+    std::string public_key;
     std::string private_key;
-
-    slot() {
-      // Set min difficulty.
-      char buf[32];
-      memset(buf, 0, 32);
-      buf[0] = 0xFF;
-      buf[1] = 0xF0;
-      difficulty = std::string(buf, 32);
-    }
+    uint32_t slot_index;
   };
 
   void initSlots();
@@ -67,20 +59,22 @@ class Miner:
   void stopMining();
   void createSignature();
 
-  size_t getSlotsNumber() { return slots.size(); }
-  slot& getSlot(int _slot) { return slots[_slot]; }
+  size_t getMinedSlotsNumber() { return mined_slots.size(); }
+  mined_slot& getMinedSlot(int _slot) { return mined_slots[_slot]; }
   unsigned char * getMask() { return mask; }
   unsigned char * getDifficulty() { return difficulty; }
 
-  void setMask(std::string _mask);
-  void setMinDifficulty(unsigned int _minDifficulty);
+  // void setMinDifficulty(unsigned int _minDifficulty);
+
+  void setMaskHex(std::string _mask);
+  void setMinDifficultyHex(std::string _minDifficulty);
   void setSlotsNumber(int _slotsNum);
   void setMinerAddress(std::string _address);
 
  private:
   // Mining
-  int totalSlots = 1024;
-  std::vector<slot> slots;
+  uint32 totalSlots = 1024;
+  std::vector<mined_slot> mined_slots;
 
   unsigned int total_keys_generated = 0;
   unsigned int last_keys_generated = 0;
@@ -92,19 +86,26 @@ class Miner:
   unsigned char difficulty[32];
   unsigned char minerAddress[32];
 
+  std::string private_key;
+  std::string eth_address;
+
   // UI
   TextEditor* txtRpcServer;
   Button* btnContract;
   TextEditor* txtContract;
-  TextEditor* txtMask;
+  // TextEditor* txtMask;
   TextEditor* txtMaskHex;
   TextEditor* txtMinerAddress;
   TextEditor* txtMinerInfo;
-  TextEditor* txtMinDifficulty;
+  // TextEditor* txtMinDifficulty;
   TextEditor* txtMinDifficultyHex;
   TextEditor* txtSlotsNum;
   TableListBox* tblSlots;
   TextEditor* txtClaim;
+
+  void importPrivateKey();
+  void updateContractData();
+  void claimMinedSlots();
 
   void timerCallback() override;
 

@@ -68,8 +68,7 @@ void DemosMainComponent::paint(Graphics& g) {
 }
 
 void DemosMainComponent::resized() {
-  auto b = getLocalBounds();
-
+  // auto b = getLocalBounds();
   // auto height = LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight();
   // menuBar->setBounds(b.removeFromTop(height));
 

@@ -19,36 +19,24 @@
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-#include "../Components/FormMaker.h"
 
-#include "automaton/core/crypto/cryptopp/secure_random_cryptopp.h"
-#include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
-#include "automaton/core/io/io.h"
+struct ValidatorSlot {
+  std::string difficulty;
+  std::string owner;
+  std::string last_claim_time;
+};
 
-class NetworkView:
-  public FormMaker,
-  private Timer {
+class AutomatonContractData {
  public:
-  //==============================================================================
-  NetworkView();
-  ~NetworkView();
+  std::string eth_url = "http://54.174.16.2:7545";
+  std::string contract_address = "0xc6A2d391fe7471EEF1D17bba1035351439bEcbBE";
+  std::string mask = "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF";
+  std::string minDifficulty = "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF";
+  uint32_t slots_number = 16;
+  uint32_t slots_claimed = 0;
+  std::vector<ValidatorSlot> slots;
 
-  void paint(Graphics& g) override;
-  void resized() override;
+  JUCE_DECLARE_SINGLETON(AutomatonContractData, true)
 
-  void update();
-
-  // Button::Listener overrides.
-  void buttonClicked(Button* btn) override;
-
-  // TextEditor::Listener overrides.
-  void textEditorTextChanged(TextEditor &) override;
-
-  void timerCallback() override;
-
- private:
-  TextEditor* txtURL;
-  TextEditor* txtContractAddress;
-
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NetworkView)
+  CriticalSection criticalSection;
 };

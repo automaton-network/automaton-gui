@@ -5,8 +5,11 @@
     <Filter Include="PlaygroundGUI\Resources">
       <UniqueIdentifier>{AE2B0A6C-5E8C-CDF5-BBA7-0BA1DA8C1FBD}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PlaygroundGUI\Source\Network">
-      <UniqueIdentifier>{56E50126-2C44-785B-FF52-6ADDB2E395F0}</UniqueIdentifier>
+    <Filter Include="PlaygroundGUI\Source\Components">
+      <UniqueIdentifier>{8B055C6F-F4AB-DB13-E936-6DDACE12A57B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlaygroundGUI\Source\Data">
+      <UniqueIdentifier>{6F63B73C-BAF2-B24A-C246-A4941CB462D4}</UniqueIdentifier>
     </Filter>
     <Filter Include="PlaygroundGUI\Source\Demos">
       <UniqueIdentifier>{C68BD2ED-9DD1-85D0-53AF-108FA6FA75E8}</UniqueIdentifier>
@@ -14,8 +17,8 @@
     <Filter Include="PlaygroundGUI\Source\Miner">
       <UniqueIdentifier>{A622B05B-83E0-B199-2F1F-CEEB4850EDB9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PlaygroundGUI\Source\Components">
-      <UniqueIdentifier>{8B055C6F-F4AB-DB13-E936-6DDACE12A57B}</UniqueIdentifier>
+    <Filter Include="PlaygroundGUI\Source\Network">
+      <UniqueIdentifier>{56E50126-2C44-785B-FF52-6ADDB2E395F0}</UniqueIdentifier>
     </Filter>
     <Filter Include="PlaygroundGUI\Source">
       <UniqueIdentifier>{80520A59-0ECE-F87A-E4EE-9B7B97051A3A}</UniqueIdentifier>
@@ -232,8 +235,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Network\NetworkView.cpp">
-      <Filter>PlaygroundGUI\Source\Network</Filter>
+    <ClCompile Include="..\..\Source\Components\FormMaker.cpp">
+      <Filter>PlaygroundGUI\Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Data\AutomatonContractData.cpp">
+      <Filter>PlaygroundGUI\Source\Data</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Demos\DemoSimNet.cpp">
       <Filter>PlaygroundGUI\Source\Demos</Filter>
@@ -244,8 +250,8 @@
     <ClCompile Include="..\..\Source\Miner\Miner.cpp">
       <Filter>PlaygroundGUI\Source\Miner</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Components\FormMaker.cpp">
-      <Filter>PlaygroundGUI\Source\Components</Filter>
+    <ClCompile Include="..\..\Source\Network\NetworkView.cpp">
+      <Filter>PlaygroundGUI\Source\Network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\MainComponent.cpp">
       <Filter>PlaygroundGUI\Source</Filter>
@@ -1533,8 +1539,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Network\NetworkView.h">
-      <Filter>PlaygroundGUI\Source\Network</Filter>
+    <ClInclude Include="..\..\Source\Components\FormMaker.h">
+      <Filter>PlaygroundGUI\Source\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Data\AutomatonContractData.h">
+      <Filter>PlaygroundGUI\Source\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Data\KingAutomatonABI.h">
+      <Filter>PlaygroundGUI\Source\Data</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Demos\DemoSimNet.h">
       <Filter>PlaygroundGUI\Source\Demos</Filter>
@@ -1545,8 +1557,8 @@
     <ClInclude Include="..\..\Source\Miner\Miner.h">
       <Filter>PlaygroundGUI\Source\Miner</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Components\FormMaker.h">
-      <Filter>PlaygroundGUI\Source\Components</Filter>
+    <ClInclude Include="..\..\Source\Network\NetworkView.h">
+      <Filter>PlaygroundGUI\Source\Network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\MainComponent.h">
       <Filter>PlaygroundGUI\Source</Filter>
