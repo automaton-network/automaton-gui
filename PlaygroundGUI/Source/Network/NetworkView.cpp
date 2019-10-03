@@ -18,6 +18,9 @@
 
 #include "NetworkView.h"
 
+#include "../Data/AutomatonContractData.h"
+#include "../Data/KingAutomatonABI.h"
+
 #include "secp256k1/include/secp256k1_recovery.h"
 #include "secp256k1/include/secp256k1.h"
 #include "secp256k1/src/hash_impl.h"
@@ -25,13 +28,36 @@
 #include "automaton/core/io/io.h"
 
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
+#include "automaton/core/interop/ethereum/eth_transaction.h"
+#include "automaton/core/interop/ethereum/eth_helper_functions.h"
 
 using automaton::core::common::status;
 using automaton::core::interop::ethereum::dec_to_32hex;
 using automaton::core::interop::ethereum::eth_contract;
-using automaton::core::interop::ethereum::hex_to_dec;
 using automaton::core::io::bin2hex;
+using automaton::core::io::dec2hex;
 using automaton::core::io::hex2bin;
+using automaton::core::io::hex2dec;
+
+// TODO(asen): Move Ethereum utilities to automaton/core/interop.
+
+status eth_parse_fixed_array(
+    std::string buffer,
+    size_t element_size,
+    std::vector<std::string>* result) {
+  if (buffer.size() < 64) {
+    return status::internal("Array too small!");
+  }
+  size_t elements_number = hex2dec(buffer.substr(0, 64));
+  if (buffer.size() != 64 + elements_number * element_size) {
+    return status::internal("Array elements number mismatch!");
+  }
+  result->clear();
+  for (size_t i = 0; i < elements_number; i++) {
+    result->push_back(hex2bin(buffer.substr(64 + i * element_size, 64)));
+  }
+  return status::ok();
+}
 
 //==============================================================================
 //  ReadContractThread
@@ -43,34 +69,30 @@ class ReadContractThread: public ThreadWithProgressWindow {
   std::string contract_addr;
   status s;
 
+  // Data imported from smart contract.
   uint32_t slots_number;
   uint32_t slots_claimed;
-  std::vector<std::string> slot_difficulty;
-  std::vector<std::string> slot_owner;
-  std::vector<std::string> slot_last_claim_time;
+  std::vector<ValidatorSlot> slots;
+  std::string mask;
+  std::string minDifficulty;
 
   ReadContractThread(std::string _url, std::string _contract_addr):
     ThreadWithProgressWindow("Reading Contract...", true, true),
-    s(status::ok()),
     url(_url),
-    contract_addr(_contract_addr) {}
+    contract_addr(_contract_addr),
+    s(status::ok())
+  {}
 
   void run() override {
-    eth_contract contract(url, contract_addr, {
-      {"getSlotsNumber", {"getSlotsNumber()", false}},
-      {"getSlotOwner", {"getSlotOwner(uint256)", false}},
-      {"getSlotDifficulty", {"getSlotDifficulty(uint256)", false}},
-      {"getSlotLastClaimTime", {"getSlotLastClaimTime(uint256)", false}},
-      {"getOwners", {"getOwners(uint256,uint256)", false}},
-      {"getDifficulties", {"getDifficulties(uint256,uint256)", false}},
-      {"getLastClaimTimes", {"getLastClaimTimes(uint256,uint256)", false}},
-      {"getMask", {"getMask()", false}},
-      {"getClaimed", {"getClaimed()", false}},
-      {"claimSlot", {"claimSlot(bytes32,bytes32,uint8,bytes32,bytes32)", true}}
-    });
+    eth_contract::register_contract(url, contract_addr, king_automaton_abi);
+    auto contract = eth_contract::get_contract(contract_addr);
+    if (contract == nullptr) {
+      s = status::internal("Contract is NULL!");
+      return;
+    }
 
     setProgress(0.1);
-    s = contract.call("", "getSlotsNumber", "");
+    s = contract->call("getSlotsNumber", "");
     if (!s.is_ok()) {
       return;
     }
@@ -78,9 +100,10 @@ class ReadContractThread: public ThreadWithProgressWindow {
       s = status::internal("Invalid contract address!");
       return;
     }
-    slots_number = hex_to_dec(s.msg);
+    slots_number = hex2dec(s.msg);
+    slots.resize(slots_number);
 
-    uint32_t step = 1000;
+    uint32_t step = 1024;
     for (uint32_t slot = 0; slot < slots_number; slot += step) {
       if (threadShouldExit()) {
         s = status::internal("Aborted");
@@ -89,65 +112,86 @@ class ReadContractThread: public ThreadWithProgressWindow {
       if (step > slots_number - slot) {
         step = slots_number - slot;
       }
-      setProgress(0.2 + (0.5 * slot) / slots_number);
+      setProgress((1.0 * slot) / slots_number);
       setStatusMessage(
-        "Getting slots [" +
-        String(slot) + " .. " + String(slot + step - 1) +
-        "] of " + String(slots_number));
+        "Getting slot " + String(slot + step) + " of " + String(slots_number));
 
-      s = contract.call("", "getOwners", dec_to_32hex(slot) + dec_to_32hex(step));
+      // Fetch owners.
+      s = contract->call("getOwners", dec_to_32hex(slot) + dec_to_32hex(step));
       if (!s.is_ok()) {
         return;
       }
 
-      s = contract.call("", "getDifficulties", dec_to_32hex(slot) + dec_to_32hex(step));
+      // Parse owners.
+      std::vector<std::string> owners_hex;
+      s = eth_parse_fixed_array(s.msg.substr(64), 64, &owners_hex);
+      if (!s.is_ok()) {
+        return;
+      }
+      for (uint32_t i = 0; i < owners_hex.size(); i++) {
+        slots[slot + i].owner = owners_hex[i];
+      }
+
+      // Fetch difficulties.
+      s = contract->call("getDifficulties", dec_to_32hex(slot) + dec_to_32hex(step));
       if (!s.is_ok()) {
         return;
       }
 
-      // s = contract->call("", "getLastClaimTimes", dec_to_32hex(slot) + dec_to_32hex(step));
-      // if (!s.is_ok()) {
-      //   return;
-      // }
-    }
+      // Parse difficulties.
+      std::vector<std::string> diff_hex;
+      s = eth_parse_fixed_array(s.msg.substr(64), 64, &diff_hex);
+      if (!s.is_ok()) {
+        return;
+      }
+      for (uint32_t i = 0; i < diff_hex.size(); i++) {
+        slots[slot + i].difficulty = diff_hex[i];
+      }
 
-    setProgress(0.9);
-    s = contract.call("", "getMask", "");
+      // Fetch last claim times.
+      s = contract->call("getLastClaimTimes", dec_to_32hex(slot) + dec_to_32hex(step));
+      if (!s.is_ok()) {
+        return;
+      }
+
+      // Parse last claim times.
+      std::vector<std::string> last_claims_hex;
+      s = eth_parse_fixed_array(s.msg.substr(64), 64, &last_claims_hex);
+      if (!s.is_ok()) {
+        return;
+      }
+      for (uint32_t i = 0; i < last_claims_hex.size(); i++) {
+        slots[slot + i].last_claim_time = last_claims_hex[i];
+      }
+    }
+    setProgress(0);
+
+    s = contract->call("getMask", "");
     if (!s.is_ok()) {
       return;
     }
-    setStatusMessage("Mask: " + s.msg);
-    wait(500);
+    mask = s.msg;
+    setStatusMessage("Mask: " + mask);
 
-    setProgress(0.9);
-    s = contract.call("", "getClaimed", "");
+    s = contract->call("getMinDifficulty", "");
     if (!s.is_ok()) {
       return;
     }
-    setStatusMessage("Number of slot claims: " + String(hex_to_dec(s.msg)));
-    wait(500);
+    minDifficulty = s.msg;
+    setStatusMessage("MinDifficulty: " + minDifficulty);
+
+    s = contract->call("getClaimed", "");
+    if (!s.is_ok()) {
+      return;
+    }
+    slots_claimed = hex2dec(s.msg);
+    setStatusMessage("Number of slot claims: " + String(slots_claimed));
 
     setProgress(1.0);
     s = status::ok();
   }
 
   void threadComplete(bool userPressedCancel) override {
-    wait(500);
-    if (userPressedCancel) {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Operation aborted!",
-                                       "Current settings were not affected.");
-    } else if (!s.is_ok()) {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Error occurred!",
-                                       s.msg);
-    } else {
-      AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,
-                                       "Operation successful!",
-                                       "Contract data loaded successfully and settings updated");
-    }
-
-    delete this;
   }
 };
 
@@ -156,16 +200,20 @@ class ReadContractThread: public ThreadWithProgressWindow {
 //==============================================================================
 
 NetworkView::NetworkView() {
+  auto cd = AutomatonContractData::getInstance();
+  ScopedLock lock(cd->criticalSection);
+
   // startTimer(1000);
   int y = 100;
   LBL("Ethereum RPC: ", 20, y, 100, 24);
   txtURL = TXT("URL", 120, y, 500, 24);
-  txtURL->setText("http://127.0.0.1:7545");
+  txtURL->setText(cd->eth_url);
 
   y += 30;
   LBL("Contract Address: ", 20, y, 100, 24);
   txtContractAddress = TXT("ADDR", 120, y, 500, 24);
   txtContractAddress->setInputRestrictions(42, "0123456789abcdefABCDEFx");
+  txtContractAddress->setText(cd->contract_address);
 
   y += 30;
   TB("Read Contract", 120, y, 120, 24);
@@ -185,7 +233,30 @@ void NetworkView::paint(Graphics& g) {
 void NetworkView::buttonClicked(Button* btn) {
   auto txt = btn->getButtonText();
   if (txt == "Read Contract") {
-    (new ReadContractThread(txtURL->getText().toStdString(), txtContractAddress->getText().toStdString()))->launchThread();
+    ReadContractThread t(txtURL->getText().toStdString(), txtContractAddress->getText().toStdString());
+    if (t.runThread(9)) {
+      if (!t.s.is_ok()) {
+      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                       "Error occurred!",
+                                       t.s.msg);
+      } else {
+        auto cd = AutomatonContractData::getInstance();
+        ScopedLock lock(cd->criticalSection);
+        cd->mask = t.mask;
+        cd->minDifficulty = t.minDifficulty;
+        cd->slots = t.slots;
+        cd->slots_number = t.slots_number;
+        cd->slots_claimed = t.slots_claimed;
+
+        AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,
+                                         "Operation successful!",
+                                         "Contract data loaded successfully and settings updated");
+      }
+    } else {
+      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                       "Operation aborted!",
+                                       "Current settings were not affected.");
+    }
   }
 }
 

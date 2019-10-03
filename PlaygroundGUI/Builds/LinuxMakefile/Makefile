@@ -68,11 +68,12 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS_APP := \
-  $(JUCE_OBJDIR)/NetworkView_2d1f0d3.o \
+  $(JUCE_OBJDIR)/FormMaker_de6ddb10.o \
+  $(JUCE_OBJDIR)/AutomatonContractData_2dae4430.o \
   $(JUCE_OBJDIR)/DemoSimNet_f027b031.o \
   $(JUCE_OBJDIR)/DemoMiner_b95613be.o \
   $(JUCE_OBJDIR)/Miner_521421b0.o \
-  $(JUCE_OBJDIR)/FormMaker_de6ddb10.o \
+  $(JUCE_OBJDIR)/NetworkView_2d1f0d3.o \
   $(JUCE_OBJDIR)/MainComponent_a6ffb4a5.o \
   $(JUCE_OBJDIR)/Main_90ebc5c2.o \
   $(JUCE_OBJDIR)/BinaryData_ce4232d4.o \
@@ -96,9 +97,14 @@ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
 	-$(V_AT)mkdir -p $(JUCE_OUTDIR)
 	$(V_AT)$(CXX) -o $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) $(OBJECTS_APP) $(JUCE_LDFLAGS) $(JUCE_LDFLAGS_APP) $(RESOURCES) $(TARGET_ARCH)
 
-$(JUCE_OBJDIR)/NetworkView_2d1f0d3.o: ../../Source/Network/NetworkView.cpp
+$(JUCE_OBJDIR)/FormMaker_de6ddb10.o: ../../Source/Components/FormMaker.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling NetworkView.cpp"
+	@echo "Compiling FormMaker.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/AutomatonContractData_2dae4430.o: ../../Source/Data/AutomatonContractData.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling AutomatonContractData.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/DemoSimNet_f027b031.o: ../../Source/Demos/DemoSimNet.cpp
@@ -116,9 +122,9 @@ $(JUCE_OBJDIR)/Miner_521421b0.o: ../../Source/Miner/Miner.cpp
 	@echo "Compiling Miner.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
-$(JUCE_OBJDIR)/FormMaker_de6ddb10.o: ../../Source/Components/FormMaker.cpp
+$(JUCE_OBJDIR)/NetworkView_2d1f0d3.o: ../../Source/Network/NetworkView.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling FormMaker.cpp"
+	@echo "Compiling NetworkView.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/MainComponent_a6ffb4a5.o: ../../Source/MainComponent.cpp
