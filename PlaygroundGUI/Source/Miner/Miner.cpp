@@ -245,7 +245,7 @@ class TableSlots: public TableListBox, TableListBoxModel {
         break;
       }
       case 3: {
-        text = "0x" + bin2hex(cd->slots[rowNumber].owner.substr(12));
+        text = "0x" + cd->slots[rowNumber].owner;
         break;
       }
       case 4: {
@@ -662,7 +662,7 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
     s = contract->call("claimSlot", t.sign_tx(bin2hex(private_key)));
     if (s.code == automaton::core::common::status::OK) {
       std::cout << "Claim slot result: " << s.msg << std::endl;
-      transaction_receipt = "0x" + s.msg;
+      transaction_receipt = s.msg;
     } else {
       return;
     }
