@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../JuceLibraryCode/JuceHeader.h"
 
 

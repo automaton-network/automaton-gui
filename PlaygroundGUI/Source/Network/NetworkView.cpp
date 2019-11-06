@@ -18,21 +18,24 @@
 
 #include "NetworkView.h"
 
-#include "../Data/AutomatonContractData.h"
+#include "../Data/AutomatonContractData.h"  // NOLINT
 #include "../Data/KingAutomatonABI.h"
 
 #include "secp256k1/include/secp256k1_recovery.h"
 #include "secp256k1/include/secp256k1.h"
 #include "secp256k1/src/hash_impl.h"
 #include "secp256k1/src/hash.h"
-#include "automaton/core/io/io.h"
+#include <json.hpp>
 
+#include "automaton/core/io/io.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
 
+using json = nlohmann::json;
+
 using automaton::core::common::status;
-using automaton::core::interop::ethereum::dec_to_32hex;
+using automaton::core::interop::ethereum::dec_to_i256;
 using automaton::core::interop::ethereum::eth_contract;
 using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
@@ -40,24 +43,6 @@ using automaton::core::io::hex2bin;
 using automaton::core::io::hex2dec;
 
 // TODO(asen): Move Ethereum utilities to automaton/core/interop.
-
-status eth_parse_fixed_array(
-    std::string buffer,
-    size_t element_size,
-    std::vector<std::string>* result) {
-  if (buffer.size() < 64) {
-    return status::internal("Array too small!");
-  }
-  size_t elements_number = hex2dec(buffer.substr(0, 64));
-  if (buffer.size() != 64 + elements_number * element_size) {
-    return status::internal("Array elements number mismatch!");
-  }
-  result->clear();
-  for (size_t i = 0; i < elements_number; i++) {
-    result->push_back(hex2bin(buffer.substr(64 + i * element_size, 64)));
-  }
-  return status::ok();
-}
 
 //==============================================================================
 //  ReadContractThread
@@ -100,7 +85,8 @@ class ReadContractThread: public ThreadWithProgressWindow {
       s = status::internal("Invalid contract address!");
       return;
     }
-    slots_number = hex2dec(s.msg);
+    json j_output = json::parse(s.msg);
+    slots_number = std::stoul((*j_output.begin()).get<std::string>());
     slots.resize(slots_number);
 
     uint32_t step = 1024;
@@ -116,76 +102,67 @@ class ReadContractThread: public ThreadWithProgressWindow {
       setStatusMessage(
         "Getting slot " + String(slot + step) + " of " + String(slots_number));
 
+      json j_input;
+      j_input.push_back(slot);
+      j_input.push_back(step);
+      std::string params = j_input.dump();
+
       // Fetch owners.
-      s = contract->call("getOwners", dec_to_32hex(slot) + dec_to_32hex(step));
+      s = contract->call("getOwners", params);
       if (!s.is_ok()) {
         return;
       }
 
       // Parse owners.
-      std::vector<std::string> owners_hex;
-      s = eth_parse_fixed_array(s.msg.substr(64), 64, &owners_hex);
-      if (!s.is_ok()) {
-        return;
-      }
-      for (uint32_t i = 0; i < owners_hex.size(); i++) {
-        slots[slot + i].owner = owners_hex[i];
+      j_output = json::parse(s.msg);
+      std::vector<std::string> owners = (*j_output.begin()).get<std::vector<std::string> >();
+      for (uint32_t i = 0; i < owners.size(); i++) {
+        slots[slot + i].owner = owners[i];
       }
 
       // Fetch difficulties.
-      s = contract->call("getDifficulties", dec_to_32hex(slot) + dec_to_32hex(step));
+      s = contract->call("getDifficulties", params);
       if (!s.is_ok()) {
         return;
       }
 
       // Parse difficulties.
-      std::vector<std::string> diff_hex;
-      s = eth_parse_fixed_array(s.msg.substr(64), 64, &diff_hex);
-      if (!s.is_ok()) {
-        return;
-      }
-      for (uint32_t i = 0; i < diff_hex.size(); i++) {
-        slots[slot + i].difficulty = diff_hex[i];
+      j_output = json::parse(s.msg);
+      std::vector<std::string> diff = (*j_output.begin()).get<std::vector<std::string> >();
+      for (uint32_t i = 0; i < diff.size(); i++) {
+        slots[slot + i].difficulty = dec_to_i256(false, diff[i]);
       }
 
       // Fetch last claim times.
-      s = contract->call("getLastClaimTimes", dec_to_32hex(slot) + dec_to_32hex(step));
+      s = contract->call("getLastClaimTimes", params);
       if (!s.is_ok()) {
         return;
       }
 
       // Parse last claim times.
-      std::vector<std::string> last_claims_hex;
-      s = eth_parse_fixed_array(s.msg.substr(64), 64, &last_claims_hex);
-      if (!s.is_ok()) {
-        return;
-      }
-      for (uint32_t i = 0; i < last_claims_hex.size(); i++) {
-        slots[slot + i].last_claim_time = last_claims_hex[i];
+      j_output = json::parse(s.msg);
+      std::vector<std::string> last_claims = (*j_output.begin()).get<std::vector<std::string> >();
+      for (uint32_t i = 0; i < last_claims.size(); i++) {
+        slots[slot + i].last_claim_time = last_claims[i];
       }
     }
     setProgress(0);
 
     s = contract->call("getMask", "");
-    if (!s.is_ok()) {
-      return;
-    }
-    mask = s.msg;
+    j_output = json::parse(s.msg);
+    mask = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     setStatusMessage("Mask: " + mask);
 
     s = contract->call("getMinDifficulty", "");
-    if (!s.is_ok()) {
-      return;
-    }
-    minDifficulty = s.msg;
+    j_output = json::parse(s.msg);
+    minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     setStatusMessage("MinDifficulty: " + minDifficulty);
 
     s = contract->call("getClaimed", "");
-    if (!s.is_ok()) {
-      return;
-    }
-    slots_claimed = hex2dec(s.msg);
-    setStatusMessage("Number of slot claims: " + String(slots_claimed));
+    j_output = json::parse(s.msg);
+    std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
+    slots_claimed = std::stoul(slots_claimed_string);
+    setStatusMessage("Number of slot claims: " + slots_claimed_string);
 
     setProgress(1.0);
     s = status::ok();
