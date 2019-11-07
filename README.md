@@ -4,7 +4,8 @@
 
 **Automaton Playground**
 
-Copyright (C) 2019 Asen Kovachev (@asenski, GitHub: akovachev)
+Copyright (c) 2019 The Automaton Playground Authors.
+Copyright (c) 2019 The automaton.network Authors.
 
 Automaton Playground is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or
 any later version.
