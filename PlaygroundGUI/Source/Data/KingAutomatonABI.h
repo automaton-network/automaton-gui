@@ -1,7 +1,7 @@
 /*
 * Automaton Playground
-* Copyright (c) 2017-2018 The Automaton Authors.
-* Copyright (c) 2017-2018 The automaton.network Authors.
+* Copyright (c) 2019 The Automaton Authors.
+* Copyright (c) 2019 The automaton.network Authors.
 *
 * Automaton Playground is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
