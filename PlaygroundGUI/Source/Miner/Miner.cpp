@@ -54,6 +54,8 @@ static std::string gen_ethereum_address(const unsigned char* priv_key) {
 
   if (!secp256k1_ec_pubkey_create(context, pubkey, priv_key)) {
     LOG(WARNING) << "Invalid priv_key " << bin2hex(std::string(reinterpret_cast<const char*>(priv_key), 32));
+    delete pubkey;
+    secp256k1_context_destroy(context);
     return "";
   }
 
@@ -62,6 +64,8 @@ static std::string gen_ethereum_address(const unsigned char* priv_key) {
   size_t outLen = 65;
   secp256k1_ec_pubkey_serialize(context, pub_key_serialized, &outLen, pubkey, SECP256K1_EC_UNCOMPRESSED);
   hash.calculate_digest(pub_key_serialized + 1, 64, eth_address);
+  delete pubkey;
+  secp256k1_context_destroy(context);
   return std::string(reinterpret_cast<char*>(eth_address + 12), 20);
 }
 
@@ -71,6 +75,8 @@ static std::string get_pub_key_x(const unsigned char* priv_key) {
 
   if (!secp256k1_ec_pubkey_create(context, pubkey, priv_key)) {
     LOG(WARNING) << "Invalid priv_key " << bin2hex(std::string(reinterpret_cast<const char*>(priv_key), 32));
+    delete pubkey;
+    secp256k1_context_destroy(context);
     return "";
   }
 
@@ -78,6 +84,8 @@ static std::string get_pub_key_x(const unsigned char* priv_key) {
   size_t outLen = 65;
   secp256k1_ec_pubkey_serialize(context, pub_key_serialized, &outLen, pubkey, SECP256K1_EC_UNCOMPRESSED);
   std::string pub_key_uncompressed(reinterpret_cast<char*>(pub_key_serialized), 65);
+  delete pubkey;
+  secp256k1_context_destroy(context);
   return std::string(reinterpret_cast<char*>(pub_key_serialized+1), 32);
 }
 
