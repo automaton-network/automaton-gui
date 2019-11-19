@@ -11,6 +11,12 @@ namespace BinaryData
     extern const char*   BIG_A_BLACK_CIRCLE_BACK_1000x1000_png;
     const int            BIG_A_BLACK_CIRCLE_BACK_1000x1000_pngSize = 60500;
 
+    extern const char*   default_config_json;
+    const int            default_config_jsonSize = 294;
+
+    extern const char*   king_automaton_abi_json;
+    const int            king_automaton_abi_jsonSize = 18187;
+
     extern const char*   PlayBold_ttf;
     const int            PlayBold_ttfSize = 210704;
 
@@ -18,7 +24,7 @@ namespace BinaryData
     const int            PlayRegular_ttfSize = 199020;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 3;
+    const int namedResourceListSize = 5;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

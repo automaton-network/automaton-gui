@@ -5,6 +5,9 @@
     <Filter Include="PlaygroundGUI\Resources">
       <UniqueIdentifier>{AE2B0A6C-5E8C-CDF5-BBA7-0BA1DA8C1FBD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PlaygroundGUI\Source\Config">
+      <UniqueIdentifier>{9A078B72-60A8-2792-7CF7-56CCCD57EC6E}</UniqueIdentifier>
+    </Filter>
     <Filter Include="PlaygroundGUI\Source\Components">
       <UniqueIdentifier>{8B055C6F-F4AB-DB13-E936-6DDACE12A57B}</UniqueIdentifier>
     </Filter>
@@ -235,6 +238,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Config\Config.cpp">
+      <Filter>PlaygroundGUI\Source\Config</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Components\FormMaker.cpp">
       <Filter>PlaygroundGUI\Source\Components</Filter>
     </ClCompile>
@@ -1141,6 +1147,9 @@
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GridItem.cpp">
       <Filter>JUCE Modules\juce_gui_basics\layout</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GridUnitTests.cpp">
+      <Filter>JUCE Modules\juce_gui_basics\layout</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.cpp">
       <Filter>JUCE Modules\juce_gui_basics\layout</Filter>
     </ClCompile>
@@ -1539,6 +1548,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Config\Config.h">
+      <Filter>PlaygroundGUI\Source\Config</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Components\FormMaker.h">
       <Filter>PlaygroundGUI\Source\Components</Filter>
     </ClInclude>
@@ -1920,9 +1932,6 @@
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\unit_tests\juce_UnitTest.h">
       <Filter>JUCE Modules\juce_core\unit_tests</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\unit_tests\juce_UnitTestCategories.h">
-      <Filter>JUCE Modules\juce_core\unit_tests</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\xml\juce_XmlDocument.h">
       <Filter>JUCE Modules\juce_core\xml</Filter>
     </ClInclude>
@@ -2209,9 +2218,6 @@
       <Filter>JUCE Modules\juce_graphics\image_formats\pnglib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngconf.h">
-      <Filter>JUCE Modules\juce_graphics\image_formats\pnglib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngdebug.h">
       <Filter>JUCE Modules\juce_graphics\image_formats\pnglib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pnginfo.h">
@@ -2771,6 +2777,15 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Resources\BIG_A_BLACK_CIRCLE_BACK_1000x1000.png">
+      <Filter>PlaygroundGUI\Resources</Filter>
+    </None>
+    <None Include="..\..\Resources\default_config.json">
+      <Filter>PlaygroundGUI\Resources</Filter>
+    </None>
+    <None Include="..\..\Resources\king_automaton_abi.json">
+      <Filter>PlaygroundGUI\Resources</Filter>
+    </None>
     <None Include="..\..\..\..\automaton\media\fonts\play\Play-Bold.ttf">
       <Filter>PlaygroundGUI\Resources</Filter>
     </None>

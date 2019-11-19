@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="Byh3dS" name="PlaygroundGUI" projectType="guiapp" jucerVersion="5.4.4"
+<JUCERPROJECT id="Byh3dS" name="PlaygroundGUI" projectType="guiapp" jucerVersion="5.4.3"
               version="0.0.1" companyName="Liberatix" companyWebsite="https://liberatix.com">
   <MAINGROUP id="r0wjCp" name="PlaygroundGUI">
     <GROUP id="{874C0493-36CA-5084-DAA0-C4287D2E83CF}" name="Resources">
       <FILE id="MDnkQK" name="BIG_A_BLACK_CIRCLE_BACK_1000x1000.png" compile="0"
             resource="1" file="Resources/BIG_A_BLACK_CIRCLE_BACK_1000x1000.png"
             xcodeResource="1"/>
+      <FILE id="x1rlyU" name="default_config.json" compile="0" resource="1"
+            file="Resources/default_config.json"/>
+      <FILE id="LKY9rv" name="king_automaton_abi.json" compile="0" resource="1"
+            file="Resources/king_automaton_abi.json"/>
       <FILE id="EZDdSv" name="Play-Bold.ttf" compile="0" resource="1" file="../../automaton/media/fonts/play/Play-Bold.ttf"/>
       <FILE id="DtzGtD" name="Play-Regular.ttf" compile="0" resource="1"
             file="../../automaton/media/fonts/play/Play-Regular.ttf"/>
     </GROUP>
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
+      <GROUP id="{CE63BB2E-4B73-1A4A-01A4-99B40D02D247}" name="Config">
+        <FILE id="yOA8V5" name="Config.cpp" compile="1" resource="0" file="Source/Config/Config.cpp"/>
+        <FILE id="egdrAA" name="Config.h" compile="1" resource="0" file="Source/Config/Config.h"/>
+      </GROUP>
       <GROUP id="{D62FB906-6D23-F538-9E50-51D60BE97FA9}" name="Components">
         <FILE id="PjEPSz" name="FormMaker.cpp" compile="1" resource="0" file="Source/Components/FormMaker.cpp"/>
         <FILE id="TI8gpa" name="FormMaker.h" compile="0" resource="0" file="Source/Components/FormMaker.h"/>
