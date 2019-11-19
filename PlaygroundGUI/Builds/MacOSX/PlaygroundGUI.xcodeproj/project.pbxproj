@@ -291,6 +291,13 @@
 			path = ../../Source/Demos/DemoSimNet.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		8B0AAA0091A485A31E7E7FB9 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file.json;
+			name = "king_automaton_abi.json";
+			path = "../../Resources/king_automaton_abi.json";
+			sourceTree = "SOURCE_ROOT";
+		};
 		8BA574E3329AE818352E2694 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.objcpp;
@@ -442,6 +449,7 @@
 			isa = PBXGroup;
 			children = (
 				6987C350E8D76C73DEEE0CF6,
+				8B0AAA0091A485A31E7E7FB9,
 				14E041721C1B23214867CB2B,
 				2886D3F006ED597D331F6F51,
 			);

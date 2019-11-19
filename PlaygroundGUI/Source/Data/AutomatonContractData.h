@@ -44,16 +44,10 @@ class AutomatonContractData {
     n = conf->get_number("slots_claimed");
     slots_claimed = n;
 
-    auto contract_abi = conf->get_json("contract_abi");
+    conf->get_abi();
 
     // TEST
-    // conf->set_and_save("eth_url", '"' + eth_url + '"');
-    // conf->set_and_save("contract_address", '"' + contract_address + '"');
-    // conf->set_and_save("mask", '"' + mask + '"');
-    // conf->set_and_save("min_difficulty", '"' + minDifficulty + '"');
-    // conf->set_and_save("slots_number", std::to_string(slots_number));
-    // conf->set_and_save("slots_claimed", std::to_string(slots_claimed));
-    // conf->set_and_save("contract_abi", contract_abi);
+    conf->save_to_local_file();
   }
 
   std::string eth_url;

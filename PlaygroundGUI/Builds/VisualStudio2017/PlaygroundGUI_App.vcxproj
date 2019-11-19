@@ -138,6 +138,7 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Config\Config.cpp"/>
     <ClCompile Include="..\..\Source\Components\FormMaker.cpp"/>
     <ClCompile Include="..\..\Source\Data\AutomatonContractData.cpp"/>
     <ClCompile Include="..\..\Source\Demos\DemoSimNet.cpp"/>
@@ -989,6 +990,9 @@
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GridItem.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GridUnitTests.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -1331,6 +1335,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Config\Config.h"/>
     <ClInclude Include="..\..\Source\Components\FormMaker.h"/>
     <ClInclude Include="..\..\Source\Data\AutomatonContractData.h"/>
     <ClInclude Include="..\..\Source\Data\KingAutomatonABI.h"/>
@@ -1458,7 +1463,6 @@
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\time\juce_RelativeTime.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\time\juce_Time.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\unit_tests\juce_UnitTest.h"/>
-    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\unit_tests\juce_UnitTestCategories.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\xml\juce_XmlDocument.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\xml\juce_XmlElement.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\zip\zlib\crc32.h"/>
@@ -1555,7 +1559,6 @@
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\jpglib\transupp.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\png.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngconf.h"/>
-    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngdebug.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pnginfo.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngpriv.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngstruct.h"/>
@@ -1743,6 +1746,9 @@
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h"/>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Resources\BIG_A_BLACK_CIRCLE_BACK_1000x1000.png"/>
+    <None Include="..\..\Resources\default_config.json"/>
+    <None Include="..\..\Resources\king_automaton_abi.json"/>
     <None Include="..\..\..\..\automaton\media\fonts\play\Play-Bold.ttf"/>
     <None Include="..\..\..\..\automaton\media\fonts\play\Play-Regular.ttf"/>
     <None Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\native\java\README.txt"/>

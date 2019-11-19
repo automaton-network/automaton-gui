@@ -9,6 +9,8 @@
             xcodeResource="1"/>
       <FILE id="x1rlyU" name="default_config.json" compile="0" resource="1"
             file="Resources/default_config.json"/>
+      <FILE id="LKY9rv" name="king_automaton_abi.json" compile="0" resource="1"
+            file="Resources/king_automaton_abi.json"/>
       <FILE id="EZDdSv" name="Play-Bold.ttf" compile="0" resource="1" file="../../automaton/media/fonts/play/Play-Bold.ttf"/>
       <FILE id="DtzGtD" name="Play-Regular.ttf" compile="0" resource="1"
             file="../../automaton/media/fonts/play/Play-Regular.ttf"/>
