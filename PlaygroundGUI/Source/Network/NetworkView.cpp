@@ -70,9 +70,11 @@ class ReadContractThread: public ThreadWithProgressWindow {
   {}
 
   void run() override {
-    eth_contract::register_contract(url, contract_addr, king_automaton_abi);
+    auto conf = Config::getInstance();
+    eth_contract::register_contract(url, contract_addr, conf->get_json("contract_abi"));
     auto contract = eth_contract::get_contract(contract_addr);
     if (contract == nullptr) {
+      std::cout << "ERROR: Contract is NULL" << std::endl;
       s = status::internal("Contract is NULL!");
       return;
     }
@@ -80,10 +82,12 @@ class ReadContractThread: public ThreadWithProgressWindow {
     setProgress(0.1);
     s = contract->call("getSlotsNumber", "");
     if (!s.is_ok()) {
+      std::cout << "ERROR: " << s.msg << std::endl;
       return;
     }
     if (s.msg.empty()) {
       s = status::internal("Invalid contract address!");
+      std::cout << "ERROR: Invalid contract address" << std::endl;
       return;
     }
     json j_output = json::parse(s.msg);
@@ -94,6 +98,7 @@ class ReadContractThread: public ThreadWithProgressWindow {
     for (uint32_t slot = 0; slot < slots_number; slot += step) {
       if (threadShouldExit()) {
         s = status::internal("Aborted");
+        std::cout << "ERROR: Aborted!" << std::endl;
         return;
       }
       if (step > slots_number - slot) {
@@ -111,6 +116,7 @@ class ReadContractThread: public ThreadWithProgressWindow {
       // Fetch owners.
       s = contract->call("getOwners", params);
       if (!s.is_ok()) {
+        std::cout << "ERROR: " << s.msg << std::endl;
         return;
       }
 
@@ -124,6 +130,7 @@ class ReadContractThread: public ThreadWithProgressWindow {
       // Fetch difficulties.
       s = contract->call("getDifficulties", params);
       if (!s.is_ok()) {
+        std::cout << "ERROR: " << s.msg << std::endl;
         return;
       }
 
@@ -137,6 +144,7 @@ class ReadContractThread: public ThreadWithProgressWindow {
       // Fetch last claim times.
       s = contract->call("getLastClaimTimes", params);
       if (!s.is_ok()) {
+        std::cout << "ERROR: " << s.msg << std::endl;
         return;
       }
 
