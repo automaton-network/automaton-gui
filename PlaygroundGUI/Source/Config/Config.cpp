@@ -31,7 +31,10 @@ Config::Config() {
 }
 
 Config::~Config() {
-  save_to_local_file();
+  auto s = save_to_local_file();
+  if (s.code != status::OK) {
+    std::cout << "Failed to save local config file! " << s.msg << std::endl;
+  }
   clearSingletonInstance();
 }
 
@@ -69,23 +72,33 @@ status Config::load() {
   return status::ok();
 }
 
-status Config::set(const std::string& field, const std::string& json_data) {
+void Config::set_json(const std::string& field, const std::string& data) {
   const ScopedLock Lock(critical_section);
   try {
-    json j = json::parse(json_data);
-    json_obj[field] = j;
+    json_obj[field] = json::parse(data);
   } catch (const std::exception& e) {
-    status s = status::unknown(e.what());
-    return s;
+    throw status::unknown(e.what());
   }
-  return status::ok();
+}
+
+void Config::set_string(const std::string& field, const std::string& data) {
+  const ScopedLock Lock(critical_section);
+  json_obj[field] = data;
+}
+
+void Config::set_bool(const std::string& field, bool data) {
+  const ScopedLock Lock(critical_section);
+  json_obj[field] = data;
+}
+
+void Config::set_number(const std::string& field, int64_t data) {
+  const ScopedLock Lock(critical_section);
+  json_obj[field] = data;
 }
 
 status Config::save_to_local_file() {
   const ScopedLock Lock(critical_section);
-  std::stringstream ss;
-  ss << json_obj;
-  std::string new_file_content = ss.str();
+  std::string new_file_content = json_obj.dump(2);
   File f = get_local_config_file();
   if (f.create().failed()) {
     std::cout << "File creation failed!" << std::endl;
@@ -99,40 +112,39 @@ status Config::save_to_local_file() {
   return status::ok();
 }
 
-std::string Config::get_json(const std::string& field) {
-  std::string res = "";
+std::string Config::get_json(const std::string& field) const {
+  const ScopedLock Lock(critical_section);
   if (json_obj.find(field) != json_obj.end() && !json_obj[field].is_null()) {
-    res = json_obj[field].dump();
+    return json_obj[field].dump();
   }
-  return res;
+  throw status::not_found("Field was not found!");
 }
 
-bool Config::get_bool(const std::string& field) {
-  bool res = false;
+bool Config::get_bool(const std::string& field) const {
+  const ScopedLock Lock(critical_section);
   if (json_obj.find(field) != json_obj.end() && json_obj[field].is_boolean()) {
-    // TODO(kari): handle errors
-    res = json_obj[field].get<bool>();
+    return json_obj[field].get<bool>();
   }
-  return res;
+  throw status::not_found("Field was not found!");
 }
 
-int64_t Config::get_number(const std::string& field) {
-  int64_t res = 0;
+int64_t Config::get_number(const std::string& field) const {
+  const ScopedLock Lock(critical_section);
   if (json_obj.find(field) != json_obj.end() && json_obj[field].is_number()) {
-    res = json_obj[field].get<int64_t>();
+    return json_obj[field].get<int64_t>();
   }
-  return res;
+  throw status::not_found("Field was not found!");
 }
 
-std::string Config::get_string(const std::string& field) {
-  std::string res = "";
+std::string Config::get_string(const std::string& field) const {
+  const ScopedLock Lock(critical_section);
   if (json_obj.find(field) != json_obj.end() && json_obj[field].is_string()) {
-    res = json_obj[field].get<std::string>();
+    return json_obj[field].get<std::string>();
   }
-  return res;
+  throw status::not_found("Field was not found!");
 }
 
-std::string Config::get_abi() {
+std::string Config::get_abi() const {
   return contract_abi;
 }
 
@@ -142,5 +154,12 @@ File Config::get_local_config_file() {
                 .getChildFile("config.json");
 }
 
+void Config::lock() {
+  critical_section.enter();
+}
+
+void Config::unlock() {
+  critical_section.exit();
+}
 
 JUCE_IMPLEMENT_SINGLETON(Config)

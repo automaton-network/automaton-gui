@@ -19,7 +19,6 @@
 
 #include "Miner.h"
 #include "../Data/AutomatonContractData.h"
-#include "../Data/KingAutomatonABI.h"
 
 #include "automaton/core/crypto/cryptopp/Keccak_256_cryptopp.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
@@ -414,7 +413,7 @@ void Miner::updateContractData() {
   ScopedLock lock(cd->criticalSection);
   setSlotsNumber(cd->slots_number);
   setMaskHex(cd->mask);
-  setMinDifficultyHex(cd->minDifficulty);
+  setMinDifficultyHex(cd->min_difficulty);
 }
 
 Miner::~Miner() {

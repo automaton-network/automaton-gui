@@ -20,7 +20,6 @@
 #include "NetworkView.h"
 
 #include "../Data/AutomatonContractData.h"  // NOLINT
-#include "../Data/KingAutomatonABI.h"
 
 #include "secp256k1/include/secp256k1_recovery.h"
 #include "secp256k1/include/secp256k1.h"
@@ -60,7 +59,7 @@ class ReadContractThread: public ThreadWithProgressWindow {
   uint32_t slots_claimed;
   std::vector<ValidatorSlot> slots;
   std::string mask;
-  std::string minDifficulty;
+  std::string min_difficulty;
 
   ReadContractThread(std::string _url, std::string _contract_addr):
     ThreadWithProgressWindow("Reading Contract...", true, true),
@@ -164,8 +163,8 @@ class ReadContractThread: public ThreadWithProgressWindow {
 
     s = contract->call("getMinDifficulty", "");
     j_output = json::parse(s.msg);
-    minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
-    setStatusMessage("MinDifficulty: " + minDifficulty);
+    min_difficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
+    setStatusMessage("MinDifficulty: " + min_difficulty);
 
     s = contract->call("getClaimed", "");
     j_output = json::parse(s.msg);
@@ -219,7 +218,14 @@ void NetworkView::paint(Graphics& g) {
 void NetworkView::buttonClicked(Button* btn) {
   auto txt = btn->getButtonText();
   if (txt == "Read Contract") {
-    ReadContractThread t(txtURL->getText().toStdString(), txtContractAddress->getText().toStdString());
+    std::string url = txtURL->getText().toStdString();
+    std::string address = txtContractAddress->getText().toStdString();
+    auto conf = Config::getInstance();
+    conf->lock();
+    conf->set_string("eth_url", url);
+    conf->set_string("contract_address", address);
+    conf->unlock();
+    ReadContractThread t(url, address);
     if (t.runThread(9)) {
       if (!t.s.is_ok()) {
       AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
@@ -229,10 +235,18 @@ void NetworkView::buttonClicked(Button* btn) {
         auto cd = AutomatonContractData::getInstance();
         ScopedLock lock(cd->criticalSection);
         cd->mask = t.mask;
-        cd->minDifficulty = t.minDifficulty;
+        cd->min_difficulty = t.min_difficulty;
         cd->slots = t.slots;
         cd->slots_number = t.slots_number;
         cd->slots_claimed = t.slots_claimed;
+
+        auto conf = Config::getInstance();
+        conf->lock();
+        conf->set_string("mask", t.mask);
+        conf->set_string("min_difficulty", t.min_difficulty);
+        conf->set_number("slots_number", t.slots_number);
+        conf->set_number("slots_claimed", t.slots_claimed);
+        conf->unlock();
 
         AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,
                                          "Operation successful!",
