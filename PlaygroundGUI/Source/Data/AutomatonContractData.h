@@ -51,8 +51,8 @@ class AutomatonContractData {
 
     // TEST
     conf->lock();
-    conf->set("test_field", "17");
-    conf->set("test_field2", "[\"non\",\"empty\"]");
+    conf->set_number("test_field", 17);
+    conf->set_json("test_field2", "[\"non\",\"empty\"]");
     conf->save_to_local_file();
     conf->unlock();
   }

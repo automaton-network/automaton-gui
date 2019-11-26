@@ -222,9 +222,8 @@ void NetworkView::buttonClicked(Button* btn) {
     std::string address = txtContractAddress->getText().toStdString();
     auto conf = Config::getInstance();
     conf->lock();
-    status s = status::ok();
-    s = conf->set("eth_url", '"' + url + '"');
-    s = conf->set("contract_address", '"' + address + '"');
+    conf->set_string("eth_url", url);
+    conf->set_string("contract_address", address);
     conf->unlock();
     ReadContractThread t(url, address);
     if (t.runThread(9)) {
@@ -243,10 +242,10 @@ void NetworkView::buttonClicked(Button* btn) {
 
         auto conf = Config::getInstance();
         conf->lock();
-        conf->set("mask", '"' + t.mask + '"');
-        conf->set("min_difficulty", '"' + t.min_difficulty + '"');
-        conf->set("slots_number", std::to_string(t.slots_number));
-        conf->set("slots_claimed", std::to_string(t.slots_claimed));
+        conf->set_string("mask", t.mask);
+        conf->set_string("min_difficulty", t.min_difficulty);
+        conf->set_number("slots_number", t.slots_number);
+        conf->set_number("slots_claimed", t.slots_claimed);
         conf->unlock();
 
         AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,

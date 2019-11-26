@@ -72,15 +72,28 @@ status Config::load() {
   return status::ok();
 }
 
-status Config::set(const std::string& field, const std::string& json_data) {
+void Config::set_json(const std::string& field, const std::string& data) {
   const ScopedLock Lock(critical_section);
   try {
-    json_obj[field] = json::parse(json_data);
+    json_obj[field] = json::parse(data);
   } catch (const std::exception& e) {
-    status s = status::unknown(e.what());
-    return s;
+    throw status::unknown(e.what());
   }
-  return status::ok();
+}
+
+void Config::set_string(const std::string& field, const std::string& data) {
+  const ScopedLock Lock(critical_section);
+  json_obj[field] = data;
+}
+
+void Config::set_bool(const std::string& field, bool data) {
+  const ScopedLock Lock(critical_section);
+  json_obj[field] = data;
+}
+
+void Config::set_number(const std::string& field, int64_t data) {
+  const ScopedLock Lock(critical_section);
+  json_obj[field] = data;
 }
 
 status Config::save_to_local_file() {
