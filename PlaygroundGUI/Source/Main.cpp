@@ -62,6 +62,7 @@ class PlaygroundGUIApplication: public JUCEApplication {
 
   void shutdown() override {
     AutomatonContractData::deleteInstance();
+    Config::deleteInstance();
 
     mainWindow = nullptr;
 

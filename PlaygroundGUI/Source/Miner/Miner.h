@@ -83,7 +83,7 @@ class Miner:
   int64 last_time = 0;
   OwnedArray<Thread> miners;
   unsigned char mask[32];
-  unsigned int minDifficulty;
+  unsigned int min_difficulty;
   unsigned char difficulty[32];
   unsigned char minerAddress[32];
 

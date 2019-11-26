@@ -35,12 +35,14 @@ class Config {
   automaton::core::common::status load();
   automaton::core::common::status set(const std::string& field, const std::string& json_data);
   automaton::core::common::status save_to_local_file();
-  std::string get_json(const std::string& field);
-  bool get_bool(const std::string& field);
-  int64_t get_number(const std::string& field);
-  std::string get_string(const std::string& field);
-  std::string get_abi();
+  std::string get_json(const std::string& field) const;
+  bool get_bool(const std::string& field) const;
+  int64_t get_number(const std::string& field) const;
+  std::string get_string(const std::string& field) const;
+  std::string get_abi() const;
   File get_local_config_file();
+  void lock();
+  void unlock();
 
   JUCE_DECLARE_SINGLETON(Config, false)
  private:

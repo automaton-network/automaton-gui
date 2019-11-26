@@ -32,28 +32,35 @@ class AutomatonContractData {
  public:
   AutomatonContractData() {
     auto conf = Config::getInstance();
-    eth_url = conf->get_string("eth_url");  // = "http://54.174.16.2:7545";
+    eth_url = conf->get_string("eth_url");
     contract_address = conf->get_string("contract_address");
-    // "0xc6A2d391fe7471EEF1D17bba1035351439bEcbBE";
     mask = conf->get_string("mask");
-    // "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF";
-    minDifficulty = conf->get_string("min_difficulty");
-    // "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF";
-    auto n = conf->get_number("slots_number");
-    slots_number = n != 0 ? n : 16;
-    n = conf->get_number("slots_claimed");
-    slots_claimed = n;
+    min_difficulty = conf->get_string("min_difficulty");
+    try {
+      slots_number = conf->get_number("slots_number");
+    } catch (...) {
+      slots_number = 0;
+    }
+    try {
+      slots_claimed = conf->get_number("slots_claimed");
+    } catch (...) {
+      slots_claimed = 0;
+    }
 
     conf->get_abi();
 
     // TEST
+    conf->lock();
+    conf->set("test_field", "17");
+    conf->set("test_field2", "[\"non\",\"empty\"]");
     conf->save_to_local_file();
+    conf->unlock();
   }
 
   std::string eth_url;
   std::string contract_address;
   std::string mask;
-  std::string minDifficulty;
+  std::string min_difficulty;
   uint32_t slots_number;
   uint32_t slots_claimed;
   std::vector<ValidatorSlot> slots;
