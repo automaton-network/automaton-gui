@@ -141,6 +141,7 @@
     <ClCompile Include="..\..\Source\Config\Config.cpp"/>
     <ClCompile Include="..\..\Source\Components\FormMaker.cpp"/>
     <ClCompile Include="..\..\Source\Data\AutomatonContractData.cpp"/>
+    <ClCompile Include="..\..\Source\Demos\DemoGrid.cpp"/>
     <ClCompile Include="..\..\Source\Demos\DemoSimNet.cpp"/>
     <ClCompile Include="..\..\Source\Demos\DemoMiner.cpp"/>
     <ClCompile Include="..\..\Source\Miner\Miner.cpp"/>
@@ -1338,7 +1339,7 @@
     <ClInclude Include="..\..\Source\Config\Config.h"/>
     <ClInclude Include="..\..\Source\Components\FormMaker.h"/>
     <ClInclude Include="..\..\Source\Data\AutomatonContractData.h"/>
-    <ClInclude Include="..\..\Source\Data\KingAutomatonABI.h"/>
+    <ClInclude Include="..\..\Source\Demos\DemoGrid.h"/>
     <ClInclude Include="..\..\Source\Demos\DemoSimNet.h"/>
     <ClInclude Include="..\..\Source\Demos\DemoMiner.h"/>
     <ClInclude Include="..\..\Source\Miner\Miner.h"/>

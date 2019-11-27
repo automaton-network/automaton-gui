@@ -71,6 +71,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/Config_ddf25eb0.o \
   $(JUCE_OBJDIR)/FormMaker_de6ddb10.o \
   $(JUCE_OBJDIR)/AutomatonContractData_2dae4430.o \
+  $(JUCE_OBJDIR)/DemoGrid_cd2fdfb1.o \
   $(JUCE_OBJDIR)/DemoSimNet_f027b031.o \
   $(JUCE_OBJDIR)/DemoMiner_b95613be.o \
   $(JUCE_OBJDIR)/Miner_521421b0.o \
@@ -111,6 +112,11 @@ $(JUCE_OBJDIR)/FormMaker_de6ddb10.o: ../../Source/Components/FormMaker.cpp
 $(JUCE_OBJDIR)/AutomatonContractData_2dae4430.o: ../../Source/Data/AutomatonContractData.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling AutomatonContractData.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/DemoGrid_cd2fdfb1.o: ../../Source/Demos/DemoGrid.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling DemoGrid.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/DemoSimNet_f027b031.o: ../../Source/Demos/DemoSimNet.cpp

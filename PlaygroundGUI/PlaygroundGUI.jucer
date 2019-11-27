@@ -29,10 +29,10 @@
               file="Source/Data/AutomatonContractData.cpp"/>
         <FILE id="kZvXeA" name="AutomatonContractData.h" compile="0" resource="0"
               file="Source/Data/AutomatonContractData.h"/>
-        <FILE id="wymDEN" name="KingAutomatonABI.h" compile="0" resource="0"
-              file="Source/Data/KingAutomatonABI.h"/>
       </GROUP>
       <GROUP id="{A93C79BF-CA8F-22F3-0EDD-09BDADF361D1}" name="Demos">
+        <FILE id="xKuhn6" name="DemoGrid.cpp" compile="1" resource="0" file="Source/Demos/DemoGrid.cpp"/>
+        <FILE id="qqi2Qx" name="DemoGrid.h" compile="0" resource="0" file="Source/Demos/DemoGrid.h"/>
         <FILE id="KRBHkg" name="DemoSimNet.cpp" compile="1" resource="0" file="Source/Demos/DemoSimNet.cpp"/>
         <FILE id="BUy8fY" name="DemoSimNet.h" compile="0" resource="0" file="Source/Demos/DemoSimNet.h"/>
         <FILE id="PWvkef" name="DemoMiner.cpp" compile="1" resource="0" file="Source/Demos/DemoMiner.cpp"/>
