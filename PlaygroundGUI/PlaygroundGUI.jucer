@@ -23,6 +23,9 @@
       <GROUP id="{D62FB906-6D23-F538-9E50-51D60BE97FA9}" name="Components">
         <FILE id="PjEPSz" name="FormMaker.cpp" compile="1" resource="0" file="Source/Components/FormMaker.cpp"/>
         <FILE id="TI8gpa" name="FormMaker.h" compile="0" resource="0" file="Source/Components/FormMaker.h"/>
+        <FILE id="YkvQZA" name="ValidatorGrid.cpp" compile="1" resource="0"
+              file="Source/Components/ValidatorGrid.cpp"/>
+        <FILE id="bqQwuG" name="ValidatorGrid.h" compile="0" resource="0" file="Source/Components/ValidatorGrid.h"/>
       </GROUP>
       <GROUP id="{5E706FC3-ED10-D0D1-94B1-CD8403AD0C54}" name="Data">
         <FILE id="TNCWPH" name="AutomatonContractData.cpp" compile="1" resource="0"

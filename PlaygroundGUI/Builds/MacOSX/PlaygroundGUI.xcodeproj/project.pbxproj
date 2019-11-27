@@ -53,6 +53,10 @@
 			isa = PBXBuildFile;
 			fileRef = EB48C8B94DF3F88534EF2E02;
 		};
+		680397493A45449A817BD319 = {
+			isa = PBXBuildFile;
+			fileRef = 674BD8AB93DB872747B5BE69;
+		};
 		C04966EEAA0333308456359D = {
 			isa = PBXBuildFile;
 			fileRef = B64797D3D8C773778F4625FB;
@@ -253,6 +257,13 @@
 			path = ../../Source/Demos/DemoMiner.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		674BD8AB93DB872747B5BE69 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ValidatorGrid.cpp;
+			path = ../../Source/Components/ValidatorGrid.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		674DB7AB7B8ED07B0A8F11AF = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
@@ -328,6 +339,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Main.cpp;
 			path = ../../Source/Main.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		A13B15A0E08E44FD6C17A560 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ValidatorGrid.h;
+			path = ../../Source/Components/ValidatorGrid.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		A15FF7D403907D9F060AC235 = {
@@ -481,6 +499,8 @@
 			children = (
 				EB48C8B94DF3F88534EF2E02,
 				510F04B2A4332278F5F209C3,
+				674BD8AB93DB872747B5BE69,
+				A13B15A0E08E44FD6C17A560,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -843,6 +863,7 @@
 				A43EEE53B12550669E555382,
 				AE1A08B1BFB106256FE4F53E,
 				88D3B11922D089AF4E26BDC0,
+				680397493A45449A817BD319,
 				C04966EEAA0333308456359D,
 				9104E8F6687A7FD224B757A9,
 				72A5DC1947B05EC06287675C,
