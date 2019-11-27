@@ -57,6 +57,10 @@
 			isa = PBXBuildFile;
 			fileRef = B64797D3D8C773778F4625FB;
 		};
+		9104E8F6687A7FD224B757A9 = {
+			isa = PBXBuildFile;
+			fileRef = 0F3E15670DE5E9D260B52A7C;
+		};
 		72A5DC1947B05EC06287675C = {
 			isa = PBXBuildFile;
 			fileRef = 86E313C97F6DB40B327704DB;
@@ -142,6 +146,13 @@
 			lastKnownFileType = file;
 			name = "juce_data_structures";
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_data_structures";
+			sourceTree = "SOURCE_ROOT";
+		};
+		0F3E15670DE5E9D260B52A7C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = DemoGrid.cpp;
+			path = ../../Source/Demos/DemoGrid.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		1052D5A686D26AD868CFADAF = {
@@ -319,6 +330,13 @@
 			path = ../../Source/Main.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		A15FF7D403907D9F060AC235 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = DemoGrid.h;
+			path = ../../Source/Demos/DemoGrid.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		A21E8A52E54BAB407CE8D405 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -359,13 +377,6 @@
 			lastKnownFileType = text.plist.xml;
 			name = "Info-App.plist";
 			path = "Info-App.plist";
-			sourceTree = "SOURCE_ROOT";
-		};
-		CA768AB0754F7EEE97816FDE = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = KingAutomatonABI.h;
-			path = ../../Source/Data/KingAutomatonABI.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		D0E6A5F1B630686C8DA092DC = {
@@ -479,7 +490,6 @@
 			children = (
 				B64797D3D8C773778F4625FB,
 				A21E8A52E54BAB407CE8D405,
-				CA768AB0754F7EEE97816FDE,
 			);
 			name = Data;
 			sourceTree = "<group>";
@@ -487,6 +497,8 @@
 		D42076CCB651D5CCB42A7F0D = {
 			isa = PBXGroup;
 			children = (
+				0F3E15670DE5E9D260B52A7C,
+				A15FF7D403907D9F060AC235,
 				86E313C97F6DB40B327704DB,
 				D752613D5D9683073A9F79DD,
 				F87EDB042F4AD000D575BE55,
@@ -832,6 +844,7 @@
 				AE1A08B1BFB106256FE4F53E,
 				88D3B11922D089AF4E26BDC0,
 				C04966EEAA0333308456359D,
+				9104E8F6687A7FD224B757A9,
 				72A5DC1947B05EC06287675C,
 				EED2358D21B09846AA8B17BD,
 				6C764B7D3E1A849226C54B02,

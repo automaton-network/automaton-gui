@@ -247,6 +247,9 @@
     <ClCompile Include="..\..\Source\Data\AutomatonContractData.cpp">
       <Filter>PlaygroundGUI\Source\Data</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Demos\DemoGrid.cpp">
+      <Filter>PlaygroundGUI\Source\Demos</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Demos\DemoSimNet.cpp">
       <Filter>PlaygroundGUI\Source\Demos</Filter>
     </ClCompile>
@@ -1557,8 +1560,8 @@
     <ClInclude Include="..\..\Source\Data\AutomatonContractData.h">
       <Filter>PlaygroundGUI\Source\Data</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Data\KingAutomatonABI.h">
-      <Filter>PlaygroundGUI\Source\Data</Filter>
+    <ClInclude Include="..\..\Source\Demos\DemoGrid.h">
+      <Filter>PlaygroundGUI\Source\Demos</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Demos\DemoSimNet.h">
       <Filter>PlaygroundGUI\Source\Demos</Filter>
