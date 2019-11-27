@@ -120,7 +120,6 @@ void ValidatorGrid::paint(Graphics& g) {
         g.setColour(col);
         g.fillRect(rect);
         if (slots[slot_index].is_mine) {
-          rect.expand(gap, gap);
           g.setColour(Colours::red);
           g.drawRect(rect);
         }
@@ -166,7 +165,7 @@ void ValidatorGrid::resized() {
 
   slot_size = std::floor((static_cast<double>(component_side_size_px - 2) / slots_per_side));
   gap = slot_size > 3 ? 1 : 0;  // TODO(kari): Better formula
-  gap = slot_size > 30 ? 3 : gap;
+  gap = slot_size > 30 ? 2 : gap;
   slot_size -= gap;
   component_side_size_px = slots_per_side * (slot_size + gap) + gap;
 }
