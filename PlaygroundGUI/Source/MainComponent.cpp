@@ -56,7 +56,7 @@ DemosMainComponent::DemosMainComponent() {
   tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("DApps"), Colour(0xff404040), new DemoBlank(), true);
-  tabbedComponent->addTab(TRANS("Demo Grid"), Colour(0xff404040), new DemoGrid(model, TEST_OWNER, 600, true), true);
+  tabbedComponent->addTab(TRANS("Demo Grid"), Colour(0xff404040), new DemoGrid(model, TEST_OWNER), true);
   // tabbedComponent->addTab(TRANS("Network Simulation"), Colour(0xff404040), new DemoSimNet(), true);
   tabbedComponent->setCurrentTabIndex(0);
 

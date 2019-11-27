@@ -244,6 +244,9 @@
     <ClCompile Include="..\..\Source\Components\FormMaker.cpp">
       <Filter>PlaygroundGUI\Source\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Components\ValidatorGrid.cpp">
+      <Filter>PlaygroundGUI\Source\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Data\AutomatonContractData.cpp">
       <Filter>PlaygroundGUI\Source\Data</Filter>
     </ClCompile>
@@ -1555,6 +1558,9 @@
       <Filter>PlaygroundGUI\Source\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Components\FormMaker.h">
+      <Filter>PlaygroundGUI\Source\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Components\ValidatorGrid.h">
       <Filter>PlaygroundGUI\Source\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Data\AutomatonContractData.h">
