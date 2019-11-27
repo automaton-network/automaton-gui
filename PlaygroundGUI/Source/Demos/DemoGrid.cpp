@@ -156,7 +156,7 @@ void DemoGrid::update() {
       slots[i].bits = leading_bits(slots[i].difficulty);
     }
 
-    if (slots[i].bits < min_leading_bits) {
+    if (slots[i].bits && slots[i].bits < min_leading_bits) {
       min_leading_bits = slots[i].bits;
     }
     if (slots[i].bits > max_leading_bits) {
