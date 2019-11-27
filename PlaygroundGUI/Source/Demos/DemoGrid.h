@@ -25,6 +25,7 @@ static const char* TEST_OWNER = "thisistestownerthisistestowner00";
 
 class SlotsModelInterface {
  public:
+  virtual ~SlotsModelInterface() {}
   virtual uint32_t get_slots_number() = 0;
   virtual std::string get_slot_owner(uint32_t slot_index) = 0;
   virtual std::string get_slot_difficulty(uint32_t slot_index) = 0;
