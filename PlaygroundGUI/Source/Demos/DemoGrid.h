@@ -22,27 +22,9 @@
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Components/ValidatorGrid.h"
 
-static const char* TEST_OWNER = "thisistestownerthisistestowner00";
-
-class SlotsModelTest: public SlotsModelInterface {
- public:
-  SlotsModelTest();
-
-  uint32_t get_slots_number();
-
-  std::string get_slot_owner(uint32_t slot_index);
-
-  std::string get_slot_difficulty(uint32_t slot_index);
-
- private:
-  uint32_t slots_number;
-  std::vector<std::string> owners;
-  std::vector<std::string> difficulties;
-};
-
 class DemoGrid: public Component, private Timer {
  public:
-  DemoGrid(std::shared_ptr<SlotsModelInterface> model, const std::string& owner);
+  DemoGrid();
   ~DemoGrid();
 
   void resized() override;
