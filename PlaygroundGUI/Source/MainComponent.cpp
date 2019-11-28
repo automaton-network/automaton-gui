@@ -45,8 +45,6 @@ DemosMainComponent::DemosMainComponent() {
   // menuBar.reset(new MenuBarComponent(this));
   // addAndMakeVisible(menuBar.get());
 
-  std::shared_ptr<SlotsModelInterface> model = std::make_shared<SlotsModelTest>();
-
   tabbedComponent.reset(new TabbedComponent(TabbedButtonBar::TabsAtTop));
   addAndMakeVisible(tabbedComponent.get());
   tabbedComponent->setTabBarDepth(37);
@@ -56,7 +54,7 @@ DemosMainComponent::DemosMainComponent() {
   tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("DApps"), Colour(0xff404040), new DemoBlank(), true);
-  tabbedComponent->addTab(TRANS("Demo Grid"), Colour(0xff404040), new DemoGrid(model, TEST_OWNER), true);
+  tabbedComponent->addTab(TRANS("Demo Grid"), Colour(0xff404040), new DemoGrid(), true);
   // tabbedComponent->addTab(TRANS("Network Simulation"), Colour(0xff404040), new DemoSimNet(), true);
   tabbedComponent->setCurrentTabIndex(0);
 

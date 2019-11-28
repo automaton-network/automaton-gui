@@ -19,8 +19,46 @@
 
 #include "DemoGrid.h"
 
-DemoGrid::DemoGrid(std::shared_ptr<SlotsModelInterface> model, const std::string& owner):
-    grid_component(model, owner, true) {
+static const char* TEST_OWNER = "thisistestownerthisistestowner00";
+
+class SlotsModelTest: public SlotsModelInterface {
+ public:
+  SlotsModelTest() {
+    srand(time(NULL));
+    slots_number = 1000;
+    owners.resize(slots_number, std::string('0', 32));
+    difficulties.resize(slots_number, std::string('0', 32));
+  }
+
+  uint32_t get_slots_number() {
+    return slots_number;
+  }
+
+  std::string get_slot_owner(uint32_t slot_index) {
+    return owners[slot_index];
+  }
+
+  std::string get_slot_difficulty(uint32_t slot_index) {
+    uint32_t k = std::rand() % 100;
+    if (k > 65) {
+      for (uint i = 0; i < 32; ++i) {
+        owners[slot_index][i] = 'a' + std::rand() % 26;
+        difficulties[slot_index][i] = std::rand() % 256;
+      }
+      if (k > 97) {
+        owners[slot_index] = TEST_OWNER;
+      }
+    }
+    return difficulties[slot_index];
+  }
+
+ private:
+  uint32_t slots_number;
+  std::vector<std::string> owners;
+  std::vector<std::string> difficulties;
+};
+
+DemoGrid::DemoGrid():grid_component(std::make_shared<SlotsModelTest>(), TEST_OWNER, true) {
   addAndMakeVisible(grid_component);
   grid_component.setBounds(50, 50, 600, 600);
   startTimer(1000);
@@ -37,35 +75,4 @@ void DemoGrid::resized() {}
 void DemoGrid::timerCallback() {
   update();
   repaint();
-}
-
-// ======================= TEST ===============================
-
-SlotsModelTest::SlotsModelTest() {
-  srand(time(NULL));
-  slots_number = 1000;
-  owners.resize(slots_number, std::string('0', 32));
-  difficulties.resize(slots_number, std::string('0', 32));
-}
-
-uint32_t SlotsModelTest::get_slots_number() {
-  return slots_number;
-}
-
-std::string SlotsModelTest::get_slot_owner(uint32_t slot_index) {
-  return owners[slot_index];
-}
-
-std::string SlotsModelTest::get_slot_difficulty(uint32_t slot_index) {
-  uint32_t k = std::rand() % 100;
-  if (k > 65) {
-    for (uint i = 0; i < 32; ++i) {
-      owners[slot_index][i] = 'a' + std::rand() % 26;
-      difficulties[slot_index][i] = std::rand() % 256;
-    }
-    if (k > 97) {
-      owners[slot_index] = TEST_OWNER;
-    }
-  }
-  return difficulties[slot_index];
 }
