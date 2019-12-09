@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="Byh3dS" name="PlaygroundGUI" projectType="guiapp" jucerVersion="5.4.3"
+<JUCERPROJECT id="Byh3dS" name="PlaygroundGUI" projectType="guiapp" jucerVersion="5.4.5"
               version="0.0.1" companyName="Liberatix" companyWebsite="https://liberatix.com">
   <MAINGROUP id="r0wjCp" name="PlaygroundGUI">
     <GROUP id="{874C0493-36CA-5084-DAA0-C4287D2E83CF}" name="Resources">
@@ -117,5 +117,5 @@
     <OSX/>
     <LINUX/>
   </LIVE_SETTINGS>
-  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_WEB_BROWSER="0"/>
+  <JUCEOPTIONS JUCE_WEB_BROWSER="0"/>
 </JUCERPROJECT>
