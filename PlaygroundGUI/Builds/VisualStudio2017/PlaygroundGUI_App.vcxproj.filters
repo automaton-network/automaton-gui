@@ -1153,9 +1153,6 @@
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GridItem.cpp">
       <Filter>JUCE Modules\juce_gui_basics\layout</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GridUnitTests.cpp">
-      <Filter>JUCE Modules\juce_gui_basics\layout</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.cpp">
       <Filter>JUCE Modules\juce_gui_basics\layout</Filter>
     </ClCompile>
@@ -1941,6 +1938,9 @@
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\unit_tests\juce_UnitTest.h">
       <Filter>JUCE Modules\juce_core\unit_tests</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\unit_tests\juce_UnitTestCategories.h">
+      <Filter>JUCE Modules\juce_core\unit_tests</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\xml\juce_XmlDocument.h">
       <Filter>JUCE Modules\juce_core\xml</Filter>
     </ClInclude>
@@ -2227,6 +2227,9 @@
       <Filter>JUCE Modules\juce_graphics\image_formats\pnglib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngconf.h">
+      <Filter>JUCE Modules\juce_graphics\image_formats\pnglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pngdebug.h">
       <Filter>JUCE Modules\juce_graphics\image_formats\pnglib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_graphics\image_formats\pnglib\pnginfo.h">
@@ -2786,9 +2789,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Resources\BIG_A_BLACK_CIRCLE_BACK_1000x1000.png">
-      <Filter>PlaygroundGUI\Resources</Filter>
-    </None>
     <None Include="..\..\Resources\default_config.json">
       <Filter>PlaygroundGUI\Resources</Filter>
     </None>

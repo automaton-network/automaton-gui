@@ -1,3 +1,6 @@
+# Local secrets/key files
+*.secret
+
 # Prerequisites
 *.d
 
