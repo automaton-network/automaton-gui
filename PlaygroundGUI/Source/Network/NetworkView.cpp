@@ -79,7 +79,7 @@ class ReadContractThread: public ThreadWithProgressWindow {
     }
 
     setProgress(0.1);
-    s = contract->call("getSlotsNumber", "");
+    s = contract->call("numSlots", "");
     if (!s.is_ok()) {
       std::cout << "ERROR: " << s.msg << std::endl;
       return;
