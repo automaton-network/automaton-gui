@@ -43,8 +43,8 @@ jucer_project_files("PlaygroundGUI/Resources"
   .         x         x         "Resources/BIG_A_BLACK_CIRCLE_BACK_1000x1000.png"
   .         .         x         "Resources/default_config.json"
   .         .         x         "Resources/king_automaton_abi.json"
-  .         .         x         "../../automaton/media/fonts/play/Play-Bold.ttf"
-  .         .         x         "../../automaton/media/fonts/play/Play-Regular.ttf"
+  .         .         x         "${AUTOMATON_CORE_DIR}/media/fonts/play/Play-Bold.ttf"
+  .         .         x         "${AUTOMATON_CORE_DIR}/media/fonts/play/Play-Regular.ttf"
 )
 
 jucer_project_files("PlaygroundGUI/Source/Config"
@@ -105,7 +105,7 @@ jucer_project_files("PlaygroundGUI/Source"
 
 jucer_project_module(
   juce_core
-  PATH "../../automaton/src/local_third_party/JUCE/modules"
+  PATH "${AUTOMATON_CORE_DIR}/src/local_third_party/JUCE/modules"
   # JUCE_FORCE_DEBUG
   # JUCE_LOG_ASSERTIONS
   # JUCE_CHECK_MEMORY_LEAKS
@@ -120,18 +120,18 @@ jucer_project_module(
 
 jucer_project_module(
   juce_data_structures
-  PATH "../../automaton/src/local_third_party/JUCE/modules"
+  PATH "${AUTOMATON_CORE_DIR}/src/local_third_party/JUCE/modules"
 )
 
 jucer_project_module(
   juce_events
-  PATH "../../automaton/src/local_third_party/JUCE/modules"
+  PATH "${AUTOMATON_CORE_DIR}/src/local_third_party/JUCE/modules"
   # JUCE_EXECUTE_APP_SUSPEND_ON_BACKGROUND_TASK
 )
 
 jucer_project_module(
   juce_graphics
-  PATH "../../automaton/src/local_third_party/JUCE/modules"
+  PATH "${AUTOMATON_CORE_DIR}/src/local_third_party/JUCE/modules"
   # JUCE_USE_COREIMAGE_LOADER
   # JUCE_USE_DIRECTWRITE
   # JUCE_DISABLE_COREGRAPHICS_FONT_SMOOTHING
@@ -139,7 +139,7 @@ jucer_project_module(
 
 jucer_project_module(
   juce_gui_basics
-  PATH "../../automaton/src/local_third_party/JUCE/modules"
+  PATH "${AUTOMATON_CORE_DIR}/src/local_third_party/JUCE/modules"
   # JUCE_ENABLE_REPAINT_DEBUGGING
   # JUCE_USE_XRANDR
   # JUCE_USE_XINERAMA
@@ -151,7 +151,7 @@ jucer_project_module(
 
 jucer_project_module(
   juce_gui_extra
-  PATH "../../automaton/src/local_third_party/JUCE/modules"
+  PATH "${AUTOMATON_CORE_DIR}/src/local_third_party/JUCE/modules"
   JUCE_WEB_BROWSER OFF
   # JUCE_ENABLE_LIVE_CONSTANT_EDITOR
 )
