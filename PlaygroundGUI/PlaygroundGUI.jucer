@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="Byh3dS" name="PlaygroundGUI" projectType="guiapp" jucerVersion="5.4.5"
+<JUCERPROJECT id="Byh3dS" name="PlaygroundGUI" projectType="guiapp" jucerVersion="5.4.7"
               version="0.0.1" companyName="Liberatix" companyWebsite="https://liberatix.com">
   <MAINGROUP id="r0wjCp" name="PlaygroundGUI">
     <GROUP id="{874C0493-36CA-5084-DAA0-C4287D2E83CF}" name="Resources">
@@ -16,6 +16,23 @@
             file="../../automaton/media/fonts/play/Play-Regular.ttf"/>
     </GROUP>
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
+      <GROUP id="{BEADF6D5-B88A-B1C3-2B00-06EE3D256D87}" name="Proposals">
+        <GROUP id="{DAD3EE95-4508-F0D4-6CDA-61B9AA5474AB}" name="ModelsAndEntities">
+          <FILE id="p1uzpL" name="AbstractListModel.h" compile="0" resource="0"
+                file="Source/Proposals/ModelsAndEntities/AbstractListModel.h"/>
+          <FILE id="new5vP" name="AbstractProxyModel.h" compile="0" resource="0"
+                file="Source/Proposals/ModelsAndEntities/AbstractProxyModel.h"/>
+          <FILE id="xCxPQP" name="Proposal.cpp" compile="1" resource="0" file="Source/Proposals/ModelsAndEntities/Proposal.cpp"/>
+          <FILE id="Dk6qLb" name="Proposal.h" compile="0" resource="0" file="Source/Proposals/ModelsAndEntities/Proposal.h"/>
+          <FILE id="V6uVbL" name="ProposalsModel.cpp" compile="1" resource="0"
+                file="Source/Proposals/ModelsAndEntities/ProposalsModel.cpp"/>
+          <FILE id="HEWAjG" name="ProposalsModel.h" compile="0" resource="0"
+                file="Source/Proposals/ModelsAndEntities/ProposalsModel.h"/>
+        </GROUP>
+        <FILE id="hEgoM2" name="ProposalsPage.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalsPage.cpp"/>
+        <FILE id="Aax2EJ" name="ProposalsPage.h" compile="0" resource="0" file="Source/Proposals/ProposalsPage.h"/>
+      </GROUP>
       <GROUP id="{CE63BB2E-4B73-1A4A-01A4-99B40D02D247}" name="Config">
         <FILE id="yOA8V5" name="Config.cpp" compile="1" resource="0" file="Source/Config/Config.cpp"/>
         <FILE id="egdrAA" name="Config.h" compile="1" resource="0" file="Source/Config/Config.h"/>

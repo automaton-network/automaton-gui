@@ -22,6 +22,9 @@
 #include "Demos/DemoSimNet.h"
 #include "Miner/Miner.h"
 #include "Network/NetworkView.h"
+#include "Proposals/ModelsAndEntities/AbstractListModel.h"
+#include "Proposals/ModelsAndEntities/ProposalsModel.h"
+#include "Proposals/ProposalsPage.h"
 
 #include "MainComponent.h"
 
@@ -51,6 +54,10 @@ DemosMainComponent::DemosMainComponent() {
   tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040), new NetworkView(), true);
   tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(), true);
   tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
+
+  auto proposalsPage = new ProposalsPage();
+  tabbedComponent->addTab(TRANS("Proposals"), Colour(0xff404040), proposalsPage, true);
+
   tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("DApps"), Colour(0xff404040), new DemoBlank(), true);
@@ -59,6 +66,11 @@ DemosMainComponent::DemosMainComponent() {
   tabbedComponent->setCurrentTabIndex(0);
 
   setSize(1024, 768);
+
+  auto model = std::make_shared<ProposalsModel>();
+  for (int i = 0; i < 20; ++i)
+    model->addItem (std::make_shared<Proposal>());
+  proposalsPage->setModel (model);
 }
 
 DemosMainComponent::~DemosMainComponent() {

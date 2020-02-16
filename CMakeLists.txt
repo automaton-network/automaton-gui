@@ -18,9 +18,11 @@ if(NOT DEFINED AUTOMATON_CORE_DIR)
   set(AUTOMATON_CORE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../automaton")
 endif()
 
+set(AUTOMATON_PLAYGROUND_GUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/PlaygroundGUI")
+
 
 jucer_project_begin(
-  JUCER_VERSION "5.4.6"
+  JUCER_VERSION "5.4.7"
   PROJECT_FILE "${PlaygroundGUI_jucer_FILE}"
   PROJECT_ID "Byh3dS"
 )
@@ -93,6 +95,24 @@ jucer_project_files("PlaygroundGUI/Source/Network"
 #           Resource  Resource
   x         .         .         "Source/Network/NetworkView.cpp"
   .         .         .         "Source/Network/NetworkView.h"
+)
+
+jucer_project_files("PlaygroundGUI/Source/Proposals/ModelsAndEntities"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  .         .         .         "Source/Proposals/ModelsAndEntities/AbstractListModel.h"
+  .         .         .         "Source/Proposals/ModelsAndEntities/AbstractProxyModel.h"
+  x         .         .         "Source/Proposals/ModelsAndEntities/Proposal.cpp"
+  .         .         .         "Source/Proposals/ModelsAndEntities/Proposal.h"
+  x         .         .         "Source/Proposals/ModelsAndEntities/ProposalsModel.cpp"
+  .         .         .         "Source/Proposals/ModelsAndEntities/ProposalsModel.h"
+)
+
+jucer_project_files("PlaygroundGUI/Source/Proposals"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/Proposals/ProposalsPage.cpp"
+  .         .         .         "Source/Proposals/ProposalsPage.h"
 )
 
 jucer_project_files("PlaygroundGUI/Source"
