@@ -250,6 +250,12 @@
     <ClCompile Include="..\..\Source\Proposals\ModelsAndEntities\ProposalsModel.cpp">
       <Filter>PlaygroundGUI\Source\Proposals\ModelsAndEntities</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\CreateProposalComponent.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsManager.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Proposals\ProposalsPage.cpp">
       <Filter>PlaygroundGUI\Source\Proposals</Filter>
     </ClCompile>
@@ -1577,6 +1583,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\ProposalsModel.h">
       <Filter>PlaygroundGUI\Source\Proposals\ModelsAndEntities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\CreateProposalComponent.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsManager.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Proposals\ProposalsPage.h">
       <Filter>PlaygroundGUI\Source\Proposals</Filter>

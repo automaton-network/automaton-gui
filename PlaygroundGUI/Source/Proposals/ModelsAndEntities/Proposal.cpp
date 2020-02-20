@@ -29,7 +29,7 @@ Proposal::Proposal()
   , m_approvalRating (0)
   , m_lengthDays (0)
   , m_timeLeft (0)
-  , m_status (Status::Accepted)
+  , m_status (Status::Uninitialized)
 {
 }
 

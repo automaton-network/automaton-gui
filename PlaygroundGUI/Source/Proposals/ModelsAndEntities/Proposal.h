@@ -18,9 +18,11 @@
  */
 
 #pragma once
-#include "../../../JuceLibraryCode/JuceHeader.h"
 
-class Proposal
+#include "../../../JuceLibraryCode/JuceHeader.h"
+#include <memory>
+
+class Proposal : public std::enable_shared_from_this<Proposal>
 {
 public:
   enum class Status
@@ -35,10 +37,12 @@ public:
     , Completed // the proposal was successfully implemented
   };
 
-  Proposal();
   using Ptr = std::shared_ptr<Proposal>;
+  Ptr getPtr() { return shared_from_this(); }
 
-  static String getStatusStr(Status status);
+  Proposal();
+
+  static String getStatusStr (Status status);
 
   void setId          (uint64 id)             { m_id = id; }
   void setAmountSpent (uint64 amountSpent)    { m_amountSpent = amountSpent; }
@@ -72,8 +76,10 @@ private:
   uint64 m_numPeriods;
   uint64 m_targetBonus;
   uint32 m_lengthDays;
-  int m_approvalRating;
-  int m_timeLeft;
+
+  int32 m_approvalRating;
+  int32 m_timeLeft;
+
   String m_title = "Test title";
   String m_creator = "Test creator";
   Status m_status;

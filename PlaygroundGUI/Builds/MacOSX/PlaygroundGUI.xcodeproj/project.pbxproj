@@ -49,6 +49,14 @@
 			isa = PBXBuildFile;
 			fileRef = A3DB72E1853A3F3DF7352004;
 		};
+		119F3E08EA0700D3227756D8 = {
+			isa = PBXBuildFile;
+			fileRef = 1F7A71E440D0AA4EFE54D78D;
+		};
+		92F7CC5A19551938C8F5434D = {
+			isa = PBXBuildFile;
+			fileRef = CC0115E7124AFF444FA9938C;
+		};
 		7BF65D2BD0133379680A47C4 = {
 			isa = PBXBuildFile;
 			fileRef = 24A90FD816B6497603F90864;
@@ -211,6 +219,13 @@
 			lastKnownFileType = sourcecode.cpp.objcpp;
 			name = "include_juce_graphics.mm";
 			path = "../../JuceLibraryCode/include_juce_graphics.mm";
+			sourceTree = "SOURCE_ROOT";
+		};
+		1F7A71E440D0AA4EFE54D78D = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = CreateProposalComponent.cpp;
+			path = ../../Source/Proposals/CreateProposalComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		24A90FD816B6497603F90864 = {
@@ -402,6 +417,13 @@
 			path = ../../Source/Main.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		9A5E50B9E6B77E8F419D53D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalsManager.h;
+			path = ../../Source/Proposals/ProposalsManager.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		A13B15A0E08E44FD6C17A560 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -465,6 +487,13 @@
 			path = "Info-App.plist";
 			sourceTree = "SOURCE_ROOT";
 		};
+		CC0115E7124AFF444FA9938C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalsManager.cpp;
+			path = ../../Source/Proposals/ProposalsManager.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		D0E6A5F1B630686C8DA092DC = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -506,6 +535,13 @@
 			name = QuartzCore.framework;
 			path = System/Library/Frameworks/QuartzCore.framework;
 			sourceTree = SDKROOT;
+		};
+		E7C2C623D58FC93EC7586866 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = CreateProposalComponent.h;
+			path = ../../Source/Proposals/CreateProposalComponent.h;
+			sourceTree = "SOURCE_ROOT";
 		};
 		EA39D34DCA843A8AB6A5D0FE = {
 			isa = PBXFileReference;
@@ -570,6 +606,10 @@
 			isa = PBXGroup;
 			children = (
 				19742883CF655113CA196584,
+				1F7A71E440D0AA4EFE54D78D,
+				E7C2C623D58FC93EC7586866,
+				CC0115E7124AFF444FA9938C,
+				9A5E50B9E6B77E8F419D53D0,
 				24A90FD816B6497603F90864,
 				0571A7A83A886A1C384783DD,
 			);
@@ -960,6 +1000,8 @@
 			files = (
 				E61B27AB1BD1011642E4B281,
 				46A40114AD5CAF20F933DFC8,
+				119F3E08EA0700D3227756D8,
+				92F7CC5A19551938C8F5434D,
 				7BF65D2BD0133379680A47C4,
 				A43EEE53B12550669E555382,
 				AE1A08B1BFB106256FE4F53E,

@@ -22,8 +22,8 @@
 #include "Demos/DemoSimNet.h"
 #include "Miner/Miner.h"
 #include "Network/NetworkView.h"
-#include "Proposals/ModelsAndEntities/AbstractListModel.h"
-#include "Proposals/ModelsAndEntities/ProposalsModel.h"
+#include "Proposals/ProposalsManager.h"
+//#include "Proposals/ModelsAndEntities/AbstractListModel.h"
 #include "Proposals/ProposalsPage.h"
 
 #include "MainComponent.h"
@@ -67,10 +67,9 @@ DemosMainComponent::DemosMainComponent() {
 
   setSize(1024, 768);
 
-  auto model = std::make_shared<ProposalsModel>();
   for (int i = 0; i < 20; ++i)
-    model->addItem (std::make_shared<Proposal>());
-  proposalsPage->setModel (model);
+    ProposalsManager::getInstance()->addProposal (std::make_shared<Proposal>());
+  proposalsPage->setModel (ProposalsManager::getInstance()->getModel());
 }
 
 DemosMainComponent::~DemosMainComponent() {

@@ -21,24 +21,31 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "ModelsAndEntities/ProposalsModel.h"
+#include "CreateProposalComponent.h"
 
 class ProposalsUIModel;
 
-class ProposalsPage : public Component,
-  public AbstractListModelBase::Listener
+class ProposalsPage : public Component
+                    , public AbstractListModelBase::Listener
+                    , private CreateProposalComponent::Listener
+                    , private Button::Listener
 {
 public:
   ProposalsPage();
   ~ProposalsPage();
 
+  void setModel (std::shared_ptr<ProposalsModel> model);
+
   void paint (Graphics&) override;
   void resized() override;
-  void setModel (std::shared_ptr<ProposalsModel> model);
 
   // AbstractListModelBase::Listener
   void modelChanged (AbstractListModelBase*);
 
 private:
+  void createProposalViewActionHappened (CreateProposalComponent* componentInWhichActionHappened, CreateProposalComponent::Action action) override;
+
+  void buttonClicked (Button* buttonThatWasClicked) override;
 
   std::unique_ptr<TableListBox> m_proposalsListBox;
   std::unique_ptr<TextButton> m_createProposalBtn;
@@ -46,8 +53,11 @@ private:
   std::unique_ptr<TextButton> m_abandonProposalBtn;
   std::unique_ptr<TextButton> m_FilterBtn;
   std::unique_ptr<ComboBox> m_filterByStatusComboBox;
+
+  std::unique_ptr<CreateProposalComponent> m_createProposalView;
+
   std::unique_ptr<ProposalsUIModel> m_proposalsUIModel;
   std::shared_ptr<ProposalsProxyModel> m_proxyModel;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProposalsPage)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProposalsPage);
 };

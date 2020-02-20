@@ -29,6 +29,14 @@
           <FILE id="HEWAjG" name="ProposalsModel.h" compile="0" resource="0"
                 file="Source/Proposals/ModelsAndEntities/ProposalsModel.h"/>
         </GROUP>
+        <FILE id="tteWB2" name="CreateProposalComponent.cpp" compile="1" resource="0"
+              file="Source/Proposals/CreateProposalComponent.cpp"/>
+        <FILE id="vxPTw7" name="CreateProposalComponent.h" compile="0" resource="0"
+              file="Source/Proposals/CreateProposalComponent.h"/>
+        <FILE id="JEcq7z" name="ProposalsManager.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalsManager.cpp"/>
+        <FILE id="KwuBjB" name="ProposalsManager.h" compile="0" resource="0"
+              file="Source/Proposals/ProposalsManager.h"/>
         <FILE id="hEgoM2" name="ProposalsPage.cpp" compile="1" resource="0"
               file="Source/Proposals/ProposalsPage.cpp"/>
         <FILE id="Aax2EJ" name="ProposalsPage.h" compile="0" resource="0" file="Source/Proposals/ProposalsPage.h"/>

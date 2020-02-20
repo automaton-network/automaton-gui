@@ -70,6 +70,8 @@ endif
 OBJECTS_APP := \
   $(JUCE_OBJDIR)/Proposal_99abfd4a.o \
   $(JUCE_OBJDIR)/ProposalsModel_2a272900.o \
+  $(JUCE_OBJDIR)/CreateProposalComponent_d7aea502.o \
+  $(JUCE_OBJDIR)/ProposalsManager_c02b45e3.o \
   $(JUCE_OBJDIR)/ProposalsPage_2056ab63.o \
   $(JUCE_OBJDIR)/Config_ddf25eb0.o \
   $(JUCE_OBJDIR)/FormMaker_de6ddb10.o \
@@ -111,6 +113,16 @@ $(JUCE_OBJDIR)/Proposal_99abfd4a.o: ../../Source/Proposals/ModelsAndEntities/Pro
 $(JUCE_OBJDIR)/ProposalsModel_2a272900.o: ../../Source/Proposals/ModelsAndEntities/ProposalsModel.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling ProposalsModel.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/CreateProposalComponent_d7aea502.o: ../../Source/Proposals/CreateProposalComponent.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling CreateProposalComponent.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/ProposalsManager_c02b45e3.o: ../../Source/Proposals/ProposalsManager.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling ProposalsManager.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/ProposalsPage_2056ab63.o: ../../Source/Proposals/ProposalsPage.cpp
