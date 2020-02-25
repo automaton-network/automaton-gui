@@ -68,7 +68,7 @@ DemosMainComponent::DemosMainComponent() {
   setSize(1024, 768);
 
   for (int i = 0; i < 20; ++i)
-    ProposalsManager::getInstance()->addProposal (std::make_shared<Proposal>());
+    ProposalsManager::getInstance()->getModel()->addItem (std::make_shared<Proposal>());
   proposalsPage->setModel (ProposalsManager::getInstance()->getModel());
 }
 

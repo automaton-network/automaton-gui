@@ -43,7 +43,7 @@ public:
 
   CreateProposalComponent();
 
-  Proposal::Ptr getProposal() const { return m_proposal->getPtr(); }
+  Proposal::Ptr getProposal() const { return m_proposal; }
 
   void addListener (CreateProposalComponent::Listener* listener) { m_listeners.add (listener); }
   void removeListener (CreateProposalComponent::Listener* listener) { m_listeners.remove (listener); }

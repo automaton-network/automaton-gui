@@ -258,7 +258,7 @@ void ProposalsPage::createProposalViewActionHappened (CreateProposalComponent* c
   {
     //TODO
     componentInWhichActionHappened->setVisible (false);
-    ProposalsManager::getInstance()->addProposal (componentInWhichActionHappened->getProposal());
+    ProposalsManager::getInstance()->addProposal (componentInWhichActionHappened->getProposal(), "a6C8015476f6F4c646C95488c5fc7f5174A4E0ef");
   }
   else if (action == CreateProposalComponent::Action::Cancelled)
   {

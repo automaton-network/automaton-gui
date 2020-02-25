@@ -21,13 +21,14 @@
 
 #include "ModelsAndEntities/ProposalsModel.h"
 
-class ProposalsManager
+class ProposalsManager : public DeletedAtShutdown
 {
 public:
   std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
 
   ProposalsManager();
-  bool addProposal (Proposal::Ptr proposal);
+  ~ProposalsManager();
+  bool addProposal (Proposal::Ptr proposal, const std::string& contributor);
 
   JUCE_DECLARE_SINGLETON(ProposalsManager, true)
 

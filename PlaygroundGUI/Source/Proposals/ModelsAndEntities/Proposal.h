@@ -22,7 +22,7 @@
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include <memory>
 
-class Proposal : public std::enable_shared_from_this<Proposal>
+class Proposal
 {
 public:
   enum class Status
@@ -38,7 +38,6 @@ public:
   };
 
   using Ptr = std::shared_ptr<Proposal>;
-  Ptr getPtr() { return shared_from_this(); }
 
   Proposal();
 
