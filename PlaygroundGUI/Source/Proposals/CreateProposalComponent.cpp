@@ -21,10 +21,10 @@
 
 CreateProposalComponent::CreateProposalComponent()
 {
-  const String numericalIntegersAllowed ("0123456789");
   m_titleEditor = std::make_unique<TextEditor> (translate ("Title"));
   addAndMakeVisible (m_titleEditor.get());
 
+  const String numericalIntegersAllowed ("0123456789");
   m_budgetEditor = std::make_unique<TextEditor> (translate ("Budget"));
   m_budgetEditor->setInputRestrictions (8, numericalIntegersAllowed);
   addAndMakeVisible (m_budgetEditor.get());

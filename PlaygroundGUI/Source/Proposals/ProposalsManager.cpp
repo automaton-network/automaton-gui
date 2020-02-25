@@ -48,20 +48,29 @@ ProposalsManager::~ProposalsManager()
 bool ProposalsManager::addProposal (Proposal::Ptr proposal, const std::string& contributor)
 {
   //TODO: pass address and privateKey
-  std::string privateKey = "af575525cab41534a57e0b0487992d5048eee7c8c72e4c39f2ec34c1a25ca385";
-  std::string address = "0xa6C8015476f6F4c646C95488c5fc7f5174A4E0ef";
+  const std::string privateKey = "af575525cab41534a57e0b0487992d5048eee7c8c72e4c39f2ec34c1a25ca385";
+  const std::string address = "0xa6C8015476f6F4c646C95488c5fc7f5174A4E0ef";
 
-  auto cd = AutomatonContractData::getInstance();
-  auto contract = eth_contract::get_contract (cd->contract_address);
-  if (contract == nullptr)
+  const auto cd = AutomatonContractData::getInstance();
+  const auto contract = eth_contract::get_contract (cd->contract_address);
+  if (contract == nullptr) {
+    std::cout << "ERROR: Contract is NULL" << std::endl;
+    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                                      "ERROR",
+                                      "Contract is NULL. Read appropriate contract data first.");
+    //s = status::internal("Contract is NULL!");
     return false;
+  }
 
-  uint32_t nonce = 0;
   auto s = eth_getTransactionCount (cd->eth_url, address);
-  if (s.code == automaton::core::common::status::OK)
-    nonce = hex2dec (s.msg);
-  else
+  const auto nonce = s.is_ok() ? s.msg : "0";
+  if (! s.is_ok())
+  {
+    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                                      "ERROR",
+                                      s.msg);
     return false;
+  }
 
   json jProposal;
   jProposal.push_back (contributor);
@@ -85,7 +94,7 @@ bool ProposalsManager::addProposal (Proposal::Ptr proposal, const std::string& c
   createProposalData << "f8a1ff12" << bin2hex (encode (jSignature.dump(), jProposal.dump()));
 
   eth_transaction transaction;
-  transaction.nonce = nonce ? dec2hex (nonce) : "";
+  transaction.nonce = nonce;
   transaction.gas_price = "1388";  // 5 000
   transaction.gas_limit = "5B8D80";  // 6M
   transaction.to = cd->contract_address.substr(2);
@@ -94,9 +103,16 @@ bool ProposalsManager::addProposal (Proposal::Ptr proposal, const std::string& c
   transaction.chain_id = "01";
   s = contract->call ("createProposal", transaction.sign_tx (privateKey));
 
-  if (s.code == automaton::core::common::status::OK)
-    std::cout << "Call result: " << s.msg << std::endl;
+  if (! s.is_ok())
+  {
+    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                                      "ERROR",
+                                      String("(") + String(s.code) + String(") :") + s.msg);
+    printf("ERROR: (%u) %s", s.code, s.msg.c_str());
+    return false;
+  }
 
+  DBG("Call result: " << s.msg << "\n");
   proposal->setStatus (Proposal::Status::Uninitialized);
   m_model->addItem (proposal);
   return true;
