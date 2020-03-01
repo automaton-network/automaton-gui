@@ -18,13 +18,16 @@
  */
 
 #include <json.hpp>
+#include <functional>
 
 #include "ProposalsManager.h"
 #include "../Data/AutomatonContractData.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
+#include "automaton/core/common/status.h"
 
+using automaton::core::common::status;
 using automaton::core::interop::ethereum::dec_to_32hex;
 using automaton::core::interop::ethereum::eth_transaction;
 using automaton::core::interop::ethereum::eth_getTransactionCount;
@@ -34,6 +37,24 @@ using automaton::core::interop::ethereum::eth_contract;
 using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
+
+class AsyncTask : public ThreadWithProgressWindow {
+public:
+  AsyncTask (std::function<bool(AsyncTask*)> fun, const String& title) :
+    ThreadWithProgressWindow (title, true, true),
+    m_status (status::ok()) {
+    m_fun = fun;
+  }
+
+  void run() {
+    m_fun (this);
+  }
+
+  status m_status;
+
+private:
+  std::function<bool(AsyncTask*)> m_fun;
+};
 
 ProposalsManager::ProposalsManager()
   : m_model (std::make_shared<ProposalsModel>())
@@ -47,74 +68,87 @@ ProposalsManager::~ProposalsManager()
 
 bool ProposalsManager::addProposal (Proposal::Ptr proposal, const std::string& contributor)
 {
-  //TODO: pass address and privateKey
-  const std::string privateKey = "af575525cab41534a57e0b0487992d5048eee7c8c72e4c39f2ec34c1a25ca385";
-  const std::string address = "0xa6C8015476f6F4c646C95488c5fc7f5174A4E0ef";
+  AsyncTask task ([=](AsyncTask* task) {
+    //TODO: pass address and privateKey
+    const std::string privateKey = "af575525cab41534a57e0b0487992d5048eee7c8c72e4c39f2ec34c1a25ca385";
+    const std::string address = "0xa6C8015476f6F4c646C95488c5fc7f5174A4E0ef";
 
-  const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract (cd->contract_address);
-  if (contract == nullptr) {
-    std::cout << "ERROR: Contract is NULL" << std::endl;
-    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                      "ERROR",
-                                      "Contract is NULL. Read appropriate contract data first.");
-    //s = status::internal("Contract is NULL!");
-    return false;
+    const auto cd = AutomatonContractData::getInstance();
+    const auto contract = eth_contract::get_contract (cd->contract_address);
+    if (contract == nullptr) {
+      std::cout << "ERROR: Contract is NULL" << std::endl;
+      AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+              "ERROR",
+              "Contract is NULL. Read appropriate contract data first.");
+      //s = status::internal("Contract is NULL!");
+      return false;
+    }
+    task->setProgress (0.1);
+
+    auto& s = task->m_status;
+    s = eth_getTransactionCount (cd->eth_url, address);
+    const auto nonce = s.is_ok() ? s.msg : "0";
+    if (! s.is_ok())
+      return false;
+
+    json jProposal;
+    jProposal.push_back (contributor);
+    jProposal.push_back (proposal->getTitle().toStdString());
+    jProposal.push_back ("google.com");
+    jProposal.push_back ("BA5EC0DE");
+    jProposal.push_back (proposal->getLengthDays());
+    jProposal.push_back (proposal->getNumPeriods());
+    jProposal.push_back (proposal->getBudget());
+
+    json jSignature;
+    jSignature.push_back ("address");
+    jSignature.push_back ("string");
+    jSignature.push_back ("string");
+    jSignature.push_back ("bytes");
+    jSignature.push_back ("uint256");
+    jSignature.push_back ("uint256");
+    jSignature.push_back ("uint256");
+
+    std::stringstream createProposalData;
+    createProposalData << "f8a1ff12" << bin2hex (encode (jSignature.dump(), jProposal.dump()));
+    task->setProgress (0.5);
+
+    eth_transaction transaction;
+    transaction.nonce = nonce;
+    transaction.gas_price = "1388";  // 5 000
+    transaction.gas_limit = "5B8D80";  // 6M
+    transaction.to = cd->contract_address.substr(2);
+    transaction.value = "";
+    transaction.data = createProposalData.str();
+    transaction.chain_id = "01";
+    s = contract->call ("createProposal", transaction.sign_tx (privateKey));
+
+    if (! s.is_ok())
+      return false;
+
+    DBG("Call result: " << s.msg << "\n");
+    proposal->setStatus (Proposal::Status::Uninitialized);
+    task->setProgress (1.0);
+
+    return true;
+  }, "Creating proposal....");
+
+
+  if (task.runThread()) {
+    m_model->addItem (proposal);
   }
-
-  auto s = eth_getTransactionCount (cd->eth_url, address);
-  const auto nonce = s.is_ok() ? s.msg : "0";
-  if (! s.is_ok())
+  else
   {
-    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                      "ERROR",
-                                      s.msg);
-    return false;
+    auto& s = task.m_status;
+    if (! s.is_ok()){
+      printf("ERROR: (%u) %s", s.code, s.msg.c_str());
+      AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+              "ERROR",
+              String("(") + String(s.code) + String(") :") + s.msg);
+      return false;
+    }
   }
 
-  json jProposal;
-  jProposal.push_back (contributor);
-  jProposal.push_back (proposal->getTitle().toStdString());
-  jProposal.push_back ("google.com");
-  jProposal.push_back ("BA5EC0DE");
-  jProposal.push_back (proposal->getLengthDays());
-  jProposal.push_back (proposal->getNumPeriods());
-  jProposal.push_back (proposal->getBudget());
-
-  json jSignature;
-  jSignature.push_back ("address");
-  jSignature.push_back ("string");
-  jSignature.push_back ("string");
-  jSignature.push_back ("bytes");
-  jSignature.push_back ("uint256");
-  jSignature.push_back ("uint256");
-  jSignature.push_back ("uint256");
-
-  std::stringstream createProposalData;
-  createProposalData << "f8a1ff12" << bin2hex (encode (jSignature.dump(), jProposal.dump()));
-
-  eth_transaction transaction;
-  transaction.nonce = nonce;
-  transaction.gas_price = "1388";  // 5 000
-  transaction.gas_limit = "5B8D80";  // 6M
-  transaction.to = cd->contract_address.substr(2);
-  transaction.value = "";
-  transaction.data = createProposalData.str();
-  transaction.chain_id = "01";
-  s = contract->call ("createProposal", transaction.sign_tx (privateKey));
-
-  if (! s.is_ok())
-  {
-    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                      "ERROR",
-                                      String("(") + String(s.code) + String(") :") + s.msg);
-    printf("ERROR: (%u) %s", s.code, s.msg.c_str());
-    return false;
-  }
-
-  DBG("Call result: " << s.msg << "\n");
-  proposal->setStatus (Proposal::Status::Uninitialized);
-  m_model->addItem (proposal);
   return true;
 }
 
