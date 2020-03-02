@@ -33,6 +33,12 @@
               file="Source/Proposals/CreateProposalComponent.cpp"/>
         <FILE id="vxPTw7" name="CreateProposalComponent.h" compile="0" resource="0"
               file="Source/Proposals/CreateProposalComponent.h"/>
+        <FILE id="Qh3qDr" name="GridView.cpp" compile="1" resource="0" file="Source/Proposals/GridView.cpp"/>
+        <FILE id="xDxtHQ" name="GridView.h" compile="0" resource="0" file="Source/Proposals/GridView.h"/>
+        <FILE id="wYSjVE" name="ProposalsActionsPage.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalsActionsPage.cpp"/>
+        <FILE id="xvDXpv" name="ProposalsActionsPage.h" compile="0" resource="0"
+              file="Source/Proposals/ProposalsActionsPage.h"/>
         <FILE id="JEcq7z" name="ProposalsManager.cpp" compile="1" resource="0"
               file="Source/Proposals/ProposalsManager.cpp"/>
         <FILE id="KwuBjB" name="ProposalsManager.h" compile="0" resource="0"

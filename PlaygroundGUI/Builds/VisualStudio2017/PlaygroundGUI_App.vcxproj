@@ -141,6 +141,8 @@
     <ClCompile Include="..\..\Source\Proposals\ModelsAndEntities\Proposal.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\ModelsAndEntities\ProposalsModel.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\CreateProposalComponent.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\GridView.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsActionsPage.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\ProposalsManager.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\ProposalsPage.cpp"/>
     <ClCompile Include="..\..\Source\Config\Config.cpp"/>
@@ -1344,6 +1346,8 @@
     <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\Proposal.h"/>
     <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\ProposalsModel.h"/>
     <ClInclude Include="..\..\Source\Proposals\CreateProposalComponent.h"/>
+    <ClInclude Include="..\..\Source\Proposals\GridView.h"/>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsActionsPage.h"/>
     <ClInclude Include="..\..\Source\Proposals\ProposalsManager.h"/>
     <ClInclude Include="..\..\Source\Proposals\ProposalsPage.h"/>
     <ClInclude Include="..\..\Source\Config\Config.h"/>

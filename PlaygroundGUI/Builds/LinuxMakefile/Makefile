@@ -71,6 +71,8 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/Proposal_99abfd4a.o \
   $(JUCE_OBJDIR)/ProposalsModel_2a272900.o \
   $(JUCE_OBJDIR)/CreateProposalComponent_d7aea502.o \
+  $(JUCE_OBJDIR)/GridView_eaf49ec2.o \
+  $(JUCE_OBJDIR)/ProposalsActionsPage_11cbcf62.o \
   $(JUCE_OBJDIR)/ProposalsManager_c02b45e3.o \
   $(JUCE_OBJDIR)/ProposalsPage_2056ab63.o \
   $(JUCE_OBJDIR)/Config_ddf25eb0.o \
@@ -118,6 +120,16 @@ $(JUCE_OBJDIR)/ProposalsModel_2a272900.o: ../../Source/Proposals/ModelsAndEntiti
 $(JUCE_OBJDIR)/CreateProposalComponent_d7aea502.o: ../../Source/Proposals/CreateProposalComponent.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling CreateProposalComponent.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/GridView_eaf49ec2.o: ../../Source/Proposals/GridView.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling GridView.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/ProposalsActionsPage_11cbcf62.o: ../../Source/Proposals/ProposalsActionsPage.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling ProposalsActionsPage.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/ProposalsManager_c02b45e3.o: ../../Source/Proposals/ProposalsManager.cpp

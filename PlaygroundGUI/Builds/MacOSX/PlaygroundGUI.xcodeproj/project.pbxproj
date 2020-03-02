@@ -53,6 +53,14 @@
 			isa = PBXBuildFile;
 			fileRef = 1F7A71E440D0AA4EFE54D78D;
 		};
+		CA1EBA052F275BF313BF1275 = {
+			isa = PBXBuildFile;
+			fileRef = B4352990FE118BBD5B965E8F;
+		};
+		25C5695494D3CEB6AB1F3674 = {
+			isa = PBXBuildFile;
+			fileRef = 30384822F40D4037F57C2DCE;
+		};
 		92F7CC5A19551938C8F5434D = {
 			isa = PBXBuildFile;
 			fileRef = CC0115E7124AFF444FA9938C;
@@ -200,6 +208,13 @@
 			path = ../../JuceLibraryCode/AppConfig.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		1460D80A9051E5EDA0A2EF60 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalsActionsPage.h;
+			path = ../../Source/Proposals/ProposalsActionsPage.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		14CE094E72DE869A11098622 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -240,6 +255,13 @@
 			lastKnownFileType = file.ttf;
 			name = "Play-Regular.ttf";
 			path = "../../../../automaton/media/fonts/play/Play-Regular.ttf";
+			sourceTree = "SOURCE_ROOT";
+		};
+		30384822F40D4037F57C2DCE = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalsActionsPage.cpp;
+			path = ../../Source/Proposals/ProposalsActionsPage.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		3604DF6B545750B665E78AE0 = {
@@ -452,6 +474,13 @@
 			path = ../../Source/Proposals/ModelsAndEntities/ProposalsModel.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		B4352990FE118BBD5B965E8F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = GridView.cpp;
+			path = ../../Source/Proposals/GridView.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		B64797D3D8C773778F4625FB = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -564,6 +593,13 @@
 			path = ../../JuceLibraryCode/JuceHeader.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		F193D440E5BAB158E4C4C217 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = GridView.h;
+			path = ../../Source/Proposals/GridView.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		F37DC7F8EC888D82E793ED31 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -608,6 +644,10 @@
 				19742883CF655113CA196584,
 				1F7A71E440D0AA4EFE54D78D,
 				E7C2C623D58FC93EC7586866,
+				B4352990FE118BBD5B965E8F,
+				F193D440E5BAB158E4C4C217,
+				30384822F40D4037F57C2DCE,
+				1460D80A9051E5EDA0A2EF60,
 				CC0115E7124AFF444FA9938C,
 				9A5E50B9E6B77E8F419D53D0,
 				24A90FD816B6497603F90864,
@@ -1001,6 +1041,8 @@
 				E61B27AB1BD1011642E4B281,
 				46A40114AD5CAF20F933DFC8,
 				119F3E08EA0700D3227756D8,
+				CA1EBA052F275BF313BF1275,
+				25C5695494D3CEB6AB1F3674,
 				92F7CC5A19551938C8F5434D,
 				7BF65D2BD0133379680A47C4,
 				A43EEE53B12550669E555382,
