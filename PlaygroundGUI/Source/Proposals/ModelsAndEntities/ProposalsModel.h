@@ -35,9 +35,28 @@ private:
   Array<Proposal::Ptr> m_items;
 };
 
+enum class ProposalFilter {
+  All = 1
+  , PayingGas
+  , Approved
+  , Accepted
+  , Rejected
+  , Contested
+  , Completed
+};
+
 class ProposalsProxyModel : public AbstractProxyModel<Proposal::Ptr>
 {
+public:
+  void setFilter (ProposalFilter filter);
+  void setSorter (std::function<int(Proposal*, Proposal*)> sorter);
+
 protected:
-  bool isAccept (int index);
-  int compareData (const Proposal::Ptr& first, const Proposal::Ptr& second) const;
+  bool isAccept (const Proposal::Ptr& item) override;
+  bool withSorting() override;
+  int compareData (const Proposal::Ptr& first, const Proposal::Ptr& second) const override;
+
+private:
+  ProposalFilter m_filter = ProposalFilter::All;
+  std::function<int(Proposal*, Proposal*)> m_sorterFun;
 };

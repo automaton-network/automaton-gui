@@ -29,20 +29,20 @@ Proposal::Proposal()
   , m_approvalRating (0)
   , m_lengthDays (0)
   , m_timeLeft (0)
-  , m_status (Status::Uninitialized)
+  , m_status (Proposal::Status::Uninitialized)
 {
 }
 
-String Proposal::getStatusStr (Status status)
+String Proposal::getStatusStr (Proposal::Status status)
 {
   switch (status)
   {
-    case Status::Uninitialized: return "Uninitialized";
-    case Status::Started: return "Voting";
-    case Status::Accepted: return "Accepted";
-    case Status::Contested: return "Contested";
-    case Status::Rejected: return "Rejected";
-    case Status::Completed: return "Completed";
+    case Proposal::Status::Uninitialized: return "Uninitialized";
+    case Proposal::Status::Started: return "Voting";
+    case Proposal::Status::Accepted: return "Accepted";
+    case Proposal::Status::Contested: return "Contested";
+    case Proposal::Status::Rejected: return "Rejected";
+    case Proposal::Status::Completed: return "Completed";
     default: return "Unknown";
   }
 }

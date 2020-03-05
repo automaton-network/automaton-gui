@@ -20,158 +20,26 @@
 #include "ProposalsPage.h"
 #include "ProposalsManager.h"
 
-
-class ProposalsUIModel : public TableListBoxModel
-{
-public:
-  enum Columns
-  {
-    ID = 1
-    , CreatorAndTitle
-    , ApprovalRating
-    , Status
-    , Spent
-    , Budget
-    , Periods
-    , Length
-    , Bonus
-    , TimeLeft
-  };
-
-  ProposalsUIModel()
-  {
-  }
-
-  void setModel (std::shared_ptr<AbstractListModel<Proposal::Ptr>> model)
-  {
-    m_model = model;
-  }
-
-  int getNumRows() override
-  {
-    return m_model != nullptr ? m_model->size() : 0;
-  }
-
-  void paintCell (Graphics& g,
-                  int rowNumber,
-                  int columnId,
-                  int width,
-                  int height,
-                  bool rowIsSelected) override
-  {
-    auto item = m_model->getAt (rowNumber);
-    g.setColour (Colours::white);
-
-    auto getPercentStr = [] (float percent) -> String { return String (percent * 100) + "%"; };
-
-    switch (columnId)
-    {
-      case ID:
-        {
-          g.drawText (String (item->getId()), 0, 0, width, height, Justification::centred);
-          break;
-        }
-      case CreatorAndTitle:
-        {
-          g.drawText (String (item->getTitle()), 0, height / 2, width, height / 2, Justification::centredLeft);
-          g.setFont (g.getCurrentFont().boldened());
-          g.drawText (String (item->getCreator()), 0, 0, width, height / 2, Justification::centredLeft);
-          break;
-        }
-      case ApprovalRating:
-        {
-          if (item->getApprovalRating() < 0)
-            g.setColour (Colours::red);
-          else
-            g.setColour (Colours::green);
-
-          g.drawText (String (item->getApprovalRating()) + "%", 0, 0, width, height, Justification::centred);
-          break;
-        }
-      case Status:
-        {
-          g.drawText (Proposal::getStatusStr (item->getStatus()), 0, 0, width, height, Justification::centred);
-          break;
-        }
-      case Spent:
-        {
-          const auto percent = item->getBudget() ? item->getAmountSpent() / item->getBudget() : 0.f;
-          const String text = String (item->getAmountSpent()) + " (" + getPercentStr(percent) + ")";
-          g.drawText (text, 0, 0, width, height, Justification::centred);
-          break;
-        }
-      case Budget:
-        {
-          g.drawText (String (item->getBudget()), 0, 0, width, height, Justification::centred);
-          break;
-        }
-      case Periods:
-        {
-          g.drawText (String (item->getNumPeriods()), 0, 0, width, height, Justification::centred);
-          break;
-        }
-      case Length:
-        {
-          const auto lengthDays = item->getLengthDays();
-          // If length is zero - the proposal has no time limit
-          if (lengthDays)
-          {
-            const String unit (lengthDays == 1 ? "day" : "days");
-            g.drawText (String (lengthDays) + " " + unit, 0, 0, width, height, Justification::centred);
-          }
-          break;
-        }
-      case Bonus:
-        {
-          const auto percent = item->getBudget() ? item->getTargetBonus() / item->getBudget() : 0.f;
-          const String text = String (item->getTargetBonus()) + " (" + getPercentStr(percent) + ")";
-          g.drawText (text, 0, 0, width, height, Justification::centred);
-          break;
-        }
-      case TimeLeft:
-        {
-          const String unit (item->getLengthDays() == 1 ? "day" : "days");
-          g.drawText (String (item->getTimeLeftDays()) + " " + unit, 0, 0, width, height, Justification::centred);
-          break;
-        }
-      default:
-      break;
-    }
-  }
-
-  void paintRowBackground (Graphics& g,
-                           int rowNumber,
-                           int width,
-                           int height,
-                           bool rowIsSelected) override
-  {
-    auto colour = LookAndFeel::getDefaultLookAndFeel().findColour (TableListBox::backgroundColourId);
-    g.setColour (rowIsSelected ? colour.darker (0.3f) : colour);
-    g.fillRect (0, 0, width, height);
-  }
-
-private:
-  std::shared_ptr<AbstractListModel<Proposal::Ptr>> m_model;
-};
-
 //==============================================================================
 ProposalsPage::ProposalsPage()
 {
   m_proposalsListBox = std::make_unique<TableListBox>();
   m_proposalsListBox->setRowHeight (50);
   m_proposalsListBox->setRowSelectedOnMouseDown (true);
+  m_proposalsListBox->setClickingTogglesRowSelection (true);
+
   auto& tableHeader = m_proposalsListBox->getHeader();
   tableHeader.setStretchToFitActive (true);
-  tableHeader.addColumn (translate ("ID"), ProposalsUIModel::ID, 30, 30, 50);
-  tableHeader.addColumn (translate ("Creator/Title"), ProposalsUIModel::CreatorAndTitle, 200);
-  tableHeader.addColumn (translate ("Approval Rating"), ProposalsUIModel::ApprovalRating, 125);
-  tableHeader.addColumn (translate ("Status"), ProposalsUIModel::Status, 75);
-  tableHeader.addColumn (translate ("Spent"), ProposalsUIModel::Spent, 75);
-  tableHeader.addColumn (translate ("Budget"), ProposalsUIModel::Budget, 75);
-  tableHeader.addColumn (translate ("Periods"), ProposalsUIModel::Periods, 75);
-  tableHeader.addColumn (translate ("Length"), ProposalsUIModel::Length, 75);
-  tableHeader.addColumn (translate ("Target Bonus"), ProposalsUIModel::Bonus, 75);
-  tableHeader.addColumn (translate ("Time Left"), ProposalsUIModel::TimeLeft, 75);
+  tableHeader.addColumn (translate ("ID"), Columns::ID, 30, 30, 50);
+  tableHeader.addColumn (translate ("Creator/Title"), Columns::CreatorAndTitle, 200);
+  tableHeader.addColumn (translate ("Approval Rating"), Columns::ApprovalRating, 125);
+  tableHeader.addColumn (translate ("Status"), Columns::Status, 75);
+  tableHeader.addColumn (translate ("Spent"), Columns::Spent, 75);
+  tableHeader.addColumn (translate ("Budget"), Columns::Budget, 75);
+  tableHeader.addColumn (translate ("Periods"), Columns::Periods, 75);
+  tableHeader.addColumn (translate ("Length"), Columns::Length, 75);
+  tableHeader.addColumn (translate ("Target Bonus"), Columns::Bonus, 75);
+  tableHeader.addColumn (translate ("Time Left"), Columns::TimeLeft, 75);
 
   m_createProposalBtn = std::make_unique<TextButton> (translate ("Create Proposal"));
   m_createProposalBtn->addListener (this);
@@ -180,20 +48,18 @@ ProposalsPage::ProposalsPage()
   m_abandonProposalBtn = std::make_unique<TextButton> (translate ("Abandon Proposal"));
 
   m_filterByStatusComboBox = std::make_unique<ComboBox>();
-  m_filterByStatusComboBox->addItem (translate ("All"), 1);
-  m_filterByStatusComboBox->addItem (translate ("Paying Gas"), 2);
-  m_filterByStatusComboBox->addItem (translate ("Approved"), 3);
-  m_filterByStatusComboBox->addItem (translate ("Accepted"), 4);
-  m_filterByStatusComboBox->addItem (translate ("Rejected"), 5);
-  m_filterByStatusComboBox->addItem (translate ("Contested"), 6);
-  m_filterByStatusComboBox->addItem (translate ("Completed"), 7);
+  m_filterByStatusComboBox->addItem (translate ("All"), (int)ProposalFilter::All);
+  m_filterByStatusComboBox->addItem (translate ("Paying Gas"), (int)ProposalFilter::PayingGas);
+  m_filterByStatusComboBox->addItem (translate ("Approved"), (int)ProposalFilter::Approved);
+  m_filterByStatusComboBox->addItem (translate ("Accepted"), (int)ProposalFilter::Accepted);
+  m_filterByStatusComboBox->addItem (translate ("Rejected"), (int)ProposalFilter::Rejected);
+  m_filterByStatusComboBox->addItem (translate ("Contested"), (int)ProposalFilter::Contested);
+  m_filterByStatusComboBox->addItem (translate ("Completed"), (int)ProposalFilter::Completed);
+  m_filterByStatusComboBox->addListener (this);
 
   m_proxyModel = std::make_shared<ProposalsProxyModel>();
   m_proxyModel->addListener (this);
-
-  m_proposalsUIModel = std::make_unique<ProposalsUIModel>();
-  m_proposalsUIModel->setModel (m_proxyModel);
-  m_proposalsListBox->setModel (m_proposalsUIModel.get());
+  m_proposalsListBox->setModel (this);
 
   // Enable only when any proposal is selected
   m_payForGasBtn->setEnabled (false);
@@ -250,6 +116,7 @@ void ProposalsPage::setModel (std::shared_ptr<ProposalsModel> model)
 void ProposalsPage::modelChanged (AbstractListModelBase*)
 {
   m_proposalsListBox->updateContent();
+  m_proposalsListBox->repaint();
 }
 
 void ProposalsPage::createProposalViewActionHappened (CreateProposalComponent* componentInWhichActionHappened, CreateProposalComponent::Action action)
@@ -273,4 +140,209 @@ void ProposalsPage::buttonClicked (Button* buttonThatWasClicked)
     m_createProposalView->setVisible (true);
     m_createProposalView->setAlwaysOnTop (true);
   }
+}
+
+void ProposalsPage::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+{
+  m_proxyModel->setFilter ((ProposalFilter) m_filterByStatusComboBox->getSelectedId());
+}
+
+void ProposalsPage::updateButtons()
+{
+  m_payForGasBtn->setEnabled (m_proposalsListBox->getNumSelectedRows() > 0);
+  m_abandonProposalBtn->setEnabled (m_proposalsListBox->getNumSelectedRows() > 0);
+}
+
+// TableListBoxModel
+//==============================================================================
+int ProposalsPage::getNumRows()
+{
+  return m_proxyModel != nullptr ? m_proxyModel->size() : 0;
+}
+
+void ProposalsPage::sortOrderChanged (int columnId, bool isForwards)
+{
+  const int direction = isForwards ? -1 : 1;
+  std::function<int(Proposal*, Proposal*)> sorter;
+
+  switch (columnId)
+  {
+    case ID:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<uint64>::compareElements (p1->getId(), p2->getId());
+        };
+        break;
+      }
+    case CreatorAndTitle:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<String>::compareElements (p1->getTitle(), p2->getTitle());
+        };
+        break;
+      }
+    case ApprovalRating:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<int>::compareElements (p1->getApprovalRating(), p2->getApprovalRating());
+        };
+        break;
+      }
+    case Status:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<int>::compareElements ((int)p1->getStatus(), (int)p2->getStatus());
+        };
+        break;
+      }
+    case Spent:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<uint64>::compareElements (p1->getAmountSpent(), p2->getAmountSpent());
+        };
+        break;
+      }
+    case Budget:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<uint64>::compareElements (p1->getBudget(), p2->getBudget());
+        };
+        break;
+      }
+    case Periods:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<uint64>::compareElements (p1->getNumPeriods(), p2->getNumPeriods());
+        };
+        break;
+      }
+    case Length:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<uint64>::compareElements (p1->getAmountSpent(), p2->getAmountSpent());
+        };
+        break;
+      }
+    case Bonus:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<uint64>::compareElements (p1->getTargetBonus(), p2->getTargetBonus());
+        };
+        break;
+      }
+    case TimeLeft:
+      {
+        sorter = [=](Proposal* p1, Proposal* p2){
+          return direction * DefaultElementComparator<int>::compareElements (p1->getTimeLeftDays(), p2->getTimeLeftDays());
+        };
+        break;
+      }
+    default:
+    break;
+  }
+
+  m_proxyModel->setSorter (sorter);
+}
+
+void ProposalsPage::paintCell (Graphics& g,
+                               int rowNumber,
+                               int columnId,
+                               int width,
+                               int height,
+                               bool rowIsSelected)
+{
+  auto item = m_proxyModel->getAt (rowNumber);
+  g.setColour (Colours::white);
+
+  auto getPercentStr = [] (float percent) -> String { return String (percent * 100) + "%"; };
+
+  switch (columnId)
+  {
+    case ID:
+      {
+        g.drawText (String (item->getId()), 0, 0, width, height, Justification::centred);
+        break;
+      }
+    case CreatorAndTitle:
+      {
+        g.drawText (String (item->getTitle()), 0, height / 2, width, height / 2, Justification::centredLeft);
+        g.setFont (g.getCurrentFont().boldened());
+        g.drawText (String (item->getCreator()), 0, 0, width, height / 2, Justification::centredLeft);
+        break;
+      }
+    case ApprovalRating:
+      {
+        if (item->getApprovalRating() < 0)
+          g.setColour (Colours::red);
+        else
+          g.setColour (Colours::green);
+
+        g.drawText (String (item->getApprovalRating()) + "%", 0, 0, width, height, Justification::centred);
+        break;
+      }
+    case Status:
+      {
+        g.drawText (Proposal::getStatusStr (item->getStatus()), 0, 0, width, height, Justification::centred);
+        break;
+      }
+    case Spent:
+      {
+        const auto percent = item->getBudget() ? item->getAmountSpent() / item->getBudget() : 0.f;
+        const String text = String (item->getAmountSpent()) + " (" + getPercentStr(percent) + ")";
+        g.drawText (text, 0, 0, width, height, Justification::centred);
+        break;
+      }
+    case Budget:
+      {
+        g.drawText (String (item->getBudget()), 0, 0, width, height, Justification::centred);
+        break;
+      }
+    case Periods:
+      {
+        g.drawText (String (item->getNumPeriods()), 0, 0, width, height, Justification::centred);
+        break;
+      }
+    case Length:
+      {
+        const auto lengthDays = item->getLengthDays();
+        // If length is zero - the proposal has no time limit
+        if (lengthDays)
+        {
+          const String unit (lengthDays == 1 ? "day" : "days");
+          g.drawText (String (lengthDays) + " " + unit, 0, 0, width, height, Justification::centred);
+        }
+        break;
+      }
+    case Bonus:
+      {
+        const auto percent = item->getBudget() ? item->getTargetBonus() / item->getBudget() : 0.f;
+        const String text = String (item->getTargetBonus()) + " (" + getPercentStr(percent) + ")";
+        g.drawText (text, 0, 0, width, height, Justification::centred);
+        break;
+      }
+    case TimeLeft:
+      {
+        const String unit (item->getLengthDays() == 1 ? "day" : "days");
+        g.drawText (String (item->getTimeLeftDays()) + " " + unit, 0, 0, width, height, Justification::centred);
+        break;
+      }
+    default:
+    break;
+  }
+}
+
+void ProposalsPage::paintRowBackground (Graphics& g,
+                                        int rowNumber,
+                                        int width,
+                                        int height,
+                                        bool rowIsSelected)
+{
+  auto colour = LookAndFeel::getDefaultLookAndFeel().findColour (TableListBox::backgroundColourId);
+  g.setColour (rowIsSelected ? colour.darker (0.3f) : colour);
+  g.fillRect (0, 0, width, height);
+}
+
+void ProposalsPage::selectedRowsChanged (int)
+{
+  updateButtons();
 }

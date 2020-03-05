@@ -40,12 +40,45 @@ void ProposalsModel::addItem (Proposal::Ptr item)
   notifyModelChanged();
 }
 
-bool ProposalsProxyModel::isAccept (int index)
+bool ProposalsProxyModel::isAccept (const Proposal::Ptr& item)
 {
-  return true;
+  switch (m_filter)
+  {
+    case ProposalFilter::All:
+      return true;
+    case ProposalFilter::PayingGas:
+      return item->getStatus() == Proposal::Status::Uninitialized;
+    case ProposalFilter::Approved:
+      return true; //TODO
+    case ProposalFilter::Accepted:
+      return item->getStatus() == Proposal::Status::Accepted;
+    case ProposalFilter::Rejected:
+      return item->getStatus() == Proposal::Status::Rejected;
+    case ProposalFilter::Contested:
+      return item->getStatus() == Proposal::Status::Contested;
+    case ProposalFilter::Completed:
+      return item->getStatus() == Proposal::Status::Completed;
+  }
+}
+
+bool ProposalsProxyModel::withSorting()
+{
+  return m_sorterFun != nullptr;
+}
+
+void ProposalsProxyModel::setFilter (ProposalFilter filter)
+{
+  m_filter = filter;
+  filterChanged();
+}
+
+void ProposalsProxyModel::setSorter (std::function<int(Proposal*, Proposal*)> sorter)
+{
+  m_sorterFun = sorter;
+  filterChanged();
 }
 
 int ProposalsProxyModel::compareData (const Proposal::Ptr& first, const Proposal::Ptr& second) const
 {
-  return 0;
+  return m_sorterFun (first.get(), second.get());
 }

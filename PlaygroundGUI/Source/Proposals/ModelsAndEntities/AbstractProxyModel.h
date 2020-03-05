@@ -60,11 +60,12 @@ public:
 
       for (int i = 0; i < size; ++i)
       {
-        if (isAccept (i))
+        if (isAccept (model->getReferenceAt (i)))
           m_proxyArray.add (i);
       }
 
-      m_proxyArray.sort (*this, true);
+      if (withSorting())
+        m_proxyArray.sort (*this, true);
       this->notifyModelChanged();
     }
   }
@@ -117,6 +118,7 @@ private:
   std::shared_ptr<AbstractListModel<T>> m_model;
 
 protected:
-  virtual bool isAccept (int index) = 0;
+  virtual bool isAccept (const T& index) = 0;
+  virtual bool withSorting() = 0;
   virtual int compareData (const T& first, const T& second) const = 0;
 };

@@ -22,26 +22,27 @@
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include <memory>
 
+
 class Proposal
 {
 public:
   enum class Status
   {
     Uninitialized = 0   // there is no proposal connected to this ballot
-    // ACTIVE statuses
-    , Started   // first period of voting until initialEndDate
-    , Accepted  // enough "yes" votes during the initial voting period
-    , Contested // too many "no" votes after the first approval ot the proposal
-    // INACTIVE statuses
-    , Rejected  // not enough "yes" votes during the initial period or during a contest period
-    , Completed // the proposal was successfully implemented
+      // ACTIVE statuses
+      , Started   // first period of voting until initialEndDate
+      , Accepted  // enough "yes" votes during the initial voting period
+      , Contested // too many "no" votes after the first approval ot the proposal
+      // INACTIVE statuses
+      , Rejected  // not enough "yes" votes during the initial period or during a contest period
+      , Completed // the proposal was successfully implemented
   };
 
   using Ptr = std::shared_ptr<Proposal>;
 
   Proposal();
 
-  static String getStatusStr (Status status);
+  static String getStatusStr (Proposal::Status status);
 
   void setId          (uint64 id)             { m_id = id; }
   void setAmountSpent (uint64 amountSpent)    { m_amountSpent = amountSpent; }
@@ -53,7 +54,7 @@ public:
   void setTimeLeftDays    (int timeLeftDays)      { m_timeLeft = timeLeftDays; }
   void setTitle   (const String& title)   { m_title = title; }
   void setCreator (const String& creator) { m_creator = creator; }
-  void setStatus (Status status) { m_status = status; }
+  void setStatus (Proposal::Status status) { m_status = status; }
 
   uint64 getId() const            { return m_id; }
   uint64 getAmountSpent() const   { return m_amountSpent; }
@@ -65,7 +66,7 @@ public:
   int getTimeLeftDays() const     { return m_timeLeft; }
   String getTitle() const         { return m_title; }
   String getCreator() const       { return m_creator; }
-  Status getStatus() const        { return m_status; }
+  Proposal::Status getStatus() const { return m_status; }
 
 
 private:
@@ -81,5 +82,5 @@ private:
 
   String m_title = "Test title";
   String m_creator = "Test creator";
-  Status m_status;
+  Proposal::Status m_status;
 };

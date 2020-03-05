@@ -70,7 +70,15 @@ DemosMainComponent::DemosMainComponent() {
   setSize(1024, 768);
 
   for (int i = 0; i < 20; ++i)
-    ProposalsManager::getInstance()->getModel()->addItem (std::make_shared<Proposal>());
+  {
+    auto p = std::make_shared<Proposal>();
+    p->setId (i);
+    p->setTitle ("Proposal" + String (i));
+    p->setAmountSpent (i);
+    p->setNumPeriods (i + 20);
+    p->setStatus ((Proposal::Status) jlimit(0, 5, i));
+    ProposalsManager::getInstance()->getModel()->addItem(p);
+  }
   proposalsPage->setModel (ProposalsManager::getInstance()->getModel());
 }
 
