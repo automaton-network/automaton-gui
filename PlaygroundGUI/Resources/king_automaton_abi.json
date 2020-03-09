@@ -197,6 +197,20 @@
     "constant": true
   },
   {
+    "inputs": [],
+    "name": "ballotBoxIDs",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1471,4 +1485,4 @@
     "stateMutability": "nonpayable",
     "type": "function"
   }
-]
+  ]
