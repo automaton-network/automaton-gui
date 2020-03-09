@@ -21,6 +21,7 @@
 
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include <memory>
+#include <string>
 
 
 class Proposal
@@ -29,18 +30,19 @@ public:
   enum class Status
   {
     Uninitialized = 0   // there is no proposal connected to this ballot
-      // ACTIVE statuses
-      , Started   // first period of voting until initialEndDate
-      , Accepted  // enough "yes" votes during the initial voting period
-      , Contested // too many "no" votes after the first approval ot the proposal
-      // INACTIVE statuses
-      , Rejected  // not enough "yes" votes during the initial period or during a contest period
-      , Completed // the proposal was successfully implemented
+    // ACTIVE statuses
+    , Started   // first period of voting until initialEndDate
+    , Accepted  // enough "yes" votes during the initial voting period
+    , Contested // too many "no" votes after the first approval ot the proposal
+    // INACTIVE statuses
+    , Rejected  // not enough "yes" votes during the initial period or during a contest period
+    , Completed // the proposal was successfully implemented
   };
 
   using Ptr = std::shared_ptr<Proposal>;
 
   Proposal();
+  Proposal (uint32_t id, const String& jsonString);
 
   static String getStatusStr (Proposal::Status status);
 
@@ -54,6 +56,8 @@ public:
   void setTimeLeftDays    (int timeLeftDays)      { m_timeLeft = timeLeftDays; }
   void setTitle   (const String& title)   { m_title = title; }
   void setCreator (const String& creator) { m_creator = creator; }
+  void setDocumentLink (const String& documentLink) { m_documentLink = documentLink; }
+  void setDocumentHash (const String& documentHash) { m_documentHash = documentHash; }
   void setStatus (Proposal::Status status) { m_status = status; }
 
   uint64 getId() const            { return m_id; }
@@ -66,6 +70,8 @@ public:
   int getTimeLeftDays() const     { return m_timeLeft; }
   String getTitle() const         { return m_title; }
   String getCreator() const       { return m_creator; }
+  String getDocumentLink() const  { return m_documentLink; }
+  String getDocumentHash() const  { return m_documentHash; }
   Proposal::Status getStatus() const { return m_status; }
 
 
@@ -82,5 +88,8 @@ private:
 
   String m_title = "Test title";
   String m_creator = "Test creator";
+  String m_documentLink;
+  String m_documentHash;
+
   Proposal::Status m_status;
 };

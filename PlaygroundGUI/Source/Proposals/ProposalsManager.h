@@ -28,7 +28,11 @@ public:
 
   ProposalsManager();
   ~ProposalsManager();
-  bool addProposal (Proposal::Ptr proposal, const std::string& contributor);
+
+  bool fetchProposals();
+  bool addProposal (const Proposal& proposal, bool sendNotification = true);
+  bool createProposal (Proposal::Ptr proposal, const std::string& contributor);
+  void notifyProposalsUpdated();
 
   JUCE_DECLARE_SINGLETON(ProposalsManager, true)
 

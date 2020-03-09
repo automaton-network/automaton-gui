@@ -34,10 +34,19 @@ Proposal::Ptr& ProposalsModel::getReferenceAt (int index)
   return m_items.getReference (index);
 }
 
-void ProposalsModel::addItem (Proposal::Ptr item)
+void ProposalsModel::addItem (Proposal::Ptr item, bool sendNotification)
 {
   m_items.add (item);
-  notifyModelChanged();
+
+  if (sendNotification)
+    notifyModelChanged();
+}
+
+void ProposalsModel::clear (bool sendNotification)
+{
+  m_items.clearQuick();
+  if (sendNotification)
+    notifyModelChanged();
 }
 
 bool ProposalsProxyModel::isAccept (const Proposal::Ptr& item)

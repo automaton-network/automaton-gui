@@ -125,7 +125,7 @@ void ProposalsPage::createProposalViewActionHappened (CreateProposalComponent* c
   {
     //TODO
     componentInWhichActionHappened->setVisible (false);
-    ProposalsManager::getInstance()->addProposal (componentInWhichActionHappened->getProposal(), "a6C8015476f6F4c646C95488c5fc7f5174A4E0ef");
+    ProposalsManager::getInstance()->createProposal (componentInWhichActionHappened->getProposal(), "a6C8015476f6F4c646C95488c5fc7f5174A4E0ef");
   }
   else if (action == CreateProposalComponent::Action::Cancelled)
   {
@@ -169,70 +169,80 @@ void ProposalsPage::sortOrderChanged (int columnId, bool isForwards)
   {
     case ID:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<uint64>::compareElements (p1->getId(), p2->getId());
         };
         break;
       }
     case CreatorAndTitle:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<String>::compareElements (p1->getTitle(), p2->getTitle());
         };
         break;
       }
     case ApprovalRating:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<int>::compareElements (p1->getApprovalRating(), p2->getApprovalRating());
         };
         break;
       }
     case Status:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<int>::compareElements ((int)p1->getStatus(), (int)p2->getStatus());
         };
         break;
       }
     case Spent:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<uint64>::compareElements (p1->getAmountSpent(), p2->getAmountSpent());
         };
         break;
       }
     case Budget:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<uint64>::compareElements (p1->getBudget(), p2->getBudget());
         };
         break;
       }
     case Periods:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<uint64>::compareElements (p1->getNumPeriods(), p2->getNumPeriods());
         };
         break;
       }
     case Length:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<uint64>::compareElements (p1->getAmountSpent(), p2->getAmountSpent());
         };
         break;
       }
     case Bonus:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<uint64>::compareElements (p1->getTargetBonus(), p2->getTargetBonus());
         };
         break;
       }
     case TimeLeft:
       {
-        sorter = [=](Proposal* p1, Proposal* p2){
+        sorter = [=](Proposal* p1, Proposal* p2)
+        {
           return direction * DefaultElementComparator<int>::compareElements (p1->getTimeLeftDays(), p2->getTimeLeftDays());
         };
         break;

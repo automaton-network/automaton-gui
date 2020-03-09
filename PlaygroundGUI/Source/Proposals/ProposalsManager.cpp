@@ -66,16 +66,77 @@ ProposalsManager::~ProposalsManager()
   clearSingletonInstance();
 }
 
-bool ProposalsManager::addProposal (Proposal::Ptr proposal, const std::string& contributor)
+bool ProposalsManager::fetchProposals()
 {
-  AsyncTask task ([=](AsyncTask* task) {
+  const auto cd = AutomatonContractData::getInstance();
+  const auto contract = eth_contract::get_contract (cd->contract_address);
+  if (contract == nullptr) {
+    std::cout << "ERROR: Contract is NULL" << std::endl;
+    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                                      "ERROR",
+                                      "Contract is NULL. Read appropriate contract data first.");
+    //s = status::internal("Contract is NULL!");
+    return false;
+  }
+
+  static const int PROPOSAL_START_ID = 100; // ballotBoxIDs initial value is 99, and the first proposal is at 100
+  auto s = contract->call ("ballotBoxIDs", "");
+  if (!s.is_ok())
+  {
+      std::cout << "ERROR: " << s.msg << std::endl;
+      return false;
+  }
+  if (s.msg.empty())
+  {
+      s = status::internal ("Invalid contract address!");
+      std::cout << "ERROR: Invalid contract address" << std::endl;
+      return false;
+  }
+
+  // Clear all existing proposals in the model
+  m_model->clear (false);
+
+  const json ballotBoxJson = json::parse (s.msg);
+  const uint32_t lastProposalId = std::stoul ((*ballotBoxJson.begin()).get<std::string>());
+  for (int i = PROPOSAL_START_ID; i <= lastProposalId; ++i)
+  {
+    json jInput;
+    jInput.push_back (i);
+    std::string params = jInput.dump();
+    // Enable in new contract version
+    //auto s = contract->call ("getProposal", params);
+    auto s = contract->call ("proposals", params);
+
+    if (! s.is_ok())
+    {
+      std::cout << "ERROR: " << s.msg << std::endl;
+      return false;
+    }
+
+    Proposal proposal (i, String (s.msg));
+    addProposal (proposal, false);
+  }
+
+  return true;
+}
+
+bool ProposalsManager::addProposal (const Proposal& proposal, bool sendNotification)
+{
+  m_model->addItem (std::make_shared<Proposal> (proposal), sendNotification);
+}
+
+bool ProposalsManager::createProposal (Proposal::Ptr proposal, const std::string& contributor)
+{
+  AsyncTask task ([=](AsyncTask* task)
+  {
     //TODO: pass address and privateKey
-    const std::string privateKey = "af575525cab41534a57e0b0487992d5048eee7c8c72e4c39f2ec34c1a25ca385";
-    const std::string address = "0xa6C8015476f6F4c646C95488c5fc7f5174A4E0ef";
+    const std::string privateKey = "d6bcab62129f74fc2dcf9f1016625c054765f2743a24ee2326b9790693051283";
+    const std::string address = "0x266f746a6d9b01085Cf2c20ba55ECC45A4D51724";
 
     const auto cd = AutomatonContractData::getInstance();
     const auto contract = eth_contract::get_contract (cd->contract_address);
-    if (contract == nullptr) {
+    if (contract == nullptr)
+    {
       std::cout << "ERROR: Contract is NULL" << std::endl;
       AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
               "ERROR",
@@ -85,7 +146,17 @@ bool ProposalsManager::addProposal (Proposal::Ptr proposal, const std::string& c
     }
     task->setProgress (0.1);
 
-    auto& s = task->m_status;
+    auto s = contract->call ("ballotBoxIDs", "");
+    if (! s.is_ok())
+    {
+      std::cout << "ERROR: " << s.msg << std::endl;
+      return false;
+    }
+    const json ballotBoxJson = json::parse (s.msg);
+    const uint32_t lastProposalId = std::stoul ((*ballotBoxJson.begin()).get<std::string>());
+    proposal->setId (lastProposalId + 1);
+    task->setProgress (0.25);
+
     s = eth_getTransactionCount (cd->eth_url, address);
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (! s.is_ok())
@@ -127,20 +198,22 @@ bool ProposalsManager::addProposal (Proposal::Ptr proposal, const std::string& c
       return false;
 
     DBG("Call result: " << s.msg << "\n");
-    proposal->setStatus (Proposal::Status::Uninitialized);
+    proposal->setStatus (Proposal::Status::Started);
     task->setProgress (1.0);
 
     return true;
   }, "Creating proposal....");
 
 
-  if (task.runThread()) {
+  if (task.runThread())
+  {
     m_model->addItem (proposal);
   }
   else
   {
     auto& s = task.m_status;
-    if (! s.is_ok()){
+    if (! s.is_ok())
+    {
       printf("ERROR: (%u) %s", s.code, s.msg.c_str());
       AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
               "ERROR",
@@ -150,6 +223,11 @@ bool ProposalsManager::addProposal (Proposal::Ptr proposal, const std::string& c
   }
 
   return true;
+}
+
+void ProposalsManager::notifyProposalsUpdated()
+{
+  m_model->notifyModelChanged();
 }
 
 JUCE_IMPLEMENT_SINGLETON(ProposalsManager);

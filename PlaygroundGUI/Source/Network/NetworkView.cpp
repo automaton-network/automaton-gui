@@ -32,6 +32,8 @@
 #include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
 
+#include "../Proposals/ProposalsManager.h"
+
 using json = nlohmann::json;
 
 using automaton::core::common::status;
@@ -171,12 +173,16 @@ class ReadContractThread: public ThreadWithProgressWindow {
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
     slots_claimed = std::stoul(slots_claimed_string);
     setStatusMessage("Number of slot claims: " + slots_claimed_string);
+    setProgress(0.8);
 
+    ProposalsManager::getInstance()->fetchProposals();
     setProgress(1.0);
+
     s = status::ok();
   }
 
   void threadComplete(bool userPressedCancel) override {
+    ProposalsManager::getInstance()->notifyProposalsUpdated();
   }
 };
 

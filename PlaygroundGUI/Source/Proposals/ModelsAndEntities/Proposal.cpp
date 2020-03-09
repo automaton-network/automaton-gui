@@ -19,6 +19,11 @@
 
 #include "Proposal.h"
 
+#include <json.hpp>
+#include <string>
+
+using json = nlohmann::json;
+
 
 Proposal::Proposal()
   : m_id (0)
@@ -31,6 +36,38 @@ Proposal::Proposal()
   , m_timeLeft (0)
   , m_status (Proposal::Status::Uninitialized)
 {
+}
+
+Proposal::Proposal (uint32_t id, const String& jsonString)
+  : m_id (0)
+  , m_amountSpent (0)
+  , m_budget (0)
+  , m_numPeriods (0)
+  , m_targetBonus (0)
+  , m_approvalRating (0)
+  , m_lengthDays (0)
+  , m_timeLeft (0)
+  , m_status (Proposal::Status::Uninitialized)
+{
+    setId (id);
+
+    json json_proposal = json::parse (jsonString.toStdString());
+    //TODO: add json error handling
+
+    setCreator (json_proposal.at (0).get<std::string>());
+    setTitle (json_proposal.at (1).get<std::string>());
+    setDocumentLink (json_proposal.at (2).get<std::string>());
+    setDocumentHash (json_proposal.at (3).get<std::string>());
+    setLengthDays (std::stoul (json_proposal.at (4).get<std::string>()));
+    setNumPeriods (std::stoul (json_proposal.at (5).get<std::string>()));
+    setBudget (std::stoul (json_proposal.at (6).get<std::string>()));
+    //TODO
+    //setNextPaymentDate (json_proposal.at (7.get<uint64_t>()));
+
+    setStatus (static_cast<Proposal::Status> (std::stoul (json_proposal.at(8).get<std::string>())));
+    //TODO
+    //setInitialEndDate (json_proposal.at (9).get<uint64_t>());
+    //setContestEndDate (json_proposal.at (10).get<uint64_t>());
 }
 
 String Proposal::getStatusStr (Proposal::Status status)
