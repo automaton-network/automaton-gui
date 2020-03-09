@@ -101,6 +101,7 @@ public:
   void modelChanged (AbstractListModelBase*) override
   {
     updateContent();
+    resized();
   }
 
   Component* refreshComponent (int index, Component* const componentToUpdate) override
