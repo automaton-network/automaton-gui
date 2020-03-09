@@ -33,6 +33,9 @@ public:
   bool addProposal (const Proposal& proposal, bool sendNotification = true);
   bool createProposal (Proposal::Ptr proposal, const std::string& contributor);
   void notifyProposalsUpdated();
+  bool addProposal (Proposal::Ptr proposal, const std::string& contributor);
+  bool payForGas (Proposal::Ptr proposal, uint64 slotsToPay);
+  bool castVote (Proposal::Ptr proposal, uint64 choice);
 
   JUCE_DECLARE_SINGLETON(ProposalsManager, true)
 

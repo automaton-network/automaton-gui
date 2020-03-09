@@ -88,6 +88,8 @@ private:
   std::unique_ptr<TextButton> m_payForGasBtn;
   std::unique_ptr<TextButton> m_abandonProposalBtn;
   std::unique_ptr<TextButton> m_FilterBtn;
+  std::unique_ptr<TextButton> m_voteYesBtn;
+  std::unique_ptr<TextButton> m_voteNoBtn;
   std::unique_ptr<ComboBox> m_filterByStatusComboBox;
 
   std::unique_ptr<CreateProposalComponent> m_createProposalView;

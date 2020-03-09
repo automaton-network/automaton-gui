@@ -44,7 +44,12 @@ ProposalsPage::ProposalsPage()
   m_createProposalBtn = std::make_unique<TextButton> (translate ("Create Proposal"));
   m_createProposalBtn->addListener (this);
   m_payForGasBtn = std::make_unique<TextButton> (translate ("Pay for Gas"));
+  m_payForGasBtn->addListener (this);
   m_FilterBtn = std::make_unique<TextButton> (translate ("Filter..."));
+  m_voteYesBtn = std::make_unique<TextButton> (translate ("Vote YES"));
+  m_voteYesBtn->addListener (this);
+  m_voteNoBtn = std::make_unique<TextButton> (translate ("Vote NO"));
+  m_voteNoBtn->addListener (this);
   m_abandonProposalBtn = std::make_unique<TextButton> (translate ("Abandon Proposal"));
 
   m_filterByStatusComboBox = std::make_unique<ComboBox>();
@@ -64,6 +69,8 @@ ProposalsPage::ProposalsPage()
   // Enable only when any proposal is selected
   m_payForGasBtn->setEnabled (false);
   m_abandonProposalBtn->setEnabled (false);
+  m_voteYesBtn->setEnabled (false);
+  m_voteNoBtn->setEnabled (false);
 
   m_createProposalView = std::make_unique<CreateProposalComponent>();
   m_createProposalView->addListener (this);
@@ -72,7 +79,8 @@ ProposalsPage::ProposalsPage()
   addAndMakeVisible (m_createProposalBtn.get());
   addAndMakeVisible (m_payForGasBtn.get());
   addAndMakeVisible (m_FilterBtn.get());
-  addAndMakeVisible (m_abandonProposalBtn.get());
+  addAndMakeVisible (m_voteYesBtn.get());
+  addAndMakeVisible (m_voteNoBtn.get());
   addAndMakeVisible (m_filterByStatusComboBox.get());
   addAndMakeVisible (m_proposalsListBox.get());
 }
@@ -101,7 +109,9 @@ void ProposalsPage::resized()
   buttonsArea.removeFromLeft (buttonsSpacing);
   m_payForGasBtn->setBounds (buttonsArea.removeFromLeft (buttonsWidth));
   buttonsArea.removeFromLeft (buttonsSpacing);
-  m_abandonProposalBtn->setBounds (buttonsArea.removeFromLeft (buttonsWidth));
+  m_voteYesBtn->setBounds (buttonsArea.removeFromLeft (buttonsWidth));
+  buttonsArea.removeFromLeft (buttonsSpacing);
+  m_voteNoBtn->setBounds (buttonsArea.removeFromLeft (buttonsWidth));
   buttonsArea.removeFromLeft (buttonsSpacing);
   m_filterByStatusComboBox->setBounds (buttonsArea.removeFromLeft (buttonsWidth));
   buttonsArea.removeFromLeft (buttonsSpacing);
@@ -140,6 +150,41 @@ void ProposalsPage::buttonClicked (Button* buttonThatWasClicked)
     m_createProposalView->setVisible (true);
     m_createProposalView->setAlwaysOnTop (true);
   }
+  else if (buttonThatWasClicked == m_voteYesBtn.get())
+  {
+    auto proposal = m_proxyModel->getAt (m_proposalsListBox->getSelectedRow());
+    ProposalsManager::getInstance()->castVote (proposal, 1);
+  }
+  else if (buttonThatWasClicked == m_voteNoBtn.get())
+  {
+    auto proposal = m_proxyModel->getAt (m_proposalsListBox->getSelectedRow());
+    ProposalsManager::getInstance()->castVote (proposal, 0);
+  }
+  else if (buttonThatWasClicked == m_payForGasBtn.get())
+  {
+    auto proposal = m_proxyModel->getAt (m_proposalsListBox->getSelectedRow());
+    AlertWindow w("Pay for gas of " + proposal->getTitle(),
+            "Enter num of slots and it will be payed.",
+            AlertWindow::QuestionIcon);
+
+    w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
+    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+    if (w.runModalLoop() == 1)
+    {
+      auto slotsToPay = w.getTextEditorContents("slotsToPay").getLargeIntValue();
+      if (slotsToPay > 0)
+      {
+        ProposalsManager::getInstance()->payForGas (proposal, slotsToPay);
+      }
+      else
+      {
+        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                "Invalid data", "Enter correct number of slots");
+      }
+    }
+  }
 }
 
 void ProposalsPage::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -149,8 +194,11 @@ void ProposalsPage::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 void ProposalsPage::updateButtons()
 {
-  m_payForGasBtn->setEnabled (m_proposalsListBox->getNumSelectedRows() > 0);
-  m_abandonProposalBtn->setEnabled (m_proposalsListBox->getNumSelectedRows() > 0);
+  const bool isRowSelected = m_proposalsListBox->getNumSelectedRows() > 0;
+  m_payForGasBtn->setEnabled (isRowSelected);
+  m_abandonProposalBtn->setEnabled (isRowSelected);
+  m_voteYesBtn->setEnabled (isRowSelected);
+  m_voteNoBtn->setEnabled (isRowSelected);
 }
 
 // TableListBoxModel
