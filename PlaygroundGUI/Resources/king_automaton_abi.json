@@ -7,9 +7,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint8",
+        "internalType": "uint256",
         "name": "minDifficultyBits",
-        "type": "uint8"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -111,21 +111,7 @@
   },
   {
     "inputs": [],
-    "name": "CONTEST_PERIOD",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "PROPOSAL_START_PERIOD",
+    "name": "MIN_PERIOD_LEN",
     "outputs": [
       {
         "internalType": "uint256",
@@ -156,20 +142,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "approvalPercentage",
-    "outputs": [
-      {
-        "internalType": "int256",
-        "name": "",
-        "type": "int256"
       }
     ],
     "stateMutability": "view",
@@ -213,46 +185,35 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "ballotBoxes",
-    "outputs": [
+        "internalType": "bytes32",
+        "name": "pubKeyX",
+        "type": "bytes32"
+      },
       {
-        "internalType": "enum KingAutomaton.BallotBoxState",
-        "name": "state",
+        "internalType": "bytes32",
+        "name": "pubKeyY",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint8",
+        "name": "v",
         "type": "uint8"
       },
       {
-        "internalType": "uint256",
-        "name": "numChoices",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
       },
       {
-        "internalType": "uint256",
-        "name": "paidSlots",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
       }
     ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "contestPercentage",
-    "outputs": [
-      {
-        "internalType": "int256",
-        "name": "",
-        "type": "int256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "name": "claimSlot",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -276,6 +237,185 @@
         "internalType": "uint8",
         "name": "",
         "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "dexData",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "ids",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "start",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "len",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDifficulties",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "result",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "start",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "len",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLastClaimTimes",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "result",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "start",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "len",
+        "type": "uint256"
+      }
+    ],
+    "name": "getOwners",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "result",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "slot",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSlot",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "difficulty",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "last_claim_time",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "slot",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSlotDifficulty",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "slot",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSlotLastClaimTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "slot",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSlotOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -440,147 +580,22 @@
     "constant": true
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "orders",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "AUTO",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "ETH",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address payable",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "enum KingAutomaton.OrderType",
-        "name": "orderType",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "proposals",
-    "outputs": [
-      {
-        "internalType": "address payable",
-        "name": "contributor",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "title",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "documentsLink",
-        "type": "string"
-      },
-      {
-        "internalType": "bytes",
-        "name": "documentsHash",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint256",
-        "name": "budgetPeriodLen",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "remainingPeriods",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "budgetPerPeriod",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nextPaymentDate",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum KingAutomaton.ProposalState",
-        "name": "state",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "initialEndDate",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "contestEndDate",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
     "inputs": [],
-    "name": "rewardPerSlotPerSecond",
+    "name": "proposalsData",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
+        "internalType": "int256",
+        "name": "approvalPercentage",
+        "type": "int256"
+      },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "slots",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
+        "internalType": "int256",
+        "name": "contestPercentage",
+        "type": "int256"
       },
       {
         "internalType": "uint256",
-        "name": "difficulty",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "last_claim_time",
+        "name": "treasuryLimitPercentage",
         "type": "uint256"
       }
     ],
@@ -605,20 +620,6 @@
   {
     "inputs": [],
     "name": "totalSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "treasuryLimitPercentage",
     "outputs": [
       {
         "internalType": "uint256",
@@ -776,19 +777,99 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "x",
+        "name": "_id",
         "type": "uint256"
       }
     ],
-    "name": "msb",
+    "name": "getBallotBox",
     "outputs": [
       {
-        "internalType": "uint8",
-        "name": "r",
+        "internalType": "enum Proposals.BallotBoxState",
+        "name": "state",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numChoices",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "paidSlots",
+        "type": "uint256"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getProposal",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "contributor",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "documentsLink",
+        "type": "string"
+      },
+      {
+        "internalType": "bytes",
+        "name": "documentsHash",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "budgetPeriodLen",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "remainingPeriods",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "budgetPerPeriod",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nextPaymentDate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum Proposals.ProposalState",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "initialEndDate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "contestEndDate",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function",
     "constant": true
   },
@@ -804,7 +885,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "id",
         "type": "uint256"
       }
     ],
@@ -853,7 +934,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_id",
         "type": "uint256"
       }
     ],
@@ -1114,208 +1195,49 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "slot",
+        "name": "nSlots",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minDifficultyBits",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "predefinedMask",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "initialDailySupply",
         "type": "uint256"
       }
     ],
-    "name": "getSlotOwner",
-    "outputs": [
+    "name": "initMining",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "addr",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "slot",
-        "type": "uint256"
-      }
-    ],
-    "name": "getSlotDifficulty",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "slot",
-        "type": "uint256"
-      }
-    ],
-    "name": "getSlotLastClaimTime",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "start",
-        "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "len",
-        "type": "uint256"
-      }
-    ],
-    "name": "getOwners",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "result",
-        "type": "address[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "start",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "userName",
+        "type": "string"
       },
       {
-        "internalType": "uint256",
-        "name": "len",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "info",
+        "type": "string"
       }
     ],
-    "name": "getDifficulties",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "result",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "start",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "len",
-        "type": "uint256"
-      }
-    ],
-    "name": "getLastClaimTimes",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "result",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "getMask",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "getMinDifficulty",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "getClaimed",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "pubKeyX",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "pubKeyY",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint8",
-        "name": "v",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "r",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "s",
-        "type": "bytes32"
-      }
-    ],
-    "name": "claimSlot",
+    "name": "registerUserInternal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1359,8 +1281,27 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getDEXBalance",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_value",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "getBalanceETH",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1390,6 +1331,41 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getOrder",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "AUTO",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ETH",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "enum DEX.OrderType",
+        "name": "orderType",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "_AUTO",
         "type": "uint256"
       }
@@ -1398,7 +1374,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "_id",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -1485,4 +1461,4 @@
     "stateMutability": "nonpayable",
     "type": "function"
   }
-  ]
+]

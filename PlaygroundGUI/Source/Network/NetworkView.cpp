@@ -158,17 +158,17 @@ class ReadContractThread: public ThreadWithProgressWindow {
     }
     setProgress(0);
 
-    s = contract->call("getMask", "");
+    s = contract->call("mask", "");
     j_output = json::parse(s.msg);
     mask = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     setStatusMessage("Mask: " + mask);
 
-    s = contract->call("getMinDifficulty", "");
+    s = contract->call("minDifficulty", "");
     j_output = json::parse(s.msg);
     min_difficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     setStatusMessage("MinDifficulty: " + min_difficulty);
 
-    s = contract->call("getClaimed", "");
+    s = contract->call("numTakeOvers", "");
     j_output = json::parse(s.msg);
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
     slots_claimed = std::stoul(slots_claimed_string);
