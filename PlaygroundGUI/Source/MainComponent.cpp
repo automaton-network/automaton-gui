@@ -23,7 +23,6 @@
 #include "Miner/Miner.h"
 #include "Network/NetworkView.h"
 #include "Proposals/ProposalsManager.h"
-//#include "Proposals/ModelsAndEntities/AbstractListModel.h"
 #include "Proposals/ProposalsPage.h"
 #include "Proposals/ProposalsActionsPage.h"
 

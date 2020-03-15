@@ -19,27 +19,20 @@
 
 #pragma once
 
-#include "ProposalsModel.h"
+#include <JuceHeader.h>
 
-class ProposalsManager : public DeletedAtShutdown
+//==============================================================================
+/*
+*/
+class DEXPage : public Component
 {
 public:
-  std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
+  DEXPage();
+  ~DEXPage();
 
-  ProposalsManager();
-  ~ProposalsManager();
-
-  bool fetchProposals();
-  bool addProposal (const Proposal& proposal, bool sendNotification = true);
-  bool createProposal (Proposal::Ptr proposal, const std::string& contributor);
-  void notifyProposalsUpdated();
-  bool addProposal (Proposal::Ptr proposal, const std::string& contributor);
-  bool payForGas (Proposal::Ptr proposal, uint64 slotsToPay);
-  bool castVote (Proposal::Ptr proposal, uint64 choice);
-
-  JUCE_DECLARE_SINGLETON(ProposalsManager, true)
-
+  void paint (Graphics&) override;
+  void resized() override;
 
 private:
-  std::shared_ptr<ProposalsModel> m_model;
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DEXPage)
 };

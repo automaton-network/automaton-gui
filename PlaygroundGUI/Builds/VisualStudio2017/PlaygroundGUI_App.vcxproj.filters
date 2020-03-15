@@ -5,8 +5,11 @@
     <Filter Include="PlaygroundGUI\Resources">
       <UniqueIdentifier>{AE2B0A6C-5E8C-CDF5-BBA7-0BA1DA8C1FBD}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PlaygroundGUI\Source\Proposals\ModelsAndEntities">
-      <UniqueIdentifier>{E50E7615-E97F-B8A8-6677-A9CA90FE2CEC}</UniqueIdentifier>
+    <Filter Include="PlaygroundGUI\Source\Models">
+      <UniqueIdentifier>{3AAFC65C-0FA2-821E-8E4D-2A7038709449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlaygroundGUI\Source\DEX">
+      <UniqueIdentifier>{63040034-0EDA-62AB-4997-EBEED418CD0F}</UniqueIdentifier>
     </Filter>
     <Filter Include="PlaygroundGUI\Source\Proposals">
       <UniqueIdentifier>{13EED7F5-D0C7-14AD-1845-C76F19314059}</UniqueIdentifier>
@@ -244,11 +247,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Proposals\ModelsAndEntities\Proposal.cpp">
-      <Filter>PlaygroundGUI\Source\Proposals\ModelsAndEntities</Filter>
+    <ClCompile Include="..\..\Source\DEX\DEXPage.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Proposals\ModelsAndEntities\ProposalsModel.cpp">
-      <Filter>PlaygroundGUI\Source\Proposals\ModelsAndEntities</Filter>
+    <ClCompile Include="..\..\Source\DEX\Order.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\Proposal.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsModel.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Proposals\CreateProposalComponent.cpp">
       <Filter>PlaygroundGUI\Source\Proposals</Filter>
@@ -1578,17 +1590,26 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\AbstractListModel.h">
-      <Filter>PlaygroundGUI\Source\Proposals\ModelsAndEntities</Filter>
+    <ClInclude Include="..\..\Source\Models\AbstractListModel.h">
+      <Filter>PlaygroundGUI\Source\Models</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\AbstractProxyModel.h">
-      <Filter>PlaygroundGUI\Source\Proposals\ModelsAndEntities</Filter>
+    <ClInclude Include="..\..\Source\Models\AbstractProxyModel.h">
+      <Filter>PlaygroundGUI\Source\Models</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\Proposal.h">
-      <Filter>PlaygroundGUI\Source\Proposals\ModelsAndEntities</Filter>
+    <ClInclude Include="..\..\Source\DEX\DEXPage.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\ProposalsModel.h">
-      <Filter>PlaygroundGUI\Source\Proposals\ModelsAndEntities</Filter>
+    <ClInclude Include="..\..\Source\DEX\Order.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DEX\OrdersModel.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\Proposal.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsModel.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Proposals\CreateProposalComponent.h">
       <Filter>PlaygroundGUI\Source\Proposals</Filter>

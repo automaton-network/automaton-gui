@@ -41,13 +41,25 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
-		E61B27AB1BD1011642E4B281 = {
+		5A3DA206190F057B44FDA6A4 = {
 			isa = PBXBuildFile;
-			fileRef = 50C480CED14A69FE7753F9AC;
+			fileRef = 146CF7EBB22338825418D3E9;
 		};
-		46A40114AD5CAF20F933DFC8 = {
+		3FAABEF679539A4A35C12933 = {
 			isa = PBXBuildFile;
-			fileRef = A3DB72E1853A3F3DF7352004;
+			fileRef = 64AA565C9FB6F488ABFC0858;
+		};
+		81315ABE1B5196E62FEAF085 = {
+			isa = PBXBuildFile;
+			fileRef = EDA72D64D0C8122D56A91779;
+		};
+		94F672D3BDA08865353B9C45 = {
+			isa = PBXBuildFile;
+			fileRef = 999124BB54C7EFFB15C28C9A;
+		};
+		B16A028E08A88B3CC4C157B1 = {
+			isa = PBXBuildFile;
+			fileRef = D60BF1DB6AB1382EC05AFF91;
 		};
 		119F3E08EA0700D3227756D8 = {
 			isa = PBXBuildFile;
@@ -187,6 +199,13 @@
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_data_structures";
 			sourceTree = "SOURCE_ROOT";
 		};
+		0C84C6C4FC66FF94F12AABA5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalsModel.h;
+			path = ../../Source/Proposals/ProposalsModel.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		0F3E15670DE5E9D260B52A7C = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -215,6 +234,13 @@
 			path = ../../Source/Proposals/ProposalsActionsPage.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		146CF7EBB22338825418D3E9 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = DEXPage.cpp;
+			path = ../../Source/DEX/DEXPage.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		14CE094E72DE869A11098622 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -227,6 +253,13 @@
 			lastKnownFileType = file.ttf;
 			name = "Play-Bold.ttf";
 			path = "../../../../automaton/media/fonts/play/Play-Bold.ttf";
+			sourceTree = "SOURCE_ROOT";
+		};
+		160F1B25E830A88EB81D11F5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = DEXPage.h;
+			path = ../../Source/DEX/DEXPage.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		1E8DE8B40D50E5DB882D0D40 = {
@@ -248,6 +281,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = ProposalsPage.cpp;
 			path = ../../Source/Proposals/ProposalsPage.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		285D5BE86C9CA0389815AD35 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = AbstractListModel.h;
+			path = ../../Source/Models/AbstractListModel.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		2886D3F006ED597D331F6F51 = {
@@ -278,26 +318,19 @@
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_gui_basics";
 			sourceTree = "SOURCE_ROOT";
 		};
+		3D9D6A70A43B37B489172BDD = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Order.h;
+			path = ../../Source/DEX/Order.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		426447579678A29AC4896E2B = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = WebKit.framework;
 			path = System/Library/Frameworks/WebKit.framework;
 			sourceTree = SDKROOT;
-		};
-		43A234BFC50B8C50834A2FE6 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = AbstractListModel.h;
-			path = ../../Source/Proposals/ModelsAndEntities/AbstractListModel.h;
-			sourceTree = "SOURCE_ROOT";
-		};
-		50C480CED14A69FE7753F9AC = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = Proposal.cpp;
-			path = ../../Source/Proposals/ModelsAndEntities/Proposal.cpp;
-			sourceTree = "SOURCE_ROOT";
 		};
 		510F04B2A4332278F5F209C3 = {
 			isa = PBXFileReference;
@@ -334,6 +367,13 @@
 			path = ../../Source/Demos/DemoMiner.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		64AA565C9FB6F488ABFC0858 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Order.cpp;
+			path = ../../Source/DEX/Order.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		674BD8AB93DB872747B5BE69 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -353,27 +393,6 @@
 			lastKnownFileType = file.json;
 			name = "default_config.json";
 			path = "../../Resources/default_config.json";
-			sourceTree = "SOURCE_ROOT";
-		};
-		6A59688D0780F2E0DD5BDE67 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = AbstractProxyModel.h;
-			path = ../../Source/Proposals/ModelsAndEntities/AbstractProxyModel.h;
-			sourceTree = "SOURCE_ROOT";
-		};
-		6DDA54725C41CC4D39DD48A9 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = Proposal.h;
-			path = ../../Source/Proposals/ModelsAndEntities/Proposal.h;
-			sourceTree = "SOURCE_ROOT";
-		};
-		7B8877B302FA30BFE4BF78E1 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = ProposalsModel.h;
-			path = ../../Source/Proposals/ModelsAndEntities/ProposalsModel.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		82B2A1E48CC113E63E1DE5AA = {
@@ -411,6 +430,13 @@
 			path = ../../Source/Demos/DemoSimNet.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		88BBF5E2B42386B3A2583ED0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = AbstractProxyModel.h;
+			path = ../../Source/Models/AbstractProxyModel.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		8B0AAA0091A485A31E7E7FB9 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.json;
@@ -437,6 +463,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Main.cpp;
 			path = ../../Source/Main.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		999124BB54C7EFFB15C28C9A = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Proposal.cpp;
+			path = ../../Source/Proposals/Proposal.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		9A5E50B9E6B77E8F419D53D0 = {
@@ -467,11 +500,11 @@
 			path = ../../Source/Data/AutomatonContractData.h;
 			sourceTree = "SOURCE_ROOT";
 		};
-		A3DB72E1853A3F3DF7352004 = {
+		AC725974DA4D5A793B592A09 = {
 			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = ProposalsModel.cpp;
-			path = ../../Source/Proposals/ModelsAndEntities/ProposalsModel.cpp;
+			lastKnownFileType = sourcecode.c.h;
+			name = Proposal.h;
+			path = ../../Source/Proposals/Proposal.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		B4352990FE118BBD5B965E8F = {
@@ -486,6 +519,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = AutomatonContractData.cpp;
 			path = ../../Source/Data/AutomatonContractData.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		BA288CD361E5BFCC337628EB = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = OrdersModel.h;
+			path = ../../Source/DEX/OrdersModel.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		BEF8E95313BF13AE8C0A6AC7 = {
@@ -544,6 +584,13 @@
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_graphics";
 			sourceTree = "SOURCE_ROOT";
 		};
+		D60BF1DB6AB1382EC05AFF91 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalsModel.cpp;
+			path = ../../Source/Proposals/ProposalsModel.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		D752613D5D9683073A9F79DD = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -593,6 +640,13 @@
 			path = ../../JuceLibraryCode/JuceHeader.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		EDA72D64D0C8122D56A91779 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = OrdersModel.cpp;
+			path = ../../Source/DEX/OrdersModel.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		F193D440E5BAB158E4C4C217 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -625,23 +679,35 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		19742883CF655113CA196584 = {
+		687803636958C453C18D7987 = {
 			isa = PBXGroup;
 			children = (
-				43A234BFC50B8C50834A2FE6,
-				6A59688D0780F2E0DD5BDE67,
-				50C480CED14A69FE7753F9AC,
-				6DDA54725C41CC4D39DD48A9,
-				A3DB72E1853A3F3DF7352004,
-				7B8877B302FA30BFE4BF78E1,
+				285D5BE86C9CA0389815AD35,
+				88BBF5E2B42386B3A2583ED0,
 			);
-			name = ModelsAndEntities;
+			name = Models;
+			sourceTree = "<group>";
+		};
+		4576C75266FC9F8B83F83140 = {
+			isa = PBXGroup;
+			children = (
+				146CF7EBB22338825418D3E9,
+				160F1B25E830A88EB81D11F5,
+				64AA565C9FB6F488ABFC0858,
+				3D9D6A70A43B37B489172BDD,
+				EDA72D64D0C8122D56A91779,
+				BA288CD361E5BFCC337628EB,
+			);
+			name = DEX;
 			sourceTree = "<group>";
 		};
 		C2050576413F623B249937CF = {
 			isa = PBXGroup;
 			children = (
-				19742883CF655113CA196584,
+				999124BB54C7EFFB15C28C9A,
+				AC725974DA4D5A793B592A09,
+				D60BF1DB6AB1382EC05AFF91,
+				0C84C6C4FC66FF94F12AABA5,
 				1F7A71E440D0AA4EFE54D78D,
 				E7C2C623D58FC93EC7586866,
 				B4352990FE118BBD5B965E8F,
@@ -719,6 +785,8 @@
 		883895BF3FD94AEF68720830 = {
 			isa = PBXGroup;
 			children = (
+				687803636958C453C18D7987,
+				4576C75266FC9F8B83F83140,
 				C2050576413F623B249937CF,
 				B56F603FB4214EB5A6B59BE1,
 				F9E1BF6AB0C4E7F511EFC866,
@@ -1038,8 +1106,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E61B27AB1BD1011642E4B281,
-				46A40114AD5CAF20F933DFC8,
+				5A3DA206190F057B44FDA6A4,
+				3FAABEF679539A4A35C12933,
+				81315ABE1B5196E62FEAF085,
+				94F672D3BDA08865353B9C45,
+				B16A028E08A88B3CC4C157B1,
 				119F3E08EA0700D3227756D8,
 				CA1EBA052F275BF313BF1275,
 				25C5695494D3CEB6AB1F3674,

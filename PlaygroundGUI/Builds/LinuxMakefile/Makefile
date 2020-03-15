@@ -68,8 +68,11 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS_APP := \
-  $(JUCE_OBJDIR)/Proposal_99abfd4a.o \
-  $(JUCE_OBJDIR)/ProposalsModel_2a272900.o \
+  $(JUCE_OBJDIR)/DEXPage_119e148f.o \
+  $(JUCE_OBJDIR)/Order_30383997.o \
+  $(JUCE_OBJDIR)/OrdersModel_86d6378d.o \
+  $(JUCE_OBJDIR)/Proposal_bae9729.o \
+  $(JUCE_OBJDIR)/ProposalsModel_40a09f9f.o \
   $(JUCE_OBJDIR)/CreateProposalComponent_d7aea502.o \
   $(JUCE_OBJDIR)/GridView_eaf49ec2.o \
   $(JUCE_OBJDIR)/ProposalsActionsPage_11cbcf62.o \
@@ -107,12 +110,27 @@ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
 	-$(V_AT)mkdir -p $(JUCE_OUTDIR)
 	$(V_AT)$(CXX) -o $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) $(OBJECTS_APP) $(JUCE_LDFLAGS) $(JUCE_LDFLAGS_APP) $(RESOURCES) $(TARGET_ARCH)
 
-$(JUCE_OBJDIR)/Proposal_99abfd4a.o: ../../Source/Proposals/ModelsAndEntities/Proposal.cpp
+$(JUCE_OBJDIR)/DEXPage_119e148f.o: ../../Source/DEX/DEXPage.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling DEXPage.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/Order_30383997.o: ../../Source/DEX/Order.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling Order.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/OrdersModel_86d6378d.o: ../../Source/DEX/OrdersModel.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling OrdersModel.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/Proposal_bae9729.o: ../../Source/Proposals/Proposal.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling Proposal.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
-$(JUCE_OBJDIR)/ProposalsModel_2a272900.o: ../../Source/Proposals/ModelsAndEntities/ProposalsModel.cpp
+$(JUCE_OBJDIR)/ProposalsModel_40a09f9f.o: ../../Source/Proposals/ProposalsModel.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling ProposalsModel.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"

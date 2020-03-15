@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "AbstractProxyModel.h"
+#include "../Models/AbstractProxyModel.h"
 #include "Proposal.h"
 
 class ProposalsModel : public AbstractListModel<Proposal::Ptr>

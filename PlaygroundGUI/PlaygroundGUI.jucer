@@ -16,19 +16,27 @@
             file="../../automaton/media/fonts/play/Play-Regular.ttf"/>
     </GROUP>
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
+      <GROUP id="{E61E1C27-4498-A9CF-2C71-5DD345898E6A}" name="Models">
+        <FILE id="vBj6l1" name="AbstractListModel.h" compile="0" resource="0"
+              file="Source/Models/AbstractListModel.h"/>
+        <FILE id="T3zYgj" name="AbstractProxyModel.h" compile="0" resource="0"
+              file="Source/Models/AbstractProxyModel.h"/>
+      </GROUP>
+      <GROUP id="{3ED33CF7-55A1-F830-A062-EA46E2239109}" name="DEX">
+        <FILE id="YWDtF2" name="DEXPage.cpp" compile="1" resource="0" file="Source/DEX/DEXPage.cpp"/>
+        <FILE id="PRHtGa" name="DEXPage.h" compile="0" resource="0" file="Source/DEX/DEXPage.h"/>
+        <FILE id="DNFrmv" name="Order.cpp" compile="1" resource="0" file="Source/DEX/Order.cpp"/>
+        <FILE id="cECUWM" name="Order.h" compile="0" resource="0" file="Source/DEX/Order.h"/>
+        <FILE id="SavH1N" name="OrdersModel.cpp" compile="1" resource="0" file="Source/DEX/OrdersModel.cpp"/>
+        <FILE id="GaasMi" name="OrdersModel.h" compile="0" resource="0" file="Source/DEX/OrdersModel.h"/>
+      </GROUP>
       <GROUP id="{BEADF6D5-B88A-B1C3-2B00-06EE3D256D87}" name="Proposals">
-        <GROUP id="{DAD3EE95-4508-F0D4-6CDA-61B9AA5474AB}" name="ModelsAndEntities">
-          <FILE id="p1uzpL" name="AbstractListModel.h" compile="0" resource="0"
-                file="Source/Proposals/ModelsAndEntities/AbstractListModel.h"/>
-          <FILE id="new5vP" name="AbstractProxyModel.h" compile="0" resource="0"
-                file="Source/Proposals/ModelsAndEntities/AbstractProxyModel.h"/>
-          <FILE id="xCxPQP" name="Proposal.cpp" compile="1" resource="0" file="Source/Proposals/ModelsAndEntities/Proposal.cpp"/>
-          <FILE id="Dk6qLb" name="Proposal.h" compile="0" resource="0" file="Source/Proposals/ModelsAndEntities/Proposal.h"/>
-          <FILE id="V6uVbL" name="ProposalsModel.cpp" compile="1" resource="0"
-                file="Source/Proposals/ModelsAndEntities/ProposalsModel.cpp"/>
-          <FILE id="HEWAjG" name="ProposalsModel.h" compile="0" resource="0"
-                file="Source/Proposals/ModelsAndEntities/ProposalsModel.h"/>
-        </GROUP>
+        <FILE id="sYLkKA" name="Proposal.cpp" compile="1" resource="0" file="Source/Proposals/Proposal.cpp"/>
+        <FILE id="hA94JD" name="Proposal.h" compile="0" resource="0" file="Source/Proposals/Proposal.h"/>
+        <FILE id="oItQcN" name="ProposalsModel.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalsModel.cpp"/>
+        <FILE id="oqtXKX" name="ProposalsModel.h" compile="0" resource="0"
+              file="Source/Proposals/ProposalsModel.h"/>
         <FILE id="tteWB2" name="CreateProposalComponent.cpp" compile="1" resource="0"
               file="Source/Proposals/CreateProposalComponent.cpp"/>
         <FILE id="vxPTw7" name="CreateProposalComponent.h" compile="0" resource="0"

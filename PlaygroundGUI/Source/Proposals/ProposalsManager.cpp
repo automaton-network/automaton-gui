@@ -426,13 +426,19 @@ bool ProposalsManager::castVote (Proposal::Ptr proposal, uint64 choice)
       return false;
 
     const auto owners = getOwners (contract, numOfSlots, s);
+
+    if (! s.is_ok())
+      return false;
+
     const String callAddress = address.substr (2);
 
+    bool isOwnerForAnySlot = false;
     for (uint64 slot = 0; slot < owners.size(); ++slot)
     {
       String owner = owners[slot];
       if (owner.equalsIgnoreCase (callAddress))
       {
+        isOwnerForAnySlot = true;
         voteWithSlot (contract, proposal->getId(), slot, choice, s);
 
         if (! s.is_ok())
@@ -440,6 +446,12 @@ bool ProposalsManager::castVote (Proposal::Ptr proposal, uint64 choice)
       }
 
       task->setProgress (slot / (double)numOfSlots);
+    }
+
+    if (! isOwnerForAnySlot)
+    {
+      s = status::internal("You own no single slot. Voting is impossible");
+      return false;
     }
 
     return true;

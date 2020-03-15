@@ -20,7 +20,7 @@
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-#include "ModelsAndEntities/Proposal.h"
+#include "Proposal.h"
 
 
 class CreateProposalComponent : public Component

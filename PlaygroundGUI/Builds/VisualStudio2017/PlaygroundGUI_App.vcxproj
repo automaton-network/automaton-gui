@@ -138,8 +138,11 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Proposals\ModelsAndEntities\Proposal.cpp"/>
-    <ClCompile Include="..\..\Source\Proposals\ModelsAndEntities\ProposalsModel.cpp"/>
+    <ClCompile Include="..\..\Source\DEX\DEXPage.cpp"/>
+    <ClCompile Include="..\..\Source\DEX\Order.cpp"/>
+    <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\Proposal.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsModel.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\CreateProposalComponent.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\GridView.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\ProposalsActionsPage.cpp"/>
@@ -1341,10 +1344,13 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\AbstractListModel.h"/>
-    <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\AbstractProxyModel.h"/>
-    <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\Proposal.h"/>
-    <ClInclude Include="..\..\Source\Proposals\ModelsAndEntities\ProposalsModel.h"/>
+    <ClInclude Include="..\..\Source\Models\AbstractListModel.h"/>
+    <ClInclude Include="..\..\Source\Models\AbstractProxyModel.h"/>
+    <ClInclude Include="..\..\Source\DEX\DEXPage.h"/>
+    <ClInclude Include="..\..\Source\DEX\Order.h"/>
+    <ClInclude Include="..\..\Source\DEX\OrdersModel.h"/>
+    <ClInclude Include="..\..\Source\Proposals\Proposal.h"/>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsModel.h"/>
     <ClInclude Include="..\..\Source\Proposals\CreateProposalComponent.h"/>
     <ClInclude Include="..\..\Source\Proposals\GridView.h"/>
     <ClInclude Include="..\..\Source\Proposals\ProposalsActionsPage.h"/>

@@ -19,11 +19,9 @@
 
 #pragma once
 
-#include "../../JuceLibraryCode/JuceHeader.h"
-#include "ModelsAndEntities/ProposalsModel.h"
+#include <JuceHeader.h>
+#include "ProposalsModel.h"
 #include "CreateProposalComponent.h"
-
-class ProposalsUIModel;
 
 class ProposalsPage : public Component
                     , public AbstractListModelBase::Listener

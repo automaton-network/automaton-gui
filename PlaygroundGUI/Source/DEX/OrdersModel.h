@@ -18,28 +18,3 @@
  */
 
 #pragma once
-
-#include "ProposalsModel.h"
-
-class ProposalsManager : public DeletedAtShutdown
-{
-public:
-  std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
-
-  ProposalsManager();
-  ~ProposalsManager();
-
-  bool fetchProposals();
-  bool addProposal (const Proposal& proposal, bool sendNotification = true);
-  bool createProposal (Proposal::Ptr proposal, const std::string& contributor);
-  void notifyProposalsUpdated();
-  bool addProposal (Proposal::Ptr proposal, const std::string& contributor);
-  bool payForGas (Proposal::Ptr proposal, uint64 slotsToPay);
-  bool castVote (Proposal::Ptr proposal, uint64 choice);
-
-  JUCE_DECLARE_SINGLETON(ProposalsManager, true)
-
-
-private:
-  std::shared_ptr<ProposalsModel> m_model;
-};

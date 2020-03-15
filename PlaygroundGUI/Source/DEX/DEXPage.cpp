@@ -17,29 +17,22 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <JuceHeader.h>
+#include "DEXPage.h"
 
-#include "ProposalsModel.h"
-
-class ProposalsManager : public DeletedAtShutdown
+//==============================================================================
+DEXPage::DEXPage()
 {
-public:
-  std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
+}
 
-  ProposalsManager();
-  ~ProposalsManager();
+DEXPage::~DEXPage()
+{
+}
 
-  bool fetchProposals();
-  bool addProposal (const Proposal& proposal, bool sendNotification = true);
-  bool createProposal (Proposal::Ptr proposal, const std::string& contributor);
-  void notifyProposalsUpdated();
-  bool addProposal (Proposal::Ptr proposal, const std::string& contributor);
-  bool payForGas (Proposal::Ptr proposal, uint64 slotsToPay);
-  bool castVote (Proposal::Ptr proposal, uint64 choice);
+void DEXPage::paint (Graphics& g)
+{
+}
 
-  JUCE_DECLARE_SINGLETON(ProposalsManager, true)
-
-
-private:
-  std::shared_ptr<ProposalsModel> m_model;
-};
+void DEXPage::resized()
+{
+}
