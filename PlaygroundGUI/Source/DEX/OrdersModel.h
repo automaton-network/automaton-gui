@@ -18,3 +18,45 @@
  */
 
 #pragma once
+
+#include "../Models/AbstractListModel.h"
+#include "../Models/AbstractProxyModel.h"
+#include "Order.h"
+
+
+class OrdersModel : public AbstractListModel<Order::Ptr>
+{
+public:
+  int size () override;
+  Order::Ptr getAt (int index) override;
+  Order::Ptr& getReferenceAt (int index) override;
+
+  void addItem (Order::Ptr item, bool sendNotification = true);
+  void clear (bool sendNotification = true);
+
+private:
+  Array<Order::Ptr> m_items;
+};
+
+enum class OrderFilter {
+  All = 1
+  , Buy
+  , Sell
+  , Auction
+};
+
+class OrdersProxyModel : public AbstractProxyModel<Order::Ptr>
+{
+public:
+  void setFilter (OrderFilter filter);
+  void setSorter (std::function<int(Order*, Order*)> sorter);
+
+protected:
+  bool isAccept (const Order::Ptr& item) override;
+  bool withSorting() override;
+  int compareData (const Order::Ptr& first, const Order::Ptr& second) const override;
+
+private:
+  OrderFilter m_filter = OrderFilter::All;
+  std::function<int(Order*, Order*)> m_sorterFun;
+};

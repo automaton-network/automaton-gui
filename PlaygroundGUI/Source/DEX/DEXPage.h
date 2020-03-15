@@ -21,9 +21,9 @@
 
 #include <JuceHeader.h>
 
-//==============================================================================
-/*
-*/
+#include "OrdersModel.h"
+
+
 class DEXPage : public Component
 {
 public:
@@ -34,5 +34,12 @@ public:
   void resized() override;
 
 private:
+  std::unique_ptr<Label> m_sellingLabel;
+  std::unique_ptr<Label> m_buyingLabel;
+  std::unique_ptr<TableListBox> m_sellingTable;
+  std::unique_ptr<TableListBox> m_buyingTable;
+  std::shared_ptr<OrdersProxyModel> m_sellingProxyModel;
+  std::shared_ptr<OrdersProxyModel> m_buyingProxyModel;
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DEXPage)
 };

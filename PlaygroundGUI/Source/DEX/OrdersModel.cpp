@@ -18,3 +18,72 @@
  */
 
 #include "OrdersModel.h"
+
+
+int OrdersModel::size()
+{
+  return m_items.size();
+}
+
+Order::Ptr OrdersModel::getAt (int index)
+{
+  return m_items[index];
+}
+
+Order::Ptr& OrdersModel::getReferenceAt (int index)
+{
+  return m_items.getReference (index);
+}
+
+void OrdersModel::addItem (Order::Ptr item, bool sendNotification)
+{
+  m_items.add (item);
+
+  if (sendNotification)
+    notifyModelChanged();
+}
+
+void OrdersModel::clear (bool sendNotification)
+{
+  m_items.clearQuick();
+  if (sendNotification)
+    notifyModelChanged();
+}
+
+
+bool OrdersProxyModel::isAccept (const Order::Ptr& item)
+{
+  switch (m_filter)
+  {
+    case OrderFilter::All:
+      return true;
+    case OrderFilter::Buy:
+      return item->getType() == Order::Type::Buy;
+    case OrderFilter::Sell:
+      return item->getType() == Order::Type::Sell;
+    case OrderFilter::Auction:
+      return item->getType() == Order::Type::Auction;
+  }
+}
+
+bool OrdersProxyModel::withSorting()
+{
+  return m_sorterFun != nullptr;
+}
+
+void OrdersProxyModel::setFilter (OrderFilter filter)
+{
+  m_filter = filter;
+  filterChanged();
+}
+
+void OrdersProxyModel::setSorter (std::function<int(Order*, Order*)> sorter)
+{
+  m_sorterFun = sorter;
+  filterChanged();
+}
+
+int OrdersProxyModel::compareData (const Order::Ptr& first, const Order::Ptr& second) const
+{
+  return m_sorterFun (first.get(), second.get());
+}

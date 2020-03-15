@@ -49,6 +49,10 @@
 			isa = PBXBuildFile;
 			fileRef = 64AA565C9FB6F488ABFC0858;
 		};
+		658A3370960D604062B98387 = {
+			isa = PBXBuildFile;
+			fileRef = 59CE134BB5F2F1D87D20AB34;
+		};
 		81315ABE1B5196E62FEAF085 = {
 			isa = PBXBuildFile;
 			fileRef = EDA72D64D0C8122D56A91779;
@@ -332,6 +336,13 @@
 			path = System/Library/Frameworks/WebKit.framework;
 			sourceTree = SDKROOT;
 		};
+		432622C848430E1D225D94C2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = OrdersManager.h;
+			path = ../../Source/DEX/OrdersManager.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		510F04B2A4332278F5F209C3 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -365,6 +376,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = DemoMiner.h;
 			path = ../../Source/Demos/DemoMiner.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		59CE134BB5F2F1D87D20AB34 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = OrdersManager.cpp;
+			path = ../../Source/DEX/OrdersManager.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		64AA565C9FB6F488ABFC0858 = {
@@ -695,6 +713,8 @@
 				160F1B25E830A88EB81D11F5,
 				64AA565C9FB6F488ABFC0858,
 				3D9D6A70A43B37B489172BDD,
+				59CE134BB5F2F1D87D20AB34,
+				432622C848430E1D225D94C2,
 				EDA72D64D0C8122D56A91779,
 				BA288CD361E5BFCC337628EB,
 			);
@@ -1108,6 +1128,7 @@
 			files = (
 				5A3DA206190F057B44FDA6A4,
 				3FAABEF679539A4A35C12933,
+				658A3370960D604062B98387,
 				81315ABE1B5196E62FEAF085,
 				94F672D3BDA08865353B9C45,
 				B16A028E08A88B3CC4C157B1,

@@ -27,6 +27,9 @@
         <FILE id="PRHtGa" name="DEXPage.h" compile="0" resource="0" file="Source/DEX/DEXPage.h"/>
         <FILE id="DNFrmv" name="Order.cpp" compile="1" resource="0" file="Source/DEX/Order.cpp"/>
         <FILE id="cECUWM" name="Order.h" compile="0" resource="0" file="Source/DEX/Order.h"/>
+        <FILE id="XqzrgY" name="OrdersManager.cpp" compile="1" resource="0"
+              file="Source/DEX/OrdersManager.cpp"/>
+        <FILE id="w5ibPP" name="OrdersManager.h" compile="0" resource="0" file="Source/DEX/OrdersManager.h"/>
         <FILE id="SavH1N" name="OrdersModel.cpp" compile="1" resource="0" file="Source/DEX/OrdersModel.cpp"/>
         <FILE id="GaasMi" name="OrdersModel.h" compile="0" resource="0" file="Source/DEX/OrdersModel.h"/>
       </GROUP>

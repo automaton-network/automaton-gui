@@ -70,6 +70,7 @@ endif
 OBJECTS_APP := \
   $(JUCE_OBJDIR)/DEXPage_119e148f.o \
   $(JUCE_OBJDIR)/Order_30383997.o \
+  $(JUCE_OBJDIR)/OrdersManager_4f5a9a51.o \
   $(JUCE_OBJDIR)/OrdersModel_86d6378d.o \
   $(JUCE_OBJDIR)/Proposal_bae9729.o \
   $(JUCE_OBJDIR)/ProposalsModel_40a09f9f.o \
@@ -118,6 +119,11 @@ $(JUCE_OBJDIR)/DEXPage_119e148f.o: ../../Source/DEX/DEXPage.cpp
 $(JUCE_OBJDIR)/Order_30383997.o: ../../Source/DEX/Order.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling Order.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/OrdersManager_4f5a9a51.o: ../../Source/DEX/OrdersManager.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling OrdersManager.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/OrdersModel_86d6378d.o: ../../Source/DEX/OrdersModel.cpp

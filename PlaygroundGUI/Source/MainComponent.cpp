@@ -25,6 +25,7 @@
 #include "Proposals/ProposalsManager.h"
 #include "Proposals/ProposalsPage.h"
 #include "Proposals/ProposalsActionsPage.h"
+#include "DEX/DEXPage.h"
 
 #include "MainComponent.h"
 
@@ -58,6 +59,7 @@ DemosMainComponent::DemosMainComponent() {
   auto proposalsPage = new ProposalsPage();
   tabbedComponent->addTab(TRANS("Proposals"), Colour(0xff404040), proposalsPage, true);
   tabbedComponent->addTab(TRANS("Proposals Actions"), Colour(0xff404040), new ProposalsActionsPage(), true);
+  tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(), true);
 
   tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);

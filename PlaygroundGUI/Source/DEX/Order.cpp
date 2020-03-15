@@ -18,3 +18,17 @@
  */
 
 #include "Order.h"
+
+#include <json.hpp>
+#include <string>
+
+using json = nlohmann::json;
+
+Order::Order (const String& jsonString)
+{
+  json json_proposal = json::parse (jsonString.toStdString());
+  m_auto = std::stoul (json_proposal.at (0).get<std::string>());
+  m_eth = std::stoul (json_proposal.at (1).get<std::string>());
+  m_owner = json_proposal.at (2).get<std::string>();
+  m_type = static_cast<Order::Type> (std::stoul (json_proposal.at (3).get<std::string>()));
+}

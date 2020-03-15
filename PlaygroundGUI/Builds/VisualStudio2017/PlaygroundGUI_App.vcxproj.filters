@@ -253,6 +253,9 @@
     <ClCompile Include="..\..\Source\DEX\Order.cpp">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\DEX\OrdersManager.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClCompile>
@@ -1600,6 +1603,9 @@
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\DEX\Order.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DEX\OrdersManager.h">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\DEX\OrdersModel.h">
