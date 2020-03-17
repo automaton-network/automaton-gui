@@ -42,6 +42,16 @@ static uint64 getNumSlots (std::shared_ptr<eth_contract> contract, status& s);
 static std::vector<std::string> getOwners (std::shared_ptr<eth_contract> contract, uint64 numOfSlots, status& s);
 static uint64 getLastProposalId (std::shared_ptr<eth_contract> contract, status& s);
 
+static std::shared_ptr<eth_contract> getContract (status& s)
+{
+  const auto cd = AutomatonContractData::getInstance();
+  const auto contract = eth_contract::get_contract (cd->contract_address);
+  if (contract == nullptr)
+    s = status::internal ("Contract is NULL. Read appropriate contract data first.");
+
+  return contract;
+}
+
 class AsyncTask : public ThreadWithProgressWindow {
 public:
   AsyncTask (std::function<bool(AsyncTask*)> fun, const String& title) :
@@ -76,32 +86,28 @@ bool ProposalsManager::fetchProposals()
   AsyncTask task ([&](AsyncTask* task)
   {
     auto& s = task->m_status;
-    const auto cd = AutomatonContractData::getInstance();
-    const auto contract = eth_contract::get_contract (cd->contract_address);
-    if (contract == nullptr)
-    {
-      s = status::internal ("Contract is NULL! Read appropriate contract data first.");
+
+    auto contract = getContract (s);
+    if (! s.is_ok())
       return false;
-    }
 
     m_model->clear (false);
 
     const auto lastProposalId = getLastProposalId (contract, s);
+    if (! s.is_ok())
+      return false;
+
     static const uint32_t PROPOSAL_START_ID = 100; // ballotBoxIDs initial value is 99, and the first proposal is at 100
     for (int i = PROPOSAL_START_ID; i <= lastProposalId; ++i)
     {
       json jInput;
       jInput.push_back (i);
       std::string params = jInput.dump();
-      // Enable in new contract version
-      //auto s = contract->call ("getProposal", params);
-      auto s = contract->call ("proposals", params);
+
+      s = contract->call ("getProposal", params);
 
       if (! s.is_ok())
-      {
-        s = status::internal("proposals method is inacessible or does not exist. Check contract data, please.");
         return false;
-      }
 
       Proposal proposal (i, String (s.msg));
       addProposal (proposal, false);
@@ -128,7 +134,7 @@ bool ProposalsManager::fetchProposals()
   else
   {
     AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-    "Fetching proposals operation aborted!",
+    "Fetching proposals canceled!",
     "Current proposals data may be broken.");
   }
 
@@ -141,21 +147,20 @@ bool ProposalsManager::addProposal (const Proposal& proposal, bool sendNotificat
 }
 
 //TODO: pass address and privateKey
-const std::string privateKey = "d6bcab62129f74fc2dcf9f1016625c054765f2743a24ee2326b9790693051283";
-const std::string address = "0x266f746a6d9b01085Cf2c20ba55ECC45A4D51724";
+const std::string privateKey = "f7bb62b8c66184e7fdcf60b749d5a5da463b434bc80c4a6c417484cdfeffd52b";
+const std::string address = "0xE22095F4f6d4a1bFbE7037Ae88AC055B67348d8e";
 
 bool ProposalsManager::createProposal (Proposal::Ptr proposal, const std::string& contributor)
 {
   AsyncTask task ([=](AsyncTask* task)
   {
     auto& s = task->m_status;
+
     const auto cd = AutomatonContractData::getInstance();
-    const auto contract = eth_contract::get_contract (cd->contract_address);
-    if (contract == nullptr)
-    {
-      s = status::internal("Contract is NULL. Read appropriate contract data first.");
+    const auto contract = getContract (s);
+    if (! s.is_ok())
       return false;
-    }
+
     task->setProgress (0.1);
 
     const auto lastProposalId = getLastProposalId (contract, s);
@@ -185,8 +190,8 @@ bool ProposalsManager::createProposal (Proposal::Ptr proposal, const std::string
     jSignature.push_back ("uint256");
     jSignature.push_back ("uint256");
 
-    std::stringstream createProposalData;
-    createProposalData << "f8a1ff12" << bin2hex (encode (jSignature.dump(), jProposal.dump()));
+    std::stringstream txData;
+    txData << "f8a1ff12" << bin2hex (encode (jSignature.dump(), jProposal.dump()));
     task->setProgress (0.5);
 
     eth_transaction transaction;
@@ -195,7 +200,7 @@ bool ProposalsManager::createProposal (Proposal::Ptr proposal, const std::string
     transaction.gas_limit = "5B8D80";  // 6M
     transaction.to = cd->contract_address.substr(2);
     transaction.value = "";
-    transaction.data = createProposalData.str();
+    transaction.data = txData.str();
     transaction.chain_id = "01";
     s = contract->call ("createProposal", transaction.sign_tx (privateKey));
 
@@ -228,8 +233,8 @@ bool ProposalsManager::createProposal (Proposal::Ptr proposal, const std::string
   else
   {
     AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-    "Operation aborted!",
-    "Current settings were not affected.");
+    "Canceled!",
+    "Operation aborted.");
   }
 
   return false;
@@ -247,13 +252,12 @@ bool ProposalsManager::payForGas (Proposal::Ptr proposal, uint64 slotsToPay)
   AsyncTask task ([=](AsyncTask* task)
   {
     auto& s = task->m_status;
+
     const auto cd = AutomatonContractData::getInstance();
-    const auto contract = eth_contract::get_contract (cd->contract_address);
-    if (contract == nullptr)
-    {
-      s = status::internal("Contract is NULL. Read appropriate contract data first.");
+    const auto contract = getContract (s);
+    if (! s.is_ok())
       return false;
-    }
+
     task->setProgress (0.1);
 
     s = eth_getTransactionCount (cd->eth_url, address);
@@ -269,8 +273,8 @@ bool ProposalsManager::payForGas (Proposal::Ptr proposal, uint64 slotsToPay)
     jSignature.push_back ("uint256");
     jSignature.push_back ("uint256");
 
-    std::stringstream createProposalData;
-    createProposalData << "10075c50" << bin2hex (encode (jSignature.dump(), jInput.dump()));
+    std::stringstream txData;
+    txData << "10075c50" << bin2hex (encode (jSignature.dump(), jInput.dump()));
     task->setProgress (0.5);
 
     eth_transaction transaction;
@@ -279,7 +283,7 @@ bool ProposalsManager::payForGas (Proposal::Ptr proposal, uint64 slotsToPay)
     transaction.gas_limit = "5B8D80";  // 6M
     transaction.to = cd->contract_address.substr(2);
     transaction.value = "";
-    transaction.data = createProposalData.str();
+    transaction.data = txData.str();
     transaction.chain_id = "01";
     s = contract->call ("payForGas", transaction.sign_tx (privateKey));
 
@@ -309,8 +313,8 @@ bool ProposalsManager::payForGas (Proposal::Ptr proposal, uint64 slotsToPay)
   else
   {
     AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-            "Operation aborted!",
-            "Current settings were not affected.");
+            "Canceled!",
+            "Operation aborted.");
   }
 
   return false;
@@ -339,8 +343,8 @@ static void voteWithSlot (std::shared_ptr<eth_contract> contract, uint64 id, uin
   jSignature.push_back ("uint256");
   jSignature.push_back ("uint8");
 
-  std::stringstream createProposalData;
-  createProposalData << "dea112a6" << bin2hex (encode (jSignature.dump(), jInput.dump()));
+  std::stringstream txData;
+  txData << "dea112a6" << bin2hex (encode (jSignature.dump(), jInput.dump()));
 
   eth_transaction transaction;
   transaction.nonce = nonce;
@@ -348,7 +352,7 @@ static void voteWithSlot (std::shared_ptr<eth_contract> contract, uint64 id, uin
   transaction.gas_limit = "5B8D80";  // 6M
   transaction.to = cd->contract_address.substr (2);
   transaction.value = "";
-  transaction.data = createProposalData.str();
+  transaction.data = txData.str();
   transaction.chain_id = "01";
   s = contract->call ("castVote", transaction.sign_tx (privateKey));
 }
@@ -389,12 +393,10 @@ static uint64 getLastProposalId (std::shared_ptr<eth_contract> contract, status&
 {
   s = contract->call ("ballotBoxIDs", "");
   if (! s.is_ok())
-  {
-    s = status::internal("ballotBoxIDs method is inacessible or does not exist. Check contract data, please.");
-    return false;
-  }
+    return 0;
+
   const json ballotBoxJson = json::parse (s.msg);
-  const uint32_t lastProposalId = std::stoul ((*ballotBoxJson.begin()).get<std::string>());
+  const uint64 lastProposalId = std::stoul ((*ballotBoxJson.begin()).get<std::string>());
 
   return lastProposalId;
 }
@@ -411,13 +413,11 @@ bool ProposalsManager::castVote (Proposal::Ptr proposal, uint64 choice)
   AsyncTask task ([=](AsyncTask* task)
   {
     auto& s = task->m_status;
-    const auto cd = AutomatonContractData::getInstance();
-    const auto contract = eth_contract::get_contract (cd->contract_address);
-    if (contract == nullptr)
-    {
-      s = status::internal("Contract is NULL. Read appropriate contract data first.");
+
+    auto contract = getContract (s);
+    if (! s.is_ok())
       return false;
-    }
+
     task->setProgress (0.1);
 
     const auto numOfSlots = getNumSlots (contract, s);
@@ -441,7 +441,7 @@ bool ProposalsManager::castVote (Proposal::Ptr proposal, uint64 choice)
         isOwnerForAnySlot = true;
         voteWithSlot (contract, proposal->getId(), slot, choice, s);
 
-        if (! s.is_ok())
+        if (! s.is_ok() || task->threadShouldExit())
           return false;
       }
 
@@ -475,8 +475,8 @@ bool ProposalsManager::castVote (Proposal::Ptr proposal, uint64 choice)
   else
   {
     AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-            "Operation aborted!",
-            "Current settings were not affected.");
+            "Canceled!",
+            "Operation aborted.");
   }
 
   return false;
