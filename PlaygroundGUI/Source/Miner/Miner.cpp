@@ -26,10 +26,8 @@
 #include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/io/io.h"
 #include "automaton/tools/miner/miner.h"
-#include "secp256k1/include/secp256k1_recovery.h"
-#include "secp256k1/include/secp256k1.h"
-#include "secp256k1/src/hash_impl.h"
-#include "secp256k1/src/hash.h"
+#include <secp256k1_recovery.h>
+#include <secp256k1.h>
 
 using automaton::core::common::status;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;

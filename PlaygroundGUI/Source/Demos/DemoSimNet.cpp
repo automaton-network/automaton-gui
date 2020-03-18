@@ -26,6 +26,14 @@
 
 #include "automaton/examples/node/blockchain_cpp_node/blockchain_cpp_node.h"
 
+#ifdef _WIN32
+ // TODO(vitalyster): use correct error level for these errors
+#define _ERROR WARNING
+#else
+#define _ERROR ERROR
+#endif
+
+
 using automaton::core::io::bin2hex;
 using automaton::core::node::node;
 using automaton::core::node::node_updater_tests;
@@ -118,7 +126,7 @@ DemoSimNet::DemoSimNet() {
     });
   if (smart_protocol::load("blockchain", "../../../../examples/smartproto/blockchain/")
       == false) {
-    LOG(ERROR) << "Blockchain protocol was NOT loaded!!!";
+    LOG(_ERROR) << "Blockchain protocol was NOT loaded!!!";
     throw std::runtime_error("Protocol was not loaded!");
   }
 
