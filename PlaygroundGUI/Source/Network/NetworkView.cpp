@@ -21,10 +21,8 @@
 
 #include "../Data/AutomatonContractData.h"  // NOLINT
 
-#include "secp256k1/include/secp256k1_recovery.h"
-#include "secp256k1/include/secp256k1.h"
-#include "secp256k1/src/hash_impl.h"
-#include "secp256k1/src/hash.h"
+#include <secp256k1_recovery.h>
+#include <secp256k1.h>
 #include <json.hpp>
 
 #include "automaton/core/io/io.h"
