@@ -37,14 +37,14 @@ public:
 
   Order (const String& jsonString);
 
-  uint64 getAuto() const { return m_auto; }
-  uint64 getEth() const { return m_eth; }
+  BigInteger getAuto() const { return m_auto; }
+  BigInteger getEth() const { return m_eth; }
   const String& getOwner() const { return m_owner; }
   Type getType() const { return m_type; }
 
 private:
-  uint64 m_auto = 0;
-  uint64 m_eth = 0;
+  BigInteger m_auto = 0;
+  BigInteger m_eth = 0;
   String m_owner;
   Type m_type = Type::None;
 };

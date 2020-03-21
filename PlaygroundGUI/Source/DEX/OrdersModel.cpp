@@ -43,6 +43,14 @@ void OrdersModel::addItem (Order::Ptr item, bool sendNotification)
     notifyModelChanged();
 }
 
+void OrdersModel::addItems (Array<Order::Ptr> items, bool sendNotification)
+{
+  m_items.addArray (items);
+
+  if (sendNotification)
+    notifyModelChanged();
+}
+
 void OrdersModel::clear (bool sendNotification)
 {
   m_items.clearQuick();

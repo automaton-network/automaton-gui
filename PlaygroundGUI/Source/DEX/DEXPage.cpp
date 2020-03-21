@@ -60,12 +60,12 @@ public:
     {
       case Auto:
       {
-        g.drawText (String (item->getAuto()), 0, 0, width, height, Justification::centredLeft);
+        g.drawText (item->getAuto().toString (10), 0, 0, width, height, Justification::centredLeft);
         break;
       }
       case Eth:
       {
-        g.drawText (String (item->getEth()), 0, 0, width, height, Justification::centredLeft);
+        g.drawText (item->getEth().toString (10), 0, 0, width, height, Justification::centredLeft);
         break;
       }
       case Owner:
@@ -98,9 +98,11 @@ DEXPage::DEXPage()
   m_sellingProxyModel = std::make_shared<OrdersProxyModel>();
   m_sellingProxyModel->setFilter (OrderFilter::Sell);
   m_sellingProxyModel->setModel (OrdersManager::getInstance()->getModel());
+  m_sellingProxyModel->addListener (this);
   m_buyingProxyModel = std::make_shared<OrdersProxyModel>();
   m_buyingProxyModel->setFilter (OrderFilter::Buy);
-  m_sellingProxyModel->setModel (OrdersManager::getInstance()->getModel());
+  m_buyingProxyModel->setModel (OrdersManager::getInstance()->getModel());
+  m_buyingProxyModel->addListener (this);
 
   m_sellingUIModel = std::make_unique<OrdersUIModel>();
   m_sellingUIModel->setModel (m_sellingProxyModel);
@@ -155,4 +157,18 @@ void DEXPage::resized()
   auto buyingBounds = tablesBounds.reduced (tablesMargin);
   m_buyingLabel->setBounds (buyingBounds.removeFromTop (titlesHeight));
   m_buyingTable->setBounds (buyingBounds);
+}
+
+void DEXPage::modelChanged (AbstractListModelBase* model)
+{
+  if (model == m_sellingProxyModel.get())
+  {
+    m_sellingTable->updateContent();
+    m_sellingTable->repaint();
+  }
+  else if (model == m_buyingProxyModel.get())
+  {
+    m_buyingTable->updateContent();
+    m_buyingTable->repaint();
+  }
 }

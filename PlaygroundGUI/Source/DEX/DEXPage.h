@@ -26,6 +26,7 @@
 class OrdersUIModel;
 
 class DEXPage : public Component
+              , public AbstractListModelBase::Listener
 {
 public:
   DEXPage();
@@ -33,6 +34,9 @@ public:
 
   void paint (Graphics&) override;
   void resized() override;
+
+  // AbstractListModelBase::Listener
+  void modelChanged (AbstractListModelBase* model);
 
 private:
   std::unique_ptr<OrdersUIModel> m_sellingUIModel;

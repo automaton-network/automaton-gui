@@ -32,6 +32,7 @@ public:
   Order::Ptr& getReferenceAt (int index) override;
 
   void addItem (Order::Ptr item, bool sendNotification = true);
+  void addItems (Array<Order::Ptr> items, bool sendNotification = true);
   void clear (bool sendNotification = true);
 
 private:

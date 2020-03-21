@@ -33,6 +33,7 @@
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
 
 #include "../Proposals/ProposalsManager.h"
+#include "../DEX/OrdersManager.h"
 
 using json = nlohmann::json;
 
@@ -261,6 +262,7 @@ void NetworkView::buttonClicked(Button* btn) {
                                        "Current settings were not affected.");
     }
     ProposalsManager::getInstance()->fetchProposals();
+    OrdersManager::getInstance()->fetchOrders();
   }
 }
 

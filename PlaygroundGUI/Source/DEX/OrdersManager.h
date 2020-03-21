@@ -19,6 +19,7 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "Order.h"
 
 class OrdersModel;
 
@@ -28,6 +29,8 @@ public:
   OrdersManager();
   ~OrdersManager();
   std::shared_ptr<OrdersModel> getModel();
+
+  bool fetchOrders();
 
   JUCE_DECLARE_SINGLETON(OrdersManager, true)
 
