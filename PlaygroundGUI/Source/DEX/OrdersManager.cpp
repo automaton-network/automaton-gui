@@ -23,7 +23,7 @@
 
 OrdersManager::OrdersManager()
 {
-  m_model  = std::make_shared<OrdersModel>();
+  m_model = std::make_shared<OrdersModel>();
 }
 
 OrdersManager::~OrdersManager()

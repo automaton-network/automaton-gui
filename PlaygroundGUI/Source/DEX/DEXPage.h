@@ -23,6 +23,7 @@
 
 #include "OrdersModel.h"
 
+class OrdersUIModel;
 
 class DEXPage : public Component
 {
@@ -34,6 +35,8 @@ public:
   void resized() override;
 
 private:
+  std::unique_ptr<OrdersUIModel> m_sellingUIModel;
+  std::unique_ptr<OrdersUIModel> m_buyingUIModel;
   std::unique_ptr<Label> m_sellingLabel;
   std::unique_ptr<Label> m_buyingLabel;
   std::unique_ptr<TableListBox> m_sellingTable;
