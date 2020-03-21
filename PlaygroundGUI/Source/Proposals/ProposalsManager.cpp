@@ -391,14 +391,19 @@ static std::vector<std::string> getOwners (std::shared_ptr<eth_contract> contrac
 
 static uint64 getLastProposalId (std::shared_ptr<eth_contract> contract, status& s)
 {
-  s = contract->call ("ballotBoxIDs", "");
+  s = contract->call ("proposalsData", "");
   if (! s.is_ok())
     return 0;
 
   const json ballotBoxJson = json::parse (s.msg);
-  const uint64 lastProposalId = std::stoul ((*ballotBoxJson.begin()).get<std::string>());
 
-  return lastProposalId;
+  if (ballotBoxJson.size() >= 3)
+  {
+    const uint64 lastProposalId = std::stoul (ballotBoxJson[3].get<std::string>());
+    return lastProposalId;
+  }
+
+  return 0;
 }
 
 bool ProposalsManager::castVote (Proposal::Ptr proposal, uint64 choice)

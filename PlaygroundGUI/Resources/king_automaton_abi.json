@@ -110,20 +110,6 @@
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "MIN_PERIOD_LEN",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -157,20 +143,6 @@
       }
     ],
     "name": "balances",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "ballotBoxIDs",
     "outputs": [
       {
         "internalType": "uint256",
@@ -539,6 +511,20 @@
   },
   {
     "inputs": [],
+    "name": "minPeriodLen",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
     "name": "name",
     "outputs": [
       {
@@ -596,6 +582,11 @@
       {
         "internalType": "uint256",
         "name": "treasuryLimitPercentage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ballotBoxIDs",
         "type": "uint256"
       }
     ],
@@ -885,7 +876,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "id",
+        "name": "",
         "type": "uint256"
       }
     ],

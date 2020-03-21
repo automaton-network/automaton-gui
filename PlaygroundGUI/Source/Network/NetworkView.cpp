@@ -236,6 +236,7 @@ void NetworkView::buttonClicked(Button* btn) {
       } else {
         auto cd = AutomatonContractData::getInstance();
         ScopedLock lock(cd->criticalSection);
+        cd->contract_address = t.contract_addr;
         cd->mask = t.mask;
         cd->min_difficulty = t.min_difficulty;
         cd->slots = t.slots;

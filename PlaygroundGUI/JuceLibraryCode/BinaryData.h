@@ -15,7 +15,7 @@ namespace BinaryData
     const int            default_config_jsonSize = 294;
 
     extern const char*   king_automaton_abi_json;
-    const int            king_automaton_abi_jsonSize = 27579;
+    const int            king_automaton_abi_jsonSize = 27433;
 
     extern const char*   PlayBold_ttf;
     const int            PlayBold_ttfSize = 210704;
