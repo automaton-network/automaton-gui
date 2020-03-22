@@ -1,0 +1,19 @@
+name: C/C++ CI
+
+on:
+  push:
+    paths:
+      - 'PlaygroundGUI/**'
+      - '.github/workflows/ccpp.yml'
+  pull_request:
+    paths:
+      - 'PlaygroundGUI/**'
+      - '.github/workflows/ccpp.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run lint checks
+        run: ./lint.sh

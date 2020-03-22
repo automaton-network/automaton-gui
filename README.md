@@ -1,5 +1,9 @@
 # Automaton Playground
 
+## Build Status
+
+[![C/C++ CI](https://github.com/automaton-network/automaton-gui/workflows/C/C++%20CI/badge.svg?branch=master)](https://github.com/automaton-network/automaton-gui/actions?query=workflow%3A%22C%2FC%2B%2B+CI%22+branch%3Amaster)
+
 ## Licenses
 
 **Automaton Playground**
