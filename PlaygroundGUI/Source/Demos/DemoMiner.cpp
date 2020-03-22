@@ -427,6 +427,8 @@ void DemoMiner::update() {
       slots[x][y].diff = r;
       slots[x][y].bits = lb;
       // slots[x][y].owner = (rand_r(&my_seed) % total_power <= mining_power) ? 1 : 0;
+      // TODO: don't use a secure random.
+      // NOLINTNEXTLINE
       slots[x][y].owner = ((rand() % 10000) < (mining_power * 100)) ? 1 : 0;
       slots[x][y].tm = t;
     }
