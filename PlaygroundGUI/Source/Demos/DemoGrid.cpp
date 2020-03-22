@@ -41,7 +41,7 @@ class SlotsModelTest: public SlotsModelInterface {
   std::string get_slot_difficulty(uint32_t slot_index) {
     uint32_t k = std::rand() % 100;
     if (k > 65) {
-      for (uint i = 0; i < 32; ++i) {
+      for (size_t i = 0; i < 32; ++i) {
         owners[slot_index][i] = 'a' + std::rand() % 26;
         difficulties[slot_index][i] = std::rand() % 256;
       }
