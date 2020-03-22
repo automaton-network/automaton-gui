@@ -2336,7 +2336,7 @@ static const unsigned char temp_binary_data_2[] =
 "    \"stateMutability\": \"nonpayable\",\n"
 "    \"type\": \"function\"\n"
 "  }\n"
-"]";
+"]\n";
 
 const char* king_automaton_abi_json = (const char*) temp_binary_data_2;
 
@@ -6859,7 +6859,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
     {
         case 0x356357bc:  numBytes = 60500; return BIG_A_BLACK_CIRCLE_BACK_1000x1000_png;
         case 0xca3ab6c7:  numBytes = 294; return default_config_json;
-        case 0x8b891876:  numBytes = 27433; return king_automaton_abi_json;
+        case 0x8b891876:  numBytes = 27434; return king_automaton_abi_json;
         case 0x520630a0:  numBytes = 210704; return PlayBold_ttf;
         case 0x91866ecf:  numBytes = 199020; return PlayRegular_ttf;
         default: break;

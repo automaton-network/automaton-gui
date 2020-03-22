@@ -74,6 +74,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>-I$(SolutionDir)/../../../../automaton/src/local_third_party/include %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
@@ -87,6 +88,7 @@
       <ProgramDatabaseFile>$(IntDir)\PlaygroundGUI.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalOptions>$(SolutionDir)/../../../../automaton/src/local_third_party/lib/blockchain_cpp_node.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/automaton-core.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/secp256k1.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_filesystem.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_iostreams.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_system.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/cryptopp-static.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libcurl-d.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/g3logger.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/lua.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libprotobufd.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/replxx-d.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/zlibstaticd.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libssl.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libcrypto.lib crypt32.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -115,6 +117,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>-I$(SolutionDir)/../../../../automaton/src/local_third_party/include %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
@@ -130,6 +133,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalOptions>$(SolutionDir)/../../../../automaton/src/local_third_party/lib/blockchain_cpp_node.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/automaton-core.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/secp256k1.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_filesystem.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_iostreams.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_system.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/cryptopp-static.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libcurl-d.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/g3logger.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/lua.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libprotobufd.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/replxx-d.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/zlibstaticd.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libssl.lib $(SolutionDir)/../../../../automaton/src/local_third_party/lib/libcrypto.lib crypt32.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
