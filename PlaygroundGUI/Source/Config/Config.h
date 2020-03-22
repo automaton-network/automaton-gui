@@ -53,6 +53,7 @@ class Config {
   void unlock();
 
   JUCE_DECLARE_SINGLETON(Config, false)
+
  private:
   std::string contract_abi;
   json json_obj;
