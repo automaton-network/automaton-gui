@@ -27,7 +27,7 @@
 #include "automaton/examples/node/blockchain_cpp_node/blockchain_cpp_node.h"
 
 #ifdef _WIN32
- // TODO(vitalyster): use correct error level for these errors
+// TODO(vitalyster): use correct error level for these errors
 #define _ERROR WARNING
 #else
 #define _ERROR ERROR
