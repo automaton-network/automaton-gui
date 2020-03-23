@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="Byh3dS" name="PlaygroundGUI" projectType="guiapp" jucerVersion="5.4.5"
+<JUCERPROJECT id="Byh3dS" name="PlaygroundGUI" projectType="guiapp" jucerVersion="5.4.7"
               version="0.0.1" companyName="Liberatix" companyWebsite="https://liberatix.com">
   <MAINGROUP id="r0wjCp" name="PlaygroundGUI">
     <GROUP id="{874C0493-36CA-5084-DAA0-C4287D2E83CF}" name="Resources">
@@ -16,6 +16,48 @@
             file="../../automaton/media/fonts/play/Play-Regular.ttf"/>
     </GROUP>
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
+      <GROUP id="{E61E1C27-4498-A9CF-2C71-5DD345898E6A}" name="Models">
+        <FILE id="vBj6l1" name="AbstractListModel.h" compile="0" resource="0"
+              file="Source/Models/AbstractListModel.h"/>
+        <FILE id="T3zYgj" name="AbstractProxyModel.h" compile="0" resource="0"
+              file="Source/Models/AbstractProxyModel.h"/>
+      </GROUP>
+      <GROUP id="{3ED33CF7-55A1-F830-A062-EA46E2239109}" name="DEX">
+        <FILE id="YWDtF2" name="DEXPage.cpp" compile="1" resource="0" file="Source/DEX/DEXPage.cpp"/>
+        <FILE id="PRHtGa" name="DEXPage.h" compile="0" resource="0" file="Source/DEX/DEXPage.h"/>
+        <FILE id="DNFrmv" name="Order.cpp" compile="1" resource="0" file="Source/DEX/Order.cpp"/>
+        <FILE id="cECUWM" name="Order.h" compile="0" resource="0" file="Source/DEX/Order.h"/>
+        <FILE id="XqzrgY" name="OrdersManager.cpp" compile="1" resource="0"
+              file="Source/DEX/OrdersManager.cpp"/>
+        <FILE id="w5ibPP" name="OrdersManager.h" compile="0" resource="0" file="Source/DEX/OrdersManager.h"/>
+        <FILE id="SavH1N" name="OrdersModel.cpp" compile="1" resource="0" file="Source/DEX/OrdersModel.cpp"/>
+        <FILE id="GaasMi" name="OrdersModel.h" compile="0" resource="0" file="Source/DEX/OrdersModel.h"/>
+      </GROUP>
+      <GROUP id="{BEADF6D5-B88A-B1C3-2B00-06EE3D256D87}" name="Proposals">
+        <FILE id="sYLkKA" name="Proposal.cpp" compile="1" resource="0" file="Source/Proposals/Proposal.cpp"/>
+        <FILE id="hA94JD" name="Proposal.h" compile="0" resource="0" file="Source/Proposals/Proposal.h"/>
+        <FILE id="oItQcN" name="ProposalsModel.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalsModel.cpp"/>
+        <FILE id="oqtXKX" name="ProposalsModel.h" compile="0" resource="0"
+              file="Source/Proposals/ProposalsModel.h"/>
+        <FILE id="tteWB2" name="CreateProposalComponent.cpp" compile="1" resource="0"
+              file="Source/Proposals/CreateProposalComponent.cpp"/>
+        <FILE id="vxPTw7" name="CreateProposalComponent.h" compile="0" resource="0"
+              file="Source/Proposals/CreateProposalComponent.h"/>
+        <FILE id="Qh3qDr" name="GridView.cpp" compile="1" resource="0" file="Source/Proposals/GridView.cpp"/>
+        <FILE id="xDxtHQ" name="GridView.h" compile="0" resource="0" file="Source/Proposals/GridView.h"/>
+        <FILE id="wYSjVE" name="ProposalsActionsPage.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalsActionsPage.cpp"/>
+        <FILE id="xvDXpv" name="ProposalsActionsPage.h" compile="0" resource="0"
+              file="Source/Proposals/ProposalsActionsPage.h"/>
+        <FILE id="JEcq7z" name="ProposalsManager.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalsManager.cpp"/>
+        <FILE id="KwuBjB" name="ProposalsManager.h" compile="0" resource="0"
+              file="Source/Proposals/ProposalsManager.h"/>
+        <FILE id="hEgoM2" name="ProposalsPage.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalsPage.cpp"/>
+        <FILE id="Aax2EJ" name="ProposalsPage.h" compile="0" resource="0" file="Source/Proposals/ProposalsPage.h"/>
+      </GROUP>
       <GROUP id="{CE63BB2E-4B73-1A4A-01A4-99B40D02D247}" name="Config">
         <FILE id="yOA8V5" name="Config.cpp" compile="1" resource="0" file="Source/Config/Config.cpp"/>
         <FILE id="egdrAA" name="Config.h" compile="1" resource="0" file="Source/Config/Config.h"/>
@@ -76,7 +118,7 @@
     </XCODE_MAC>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" smallIcon="MDnkQK" bigIcon="MDnkQK"
                 extraCompilerFlags="-I ../../../../automaton/src/local_third_party/include"
-                extraLinkerFlags="../../../../automaton/src/local_third_party/lib/libblockchain_cpp_node.a&#10;../../../../automaton/src/local_third_party/lib/libautomaton-core.a&#10;../../../../automaton/src/local_third_party/lib/libsecp256k1.a&#10;../../../../automaton/src/local_third_party/lib/libboost_filesystem.a&#10;../../../../automaton/src/local_third_party/lib/libboost_iostreams.a&#10;../../../../automaton/src/local_third_party/lib/libboost_system.a&#10;../../../../automaton/src/local_third_party/lib/libssl.a&#10;../../../../automaton/src/local_third_party/lib/libcrypto.a&#10;../../../../automaton/src/local_third_party/lib/libcryptopp.a&#10;../../../../automaton/src/local_third_party/lib/libcurl.a&#10;../../../../automaton/src/local_third_party/lib/libg3logger.a&#10;../../../../automaton/src/local_third_party/lib/libgmp.a&#10;../../../../automaton/src/local_third_party/lib/liblua.a&#10;../../../../automaton/src/local_third_party/lib/libprotobuf-lite.a&#10;../../../../automaton/src/local_third_party/lib/libprotobuf-lite.a&#10;../../../../automaton/src/local_third_party/lib/libprotobuf.a&#10;../../../../automaton/src/local_third_party/lib/libreplxx.a&#10;../../../../automaton/src/local_third_party/lib/libz.a&#10;"
+                extraLinkerFlags="../../../../automaton/src/local_third_party/lib/libblockchain_cpp_node.a&#10;../../../../automaton/src/local_third_party/lib/libautomaton-core.a&#10;../../../../automaton/src/local_third_party/lib/libsecp256k1.a&#10;../../../../automaton/src/local_third_party/lib/libboost_filesystem.a&#10;../../../../automaton/src/local_third_party/lib/libboost_iostreams.a&#10;../../../../automaton/src/local_third_party/lib/libboost_system.a&#10;../../../../automaton/src/local_third_party/lib/libssl.a&#10;../../../../automaton/src/local_third_party/lib/libcrypto.a&#10;../../../../automaton/src/local_third_party/lib/libcryptopp.a&#10;../../../../automaton/src/local_third_party/lib/libcurl.a&#10;../../../../automaton/src/local_third_party/lib/libg3logger.a&#10;../../../../automaton/src/local_third_party/lib/libgmp.a&#10;../../../../automaton/src/local_third_party/lib/liblua.a&#10;../../../../automaton/src/local_third_party/lib/libprotobuf-lite.a&#10;../../../../automaton/src/local_third_party/lib/libprotobuf-lite.a&#10;../../../../automaton/src/local_third_party/lib/libprotobuf.a&#10;../../../../automaton/src/local_third_party/lib/libreplxx.a&#10;../../../../automaton/src/local_third_party/lib/libz.a"
                 externalLibraries="gmp">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>
@@ -92,7 +134,7 @@
       </MODULEPATHS>
     </LINUX_MAKE>
     <VS2017 targetFolder="Builds/VisualStudio2017" smallIcon="MDnkQK" bigIcon="MDnkQK"
-            extraCompilerFlags="-I $(SolutionDir)/../../../../automaton/src/local_third_party/include"
+            extraCompilerFlags="-I$(SolutionDir)/../../../../automaton/src/local_third_party/include"
             extraLinkerFlags="$(SolutionDir)/../../../../automaton/src/local_third_party/lib/blockchain_cpp_node.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/automaton-core.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/secp256k1.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_filesystem.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_iostreams.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_system.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/cryptopp-static.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libcurl-d.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/g3logger.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/lua.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libprotobufd.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/replxx-d.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/zlibstaticd.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libssl.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libcrypto.lib&#10;crypt32.lib">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>

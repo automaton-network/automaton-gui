@@ -22,6 +22,10 @@
 #include "Demos/DemoSimNet.h"
 #include "Miner/Miner.h"
 #include "Network/NetworkView.h"
+#include "Proposals/ProposalsManager.h"
+#include "Proposals/ProposalsPage.h"
+#include "Proposals/ProposalsActionsPage.h"
+#include "DEX/DEXPage.h"
 
 #include "MainComponent.h"
 
@@ -51,6 +55,12 @@ DemosMainComponent::DemosMainComponent() {
   tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040), new NetworkView(), true);
   tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(), true);
   tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
+
+  auto proposalsPage = new ProposalsPage();
+  tabbedComponent->addTab(TRANS("Proposals"), Colour(0xff404040), proposalsPage, true);
+  tabbedComponent->addTab(TRANS("Proposals Actions"), Colour(0xff404040), new ProposalsActionsPage(), true);
+  tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(), true);
+
   tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
   tabbedComponent->addTab(TRANS("DApps"), Colour(0xff404040), new DemoBlank(), true);
@@ -59,6 +69,17 @@ DemosMainComponent::DemosMainComponent() {
   tabbedComponent->setCurrentTabIndex(0);
 
   setSize(1024, 768);
+
+  for (int i = 0; i < 20; ++i) {
+    auto p = std::make_shared<Proposal>();
+    p->setId(i);
+    p->setTitle("Proposal" + String(i));
+    p->setAmountSpent(i);
+    p->setNumPeriods(i + 20);
+    p->setStatus((Proposal::Status) jlimit(0, 5, i));
+    ProposalsManager::getInstance()->getModel()->addItem(p);
+  }
+  proposalsPage->setModel(ProposalsManager::getInstance()->getModel());
 }
 
 DemosMainComponent::~DemosMainComponent() {

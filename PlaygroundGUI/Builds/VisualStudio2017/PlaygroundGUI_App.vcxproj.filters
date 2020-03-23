@@ -5,6 +5,15 @@
     <Filter Include="PlaygroundGUI\Resources">
       <UniqueIdentifier>{AE2B0A6C-5E8C-CDF5-BBA7-0BA1DA8C1FBD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PlaygroundGUI\Source\Models">
+      <UniqueIdentifier>{3AAFC65C-0FA2-821E-8E4D-2A7038709449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlaygroundGUI\Source\DEX">
+      <UniqueIdentifier>{63040034-0EDA-62AB-4997-EBEED418CD0F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlaygroundGUI\Source\Proposals">
+      <UniqueIdentifier>{13EED7F5-D0C7-14AD-1845-C76F19314059}</UniqueIdentifier>
+    </Filter>
     <Filter Include="PlaygroundGUI\Source\Config">
       <UniqueIdentifier>{9A078B72-60A8-2792-7CF7-56CCCD57EC6E}</UniqueIdentifier>
     </Filter>
@@ -238,6 +247,39 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\DEX\DEXPage.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\DEX\Order.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\DEX\OrdersManager.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\Proposal.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsModel.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\CreateProposalComponent.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\GridView.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsActionsPage.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsManager.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsPage.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Config\Config.cpp">
       <Filter>PlaygroundGUI\Source\Config</Filter>
     </ClCompile>
@@ -356,9 +398,6 @@
       <Filter>JUCE Modules\juce_core\misc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_RuntimePermissions.cpp">
-      <Filter>JUCE Modules\juce_core\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_StdFunctionCompat.cpp">
       <Filter>JUCE Modules\juce_core\misc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_Uuid.cpp">
@@ -524,6 +563,9 @@
       <Filter>JUCE Modules\juce_core\threads</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\threads\juce_TimeSliceThread.cpp">
+      <Filter>JUCE Modules\juce_core\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\threads\juce_WaitableEvent.cpp">
       <Filter>JUCE Modules\juce_core\threads</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\time\juce_PerformanceCounter.cpp">
@@ -1551,6 +1593,45 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Models\AbstractListModel.h">
+      <Filter>PlaygroundGUI\Source\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Models\AbstractProxyModel.h">
+      <Filter>PlaygroundGUI\Source\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DEX\DEXPage.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DEX\Order.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DEX\OrdersManager.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DEX\OrdersModel.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\Proposal.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsModel.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\CreateProposalComponent.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\GridView.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsActionsPage.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsManager.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsPage.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Config\Config.h">
       <Filter>PlaygroundGUI\Source\Config</Filter>
     </ClInclude>
@@ -1741,9 +1822,6 @@
       <Filter>JUCE Modules\juce_core\misc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_RuntimePermissions.h">
-      <Filter>JUCE Modules\juce_core\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_StdFunctionCompat.h">
       <Filter>JUCE Modules\juce_core\misc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_Uuid.h">

@@ -74,7 +74,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>-I $(SolutionDir)/../../../../automaton/src/local_third_party/include %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-I$(SolutionDir)/../../../../automaton/src/local_third_party/include %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
@@ -117,7 +117,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>-I $(SolutionDir)/../../../../automaton/src/local_third_party/include %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-I$(SolutionDir)/../../../../automaton/src/local_third_party/include %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
@@ -142,6 +142,17 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\DEX\DEXPage.cpp"/>
+    <ClCompile Include="..\..\Source\DEX\Order.cpp"/>
+    <ClCompile Include="..\..\Source\DEX\OrdersManager.cpp"/>
+    <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\Proposal.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsModel.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\CreateProposalComponent.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\GridView.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsActionsPage.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsManager.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\ProposalsPage.cpp"/>
     <ClCompile Include="..\..\Source\Config\Config.cpp"/>
     <ClCompile Include="..\..\Source\Components\FormMaker.cpp"/>
     <ClCompile Include="..\..\Source\Components\ValidatorGrid.cpp"/>
@@ -238,9 +249,6 @@
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_RuntimePermissions.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_StdFunctionCompat.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_Uuid.cpp">
@@ -391,6 +399,9 @@
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\threads\juce_TimeSliceThread.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\threads\juce_WaitableEvent.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\time\juce_PerformanceCounter.cpp">
@@ -1338,6 +1349,19 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Models\AbstractListModel.h"/>
+    <ClInclude Include="..\..\Source\Models\AbstractProxyModel.h"/>
+    <ClInclude Include="..\..\Source\DEX\DEXPage.h"/>
+    <ClInclude Include="..\..\Source\DEX\Order.h"/>
+    <ClInclude Include="..\..\Source\DEX\OrdersManager.h"/>
+    <ClInclude Include="..\..\Source\DEX\OrdersModel.h"/>
+    <ClInclude Include="..\..\Source\Proposals\Proposal.h"/>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsModel.h"/>
+    <ClInclude Include="..\..\Source\Proposals\CreateProposalComponent.h"/>
+    <ClInclude Include="..\..\Source\Proposals\GridView.h"/>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsActionsPage.h"/>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsManager.h"/>
+    <ClInclude Include="..\..\Source\Proposals\ProposalsPage.h"/>
     <ClInclude Include="..\..\Source\Config\Config.h"/>
     <ClInclude Include="..\..\Source\Components\FormMaker.h"/>
     <ClInclude Include="..\..\Source\Components\ValidatorGrid.h"/>
@@ -1402,7 +1426,6 @@
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_ConsoleApplication.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_Result.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_RuntimePermissions.h"/>
-    <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_StdFunctionCompat.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_Uuid.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\misc\juce_WindowsRegistry.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\native\juce_android_JNIHelpers.h"/>

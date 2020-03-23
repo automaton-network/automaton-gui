@@ -30,6 +30,9 @@
 #include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
 
+#include "../Proposals/ProposalsManager.h"
+#include "../DEX/OrdersManager.h"
+
 using json = nlohmann::json;
 
 using automaton::core::common::status;
@@ -154,23 +157,23 @@ class ReadContractThread: public ThreadWithProgressWindow {
     }
     setProgress(0);
 
-    s = contract->call("getMask", "");
+    s = contract->call("mask", "");
     j_output = json::parse(s.msg);
     mask = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     setStatusMessage("Mask: " + mask);
 
-    s = contract->call("getMinDifficulty", "");
+    s = contract->call("minDifficulty", "");
     j_output = json::parse(s.msg);
     min_difficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     setStatusMessage("MinDifficulty: " + min_difficulty);
 
-    s = contract->call("getClaimed", "");
+    s = contract->call("numTakeOvers", "");
     j_output = json::parse(s.msg);
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
     slots_claimed = std::stoul(slots_claimed_string);
     setStatusMessage("Number of slot claims: " + slots_claimed_string);
-
     setProgress(1.0);
+
     s = status::ok();
   }
 
@@ -232,6 +235,7 @@ void NetworkView::buttonClicked(Button* btn) {
       } else {
         auto cd = AutomatonContractData::getInstance();
         ScopedLock lock(cd->criticalSection);
+        cd->contract_address = t.contract_addr;
         cd->mask = t.mask;
         cd->min_difficulty = t.min_difficulty;
         cd->slots = t.slots;
@@ -255,6 +259,8 @@ void NetworkView::buttonClicked(Button* btn) {
                                        "Operation aborted!",
                                        "Current settings were not affected.");
     }
+    ProposalsManager::getInstance()->fetchProposals();
+    OrdersManager::getInstance()->fetchOrders();
   }
 }
 

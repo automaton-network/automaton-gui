@@ -41,6 +41,50 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
+		5A3DA206190F057B44FDA6A4 = {
+			isa = PBXBuildFile;
+			fileRef = 146CF7EBB22338825418D3E9;
+		};
+		3FAABEF679539A4A35C12933 = {
+			isa = PBXBuildFile;
+			fileRef = 64AA565C9FB6F488ABFC0858;
+		};
+		658A3370960D604062B98387 = {
+			isa = PBXBuildFile;
+			fileRef = 59CE134BB5F2F1D87D20AB34;
+		};
+		81315ABE1B5196E62FEAF085 = {
+			isa = PBXBuildFile;
+			fileRef = EDA72D64D0C8122D56A91779;
+		};
+		94F672D3BDA08865353B9C45 = {
+			isa = PBXBuildFile;
+			fileRef = 999124BB54C7EFFB15C28C9A;
+		};
+		B16A028E08A88B3CC4C157B1 = {
+			isa = PBXBuildFile;
+			fileRef = D60BF1DB6AB1382EC05AFF91;
+		};
+		119F3E08EA0700D3227756D8 = {
+			isa = PBXBuildFile;
+			fileRef = 1F7A71E440D0AA4EFE54D78D;
+		};
+		CA1EBA052F275BF313BF1275 = {
+			isa = PBXBuildFile;
+			fileRef = B4352990FE118BBD5B965E8F;
+		};
+		25C5695494D3CEB6AB1F3674 = {
+			isa = PBXBuildFile;
+			fileRef = 30384822F40D4037F57C2DCE;
+		};
+		92F7CC5A19551938C8F5434D = {
+			isa = PBXBuildFile;
+			fileRef = CC0115E7124AFF444FA9938C;
+		};
+		7BF65D2BD0133379680A47C4 = {
+			isa = PBXBuildFile;
+			fileRef = 24A90FD816B6497603F90864;
+		};
 		A43EEE53B12550669E555382 = {
 			isa = PBXBuildFile;
 			fileRef = 57D3C94C7E5B841F93AF02D6;
@@ -131,6 +175,13 @@
 			path = PlaygroundGUI.app;
 			sourceTree = "BUILT_PRODUCTS_DIR";
 		};
+		0571A7A83A886A1C384783DD = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalsPage.h;
+			path = ../../Source/Proposals/ProposalsPage.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		05DA0D453EDBFC5819828842 = {
 			isa = PBXFileReference;
 			lastKnownFileType = image.png;
@@ -150,6 +201,13 @@
 			lastKnownFileType = file;
 			name = "juce_data_structures";
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_data_structures";
+			sourceTree = "SOURCE_ROOT";
+		};
+		0C84C6C4FC66FF94F12AABA5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalsModel.h;
+			path = ../../Source/Proposals/ProposalsModel.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		0F3E15670DE5E9D260B52A7C = {
@@ -173,6 +231,20 @@
 			path = ../../JuceLibraryCode/AppConfig.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		1460D80A9051E5EDA0A2EF60 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalsActionsPage.h;
+			path = ../../Source/Proposals/ProposalsActionsPage.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		146CF7EBB22338825418D3E9 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = DEXPage.cpp;
+			path = ../../Source/DEX/DEXPage.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		14CE094E72DE869A11098622 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -187,6 +259,13 @@
 			path = "../../../../automaton/media/fonts/play/Play-Bold.ttf";
 			sourceTree = "SOURCE_ROOT";
 		};
+		160F1B25E830A88EB81D11F5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = DEXPage.h;
+			path = ../../Source/DEX/DEXPage.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		1E8DE8B40D50E5DB882D0D40 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.objcpp;
@@ -194,11 +273,39 @@
 			path = "../../JuceLibraryCode/include_juce_graphics.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
+		1F7A71E440D0AA4EFE54D78D = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = CreateProposalComponent.cpp;
+			path = ../../Source/Proposals/CreateProposalComponent.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		24A90FD816B6497603F90864 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalsPage.cpp;
+			path = ../../Source/Proposals/ProposalsPage.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		285D5BE86C9CA0389815AD35 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = AbstractListModel.h;
+			path = ../../Source/Models/AbstractListModel.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		2886D3F006ED597D331F6F51 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.ttf;
 			name = "Play-Regular.ttf";
 			path = "../../../../automaton/media/fonts/play/Play-Regular.ttf";
+			sourceTree = "SOURCE_ROOT";
+		};
+		30384822F40D4037F57C2DCE = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalsActionsPage.cpp;
+			path = ../../Source/Proposals/ProposalsActionsPage.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		3604DF6B545750B665E78AE0 = {
@@ -215,12 +322,26 @@
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_gui_basics";
 			sourceTree = "SOURCE_ROOT";
 		};
+		3D9D6A70A43B37B489172BDD = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Order.h;
+			path = ../../Source/DEX/Order.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		426447579678A29AC4896E2B = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = WebKit.framework;
 			path = System/Library/Frameworks/WebKit.framework;
 			sourceTree = SDKROOT;
+		};
+		432622C848430E1D225D94C2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = OrdersManager.h;
+			path = ../../Source/DEX/OrdersManager.h;
+			sourceTree = "SOURCE_ROOT";
 		};
 		510F04B2A4332278F5F209C3 = {
 			isa = PBXFileReference;
@@ -255,6 +376,20 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = DemoMiner.h;
 			path = ../../Source/Demos/DemoMiner.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		59CE134BB5F2F1D87D20AB34 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = OrdersManager.cpp;
+			path = ../../Source/DEX/OrdersManager.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		64AA565C9FB6F488ABFC0858 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Order.cpp;
+			path = ../../Source/DEX/Order.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		674BD8AB93DB872747B5BE69 = {
@@ -313,6 +448,13 @@
 			path = ../../Source/Demos/DemoSimNet.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		88BBF5E2B42386B3A2583ED0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = AbstractProxyModel.h;
+			path = ../../Source/Models/AbstractProxyModel.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		8B0AAA0091A485A31E7E7FB9 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.json;
@@ -341,6 +483,20 @@
 			path = ../../Source/Main.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		999124BB54C7EFFB15C28C9A = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Proposal.cpp;
+			path = ../../Source/Proposals/Proposal.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		9A5E50B9E6B77E8F419D53D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalsManager.h;
+			path = ../../Source/Proposals/ProposalsManager.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		A13B15A0E08E44FD6C17A560 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -362,11 +518,18 @@
 			path = ../../Source/Data/AutomatonContractData.h;
 			sourceTree = "SOURCE_ROOT";
 		};
-		AB26CD15F1D08E8210A3CDEF = {
+		AC725974DA4D5A793B592A09 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
-			name = PlaygroundGUI.entitlements;
-			path = PlaygroundGUI.entitlements;
+			lastKnownFileType = sourcecode.c.h;
+			name = Proposal.h;
+			path = ../../Source/Proposals/Proposal.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		B4352990FE118BBD5B965E8F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = GridView.cpp;
+			path = ../../Source/Proposals/GridView.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		B64797D3D8C773778F4625FB = {
@@ -374,6 +537,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = AutomatonContractData.cpp;
 			path = ../../Source/Data/AutomatonContractData.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		BA288CD361E5BFCC337628EB = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = OrdersModel.h;
+			path = ../../Source/DEX/OrdersModel.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		BEF8E95313BF13AE8C0A6AC7 = {
@@ -404,6 +574,13 @@
 			path = "Info-App.plist";
 			sourceTree = "SOURCE_ROOT";
 		};
+		CC0115E7124AFF444FA9938C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalsManager.cpp;
+			path = ../../Source/Proposals/ProposalsManager.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		D0E6A5F1B630686C8DA092DC = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -423,6 +600,13 @@
 			lastKnownFileType = file;
 			name = "juce_graphics";
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_graphics";
+			sourceTree = "SOURCE_ROOT";
+		};
+		D60BF1DB6AB1382EC05AFF91 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalsModel.cpp;
+			path = ../../Source/Proposals/ProposalsModel.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		D752613D5D9683073A9F79DD = {
@@ -446,6 +630,13 @@
 			path = System/Library/Frameworks/QuartzCore.framework;
 			sourceTree = SDKROOT;
 		};
+		E7C2C623D58FC93EC7586866 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = CreateProposalComponent.h;
+			path = ../../Source/Proposals/CreateProposalComponent.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		EA39D34DCA843A8AB6A5D0FE = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
@@ -465,6 +656,20 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = JuceHeader.h;
 			path = ../../JuceLibraryCode/JuceHeader.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		EDA72D64D0C8122D56A91779 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = OrdersModel.cpp;
+			path = ../../Source/DEX/OrdersModel.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		F193D440E5BAB158E4C4C217 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = GridView.h;
+			path = ../../Source/Proposals/GridView.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		F37DC7F8EC888D82E793ED31 = {
@@ -490,6 +695,51 @@
 				2886D3F006ED597D331F6F51,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		687803636958C453C18D7987 = {
+			isa = PBXGroup;
+			children = (
+				285D5BE86C9CA0389815AD35,
+				88BBF5E2B42386B3A2583ED0,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		4576C75266FC9F8B83F83140 = {
+			isa = PBXGroup;
+			children = (
+				146CF7EBB22338825418D3E9,
+				160F1B25E830A88EB81D11F5,
+				64AA565C9FB6F488ABFC0858,
+				3D9D6A70A43B37B489172BDD,
+				59CE134BB5F2F1D87D20AB34,
+				432622C848430E1D225D94C2,
+				EDA72D64D0C8122D56A91779,
+				BA288CD361E5BFCC337628EB,
+			);
+			name = DEX;
+			sourceTree = "<group>";
+		};
+		C2050576413F623B249937CF = {
+			isa = PBXGroup;
+			children = (
+				999124BB54C7EFFB15C28C9A,
+				AC725974DA4D5A793B592A09,
+				D60BF1DB6AB1382EC05AFF91,
+				0C84C6C4FC66FF94F12AABA5,
+				1F7A71E440D0AA4EFE54D78D,
+				E7C2C623D58FC93EC7586866,
+				B4352990FE118BBD5B965E8F,
+				F193D440E5BAB158E4C4C217,
+				30384822F40D4037F57C2DCE,
+				1460D80A9051E5EDA0A2EF60,
+				CC0115E7124AFF444FA9938C,
+				9A5E50B9E6B77E8F419D53D0,
+				24A90FD816B6497603F90864,
+				0571A7A83A886A1C384783DD,
+			);
+			name = Proposals;
 			sourceTree = "<group>";
 		};
 		B56F603FB4214EB5A6B59BE1 = {
@@ -555,6 +805,9 @@
 		883895BF3FD94AEF68720830 = {
 			isa = PBXGroup;
 			children = (
+				687803636958C453C18D7987,
+				4576C75266FC9F8B83F83140,
+				C2050576413F623B249937CF,
 				B56F603FB4214EB5A6B59BE1,
 				F9E1BF6AB0C4E7F511EFC866,
 				2B6DFF850E82EF2A271142A2,
@@ -790,6 +1043,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "PlaygroundGUI";
+				SDKROOT = macosx;
 				WARNING_CFLAGS = "-Wreorder";
 				ZERO_LINK = NO;
 			};
@@ -835,6 +1089,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "PlaygroundGUI";
+				SDKROOT = macosx;
 				WARNING_CFLAGS = "-Wreorder";
 				ZERO_LINK = NO;
 			};
@@ -876,6 +1131,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A3DA206190F057B44FDA6A4,
+				3FAABEF679539A4A35C12933,
+				658A3370960D604062B98387,
+				81315ABE1B5196E62FEAF085,
+				94F672D3BDA08865353B9C45,
+				B16A028E08A88B3CC4C157B1,
+				119F3E08EA0700D3227756D8,
+				CA1EBA052F275BF313BF1275,
+				25C5695494D3CEB6AB1F3674,
+				92F7CC5A19551938C8F5434D,
+				7BF65D2BD0133379680A47C4,
 				A43EEE53B12550669E555382,
 				AE1A08B1BFB106256FE4F53E,
 				88D3B11922D089AF4E26BDC0,
