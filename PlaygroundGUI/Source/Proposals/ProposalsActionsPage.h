@@ -23,18 +23,17 @@
 
 class ProposalsGrid;
 
-class ProposalsActionsPage : public Component
-{
-public:
+class ProposalsActionsPage : public Component {
+ public:
   ProposalsActionsPage();
   ~ProposalsActionsPage();
 
-  void paint (Graphics& g) override;
+  void paint(Graphics& g) override;
   void resized() override;
 
-private:
+ private:
   std::unique_ptr<Label> m_titleLabel;
   std::unique_ptr<ProposalsGrid> m_proposalsGrid;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProposalsActionsPage)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProposalsActionsPage)
 };

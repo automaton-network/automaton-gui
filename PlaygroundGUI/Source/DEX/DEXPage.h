@@ -26,19 +26,18 @@
 class OrdersUIModel;
 
 class DEXPage : public Component
-              , public AbstractListModelBase::Listener
-{
-public:
+              , public AbstractListModelBase::Listener {
+ public:
   DEXPage();
   ~DEXPage();
 
-  void paint (Graphics&) override;
+  void paint(Graphics&) override;
   void resized() override;
 
   // AbstractListModelBase::Listener
-  void modelChanged (AbstractListModelBase* model);
+  void modelChanged(AbstractListModelBase* model);
 
-private:
+ private:
   std::unique_ptr<OrdersUIModel> m_sellingUIModel;
   std::unique_ptr<OrdersUIModel> m_buyingUIModel;
   std::unique_ptr<Label> m_sellingLabel;
@@ -48,5 +47,5 @@ private:
   std::shared_ptr<OrdersProxyModel> m_sellingProxyModel;
   std::shared_ptr<OrdersProxyModel> m_buyingProxyModel;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DEXPage)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DEXPage)
 };

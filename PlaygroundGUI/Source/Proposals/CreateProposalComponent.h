@@ -24,36 +24,34 @@
 
 
 class CreateProposalComponent : public Component
-                              , private Button::Listener
-{
-public:
-  enum class Action
-  {
+                              , private Button::Listener {
+ public:
+  enum class Action {
     ProposalCreated = 1
     , Cancelled
     , Unknown
   };
 
-  class Listener
-  {
-  public:
+  class Listener {
+   public:
     virtual ~Listener() {}
-    virtual void createProposalViewActionHappened (CreateProposalComponent* componentInWhichActionHappened, CreateProposalComponent::Action action) = 0;
+    virtual void createProposalViewActionHappened(CreateProposalComponent* componentInWhichActionHappened,
+                                                  CreateProposalComponent::Action action) = 0;
   };
 
   CreateProposalComponent();
 
   Proposal::Ptr getProposal() const { return m_proposal; }
 
-  void addListener (CreateProposalComponent::Listener* listener) { m_listeners.add (listener); }
-  void removeListener (CreateProposalComponent::Listener* listener) { m_listeners.remove (listener); }
+  void addListener(CreateProposalComponent::Listener* listener) { m_listeners.add(listener); }
+  void removeListener(CreateProposalComponent::Listener* listener) { m_listeners.remove(listener); }
 
-  void paint (Graphics& g) override;
+  void paint(Graphics& g) override;
   void resized() override;
 
 
-private:
-  void buttonClicked (Button* buttonThatWasClicked) override;
+ private:
+  void buttonClicked(Button* buttonThatWasClicked) override;
 
   std::unique_ptr<TextEditor> m_titleEditor;
   std::unique_ptr<TextEditor> m_budgetEditor;
@@ -68,5 +66,5 @@ private:
 
   ListenerList<CreateProposalComponent::Listener> m_listeners;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CreateProposalComponent);
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CreateProposalComponent);
 };

@@ -38,161 +38,154 @@ using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
-static uint64 getNumSlots (std::shared_ptr<eth_contract> contract, status& s);
-static std::vector<std::string> getOwners (std::shared_ptr<eth_contract> contract, uint64 numOfSlots, status& s);
-static uint64 getLastProposalId (std::shared_ptr<eth_contract> contract, status& s);
+static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus);
+static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract, uint64 numOfSlots, status* resStatus);
+static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus);
+static void voteWithSlot(std::shared_ptr<eth_contract> contract,
+                         uint64 id, uint64 slot, uint64 choice,
+                         status* resStatus);
 
-static std::shared_ptr<eth_contract> getContract (status& s)
-{
+static std::shared_ptr<eth_contract> getContract(status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract (cd->contract_address);
+  const auto contract = eth_contract::get_contract(cd->contract_address);
   if (contract == nullptr)
-    s = status::internal ("Contract is NULL. Read appropriate contract data first.");
+    *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
 
   return contract;
 }
 
+
 class AsyncTask : public ThreadWithProgressWindow {
-public:
-  AsyncTask (std::function<bool(AsyncTask*)> fun, const String& title) :
-    ThreadWithProgressWindow (title, true, true),
-    m_status (status::ok()) {
+ public:
+  AsyncTask(std::function<bool(AsyncTask*)> fun, const String& title)
+      : ThreadWithProgressWindow(title, true, true)
+      , m_status(status::ok()) {
     m_fun = fun;
   }
 
   void run() {
-    m_fun (this);
+    m_fun(this);
   }
 
   status m_status;
 
-private:
+ private:
   std::function<bool(AsyncTask*)> m_fun;
 };
 
+
 ProposalsManager::ProposalsManager()
-  : m_model (std::make_shared<ProposalsModel>())
-{
+  : m_model(std::make_shared<ProposalsModel>()) {
 }
 
-ProposalsManager::~ProposalsManager()
-{
+ProposalsManager::~ProposalsManager() {
   clearSingletonInstance();
 }
 
-bool ProposalsManager::fetchProposals()
-{
+bool ProposalsManager::fetchProposals() {
   Array<Proposal> proposals;
-  AsyncTask task ([&](AsyncTask* task)
-  {
+  AsyncTask task([&](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract (s);
-    if (! s.is_ok())
+    auto contract = getContract(&s);
+    if (!s.is_ok())
       return false;
 
-    m_model->clear (false);
+    m_model->clear(false);
 
-    const auto lastProposalId = getLastProposalId (contract, s);
-    if (! s.is_ok())
+    const auto lastProposalId = getLastProposalId(contract, &s);
+    if (!s.is_ok())
       return false;
 
-    static const uint32_t PROPOSAL_START_ID = 100; // ballotBoxIDs initial value is 99, and the first proposal is at 100
-    for (int i = PROPOSAL_START_ID; i <= lastProposalId; ++i)
-    {
+    // ballotBoxIDs initial value is 99, and the first proposal is at 100
+    static const uint32_t PROPOSAL_START_ID = 100;
+    for (int i = PROPOSAL_START_ID; i <= lastProposalId; ++i) {
       json jInput;
-      jInput.push_back (i);
+      jInput.push_back(i);
       std::string params = jInput.dump();
 
-      s = contract->call ("getProposal", params);
+      s = contract->call("getProposal", params);
 
-      if (! s.is_ok())
+      if (!s.is_ok())
         return false;
 
-      Proposal proposal (i, String (s.msg));
-      addProposal (proposal, false);
+      Proposal proposal(i, String(s.msg));
+      addProposal(proposal, false);
     }
 
     return true;
   }, "Fetching proposals...");
 
-  if (task.runThread())
-  {
+  if (task.runThread()) {
     auto& s = task.m_status;
-    if (s.is_ok())
-    {
+    if (s.is_ok()) {
       notifyProposalsUpdated();
       return true;
+    } else {
+      AlertWindow::showMessageBoxAsync(
+        AlertWindow::WarningIcon,
+        "ERROR",
+        String("(") + String(s.code) + String(") :") + s.msg);
     }
-    else
-    {
-      AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-              "ERROR",
-              String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  }
-  else
-  {
-    AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-    "Fetching proposals canceled!",
-    "Current proposals data may be broken.");
+  } else {
+    AlertWindow::showMessageBoxAsync(
+      AlertWindow::WarningIcon,
+      "Fetching proposals canceled!",
+      "Current proposals data may be broken.");
   }
 
   return false;
 }
 
-bool ProposalsManager::addProposal (const Proposal& proposal, bool sendNotification)
-{
-  m_model->addItem (std::make_shared<Proposal> (proposal), sendNotification);
+bool ProposalsManager::addProposal(const Proposal& proposal, bool sendNotification) {
+  m_model->addItem(std::make_shared<Proposal>(proposal), sendNotification);
 }
 
-//TODO: pass address and privateKey
-const std::string privateKey = "f7bb62b8c66184e7fdcf60b749d5a5da463b434bc80c4a6c417484cdfeffd52b";
-const std::string address = "0xE22095F4f6d4a1bFbE7037Ae88AC055B67348d8e";
+// TODO(Kirill): pass address and privateKey
+static const char privateKey[] = "f7bb62b8c66184e7fdcf60b749d5a5da463b434bc80c4a6c417484cdfeffd52b";
+static const char address[] = "0xE22095F4f6d4a1bFbE7037Ae88AC055B67348d8e";
 
-bool ProposalsManager::createProposal (Proposal::Ptr proposal, const std::string& contributor)
-{
-  AsyncTask task ([=](AsyncTask* task)
-  {
+bool ProposalsManager::createProposal(Proposal::Ptr proposal, const std::string& contributor) {
+  AsyncTask task([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     const auto cd = AutomatonContractData::getInstance();
-    const auto contract = getContract (s);
-    if (! s.is_ok())
+    const auto contract = getContract(&s);
+    if (!s.is_ok())
       return false;
 
-    task->setProgress (0.1);
+    task->setProgress(0.1);
 
-    const auto lastProposalId = getLastProposalId (contract, s);
-    proposal->setId (lastProposalId + 1);
-    task->setProgress (0.25);
+    const auto lastProposalId = getLastProposalId(contract, &s);
+    proposal->setId(lastProposalId + 1);
+    task->setProgress(0.25);
 
-    s = eth_getTransactionCount (cd->eth_url, address);
+    s = eth_getTransactionCount(cd->eth_url, address);
     const auto nonce = s.is_ok() ? s.msg : "0";
-    if (! s.is_ok())
+    if (!s.is_ok())
       return false;
 
     json jProposal;
-    jProposal.push_back (contributor);
-    jProposal.push_back (proposal->getTitle().toStdString());
-    jProposal.push_back ("google.com");
-    jProposal.push_back ("BA5EC0DE");
-    jProposal.push_back (proposal->getLengthDays());
-    jProposal.push_back (proposal->getNumPeriods());
-    jProposal.push_back (proposal->getBudget());
+    jProposal.push_back(contributor);
+    jProposal.push_back(proposal->getTitle().toStdString());
+    jProposal.push_back("google.com");
+    jProposal.push_back("BA5EC0DE");
+    jProposal.push_back(proposal->getLengthDays());
+    jProposal.push_back(proposal->getNumPeriods());
+    jProposal.push_back(proposal->getBudget());
 
     json jSignature;
-    jSignature.push_back ("address");
-    jSignature.push_back ("string");
-    jSignature.push_back ("string");
-    jSignature.push_back ("bytes");
-    jSignature.push_back ("uint256");
-    jSignature.push_back ("uint256");
-    jSignature.push_back ("uint256");
+    jSignature.push_back("address");
+    jSignature.push_back("string");
+    jSignature.push_back("string");
+    jSignature.push_back("bytes");
+    jSignature.push_back("uint256");
+    jSignature.push_back("uint256");
+    jSignature.push_back("uint256");
 
     std::stringstream txData;
-    txData << "f8a1ff12" << bin2hex (encode (jSignature.dump(), jProposal.dump()));
-    task->setProgress (0.5);
+    txData << "f8a1ff12" << bin2hex(encode(jSignature.dump(), jProposal.dump()));
+    task->setProgress(0.5);
 
     eth_transaction transaction;
     transaction.nonce = nonce;
@@ -202,80 +195,74 @@ bool ProposalsManager::createProposal (Proposal::Ptr proposal, const std::string
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
-    s = contract->call ("createProposal", transaction.sign_tx (privateKey));
+    s = contract->call("createProposal", transaction.sign_tx(privateKey));
 
-    if (! s.is_ok())
+    if (!s.is_ok())
       return false;
 
     DBG("Call result: " << s.msg << "\n");
-    proposal->setStatus (Proposal::Status::Started);
-    task->setProgress (1.0);
+    proposal->setStatus(Proposal::Status::Started);
+    task->setProgress(1.0);
 
     return true;
   }, "Creating proposal...");
 
 
-  if (task.runThread())
-  {
+  if (task.runThread()) {
     auto& s = task.m_status;
-    if (s.is_ok())
-    {
-      m_model->addItem (proposal);
+    if (s.is_ok()) {
+      m_model->addItem(proposal);
       return true;
+    } else {
+      AlertWindow::showMessageBoxAsync(
+        AlertWindow::WarningIcon,
+        "ERROR",
+        String("(") + String(s.code) + String(") :") + s.msg);
     }
-    else
-    {
-      AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-              "ERROR",
-              String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  }
-  else
-  {
-    AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-    "Canceled!",
-    "Operation aborted.");
+  } else {
+    AlertWindow::showMessageBoxAsync(
+      AlertWindow::WarningIcon,
+      "Canceled!",
+      "Operation aborted.");
   }
 
   return false;
 }
 
-bool ProposalsManager::payForGas (Proposal::Ptr proposal, uint64 slotsToPay)
-{
-  if (proposal->getId() <= 0)
-  {
-    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-            "ERROR",
-            "The proposal is not valid");
+bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
+  if (proposal->getId() <= 0) {
+    AlertWindow::showMessageBoxAsync(
+      AlertWindow::WarningIcon,
+      "ERROR",
+      "The proposal is not valid");
   }
 
-  AsyncTask task ([=](AsyncTask* task)
-  {
+  AsyncTask task([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     const auto cd = AutomatonContractData::getInstance();
-    const auto contract = getContract (s);
-    if (! s.is_ok())
+    const auto contract = getContract(&s);
+    if (!s.is_ok())
       return false;
 
-    task->setProgress (0.1);
+    task->setProgress(0.1);
 
-    s = eth_getTransactionCount (cd->eth_url, address);
+    s = eth_getTransactionCount(cd->eth_url, address);
     const auto nonce = s.is_ok() ? s.msg : "0";
-    if (! s.is_ok())
+    if (!s.is_ok())
       return false;
 
     json jInput;
-    jInput.push_back (proposal->getId());
-    jInput.push_back (slotsToPay);
+    jInput.push_back(proposal->getId());
+    jInput.push_back(slotsToPay);
 
     json jSignature;
-    jSignature.push_back ("uint256");
-    jSignature.push_back ("uint256");
+    jSignature.push_back("uint256");
+    jSignature.push_back("uint256");
 
     std::stringstream txData;
-    txData << "10075c50" << bin2hex (encode (jSignature.dump(), jInput.dump()));
-    task->setProgress (0.5);
+    txData << "10075c50" << bin2hex(encode(jSignature.dump(), jInput.dump()));
+    task->setProgress(0.5);
 
     eth_transaction transaction;
     transaction.nonce = nonce;
@@ -285,176 +272,168 @@ bool ProposalsManager::payForGas (Proposal::Ptr proposal, uint64 slotsToPay)
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
-    s = contract->call ("payForGas", transaction.sign_tx (privateKey));
+    s = contract->call("payForGas", transaction.sign_tx(privateKey));
 
-    if (! s.is_ok())
+    if (!s.is_ok())
       return false;
 
-    task->setProgress (1.0);
+    task->setProgress(1.0);
 
     return true;
   }, "Paying for gas....");
 
 
-  if (task.runThread())
-  {
+  if (task.runThread()) {
     auto& s = task.m_status;
-    if (s.is_ok())
-    {
+    if (s.is_ok()) {
       return true;
+    } else {
+      AlertWindow::showMessageBoxAsync(
+        AlertWindow::WarningIcon,
+        "ERROR",
+        String("(") + String(s.code) + String(") :") + s.msg);
     }
-    else
-    {
-      AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-              "ERROR",
-              String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  }
-  else
-  {
-    AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-            "Canceled!",
-            "Operation aborted.");
+  } else {
+    AlertWindow::showMessageBoxAsync(
+     AlertWindow::WarningIcon,
+     "Canceled!",
+     "Operation aborted.");
   }
 
   return false;
 }
 
-void ProposalsManager::notifyProposalsUpdated()
-{
+void ProposalsManager::notifyProposalsUpdated() {
   m_model->notifyModelChanged();
 }
 
-static void voteWithSlot (std::shared_ptr<eth_contract> contract, uint64 id, uint64 slot, uint64 choice, status& s)
-{
+static void voteWithSlot(std::shared_ptr<eth_contract> contract,
+                         uint64 id, uint64 slot, uint64 choice,
+                         status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  s = eth_getTransactionCount (cd->eth_url, address);
+  const auto s = eth_getTransactionCount(cd->eth_url, address);
+  *resStatus = s;
   const auto nonce = s.is_ok() ? s.msg : "0";
-  if (! s.is_ok())
+  if (!s.is_ok())
     return;
 
   json jInput;
-  jInput.push_back (id);
-  jInput.push_back (slot);
-  jInput.push_back (choice);
+  jInput.push_back(id);
+  jInput.push_back(slot);
+  jInput.push_back(choice);
 
   json jSignature;
-  jSignature.push_back ("uint256");
-  jSignature.push_back ("uint256");
-  jSignature.push_back ("uint8");
+  jSignature.push_back("uint256");
+  jSignature.push_back("uint256");
+  jSignature.push_back("uint8");
 
   std::stringstream txData;
-  txData << "dea112a6" << bin2hex (encode (jSignature.dump(), jInput.dump()));
+  txData << "dea112a6" << bin2hex(encode(jSignature.dump(), jInput.dump()));
 
   eth_transaction transaction;
   transaction.nonce = nonce;
   transaction.gas_price = "1388";  // 5 000
   transaction.gas_limit = "5B8D80";  // 6M
-  transaction.to = cd->contract_address.substr (2);
+  transaction.to = cd->contract_address.substr(2);
   transaction.value = "";
   transaction.data = txData.str();
   transaction.chain_id = "01";
-  s = contract->call ("castVote", transaction.sign_tx (privateKey));
+  *resStatus = contract->call("castVote", transaction.sign_tx(privateKey));
 }
 
-static uint64 getNumSlots (std::shared_ptr<eth_contract> contract, status& s)
-{
-  s = contract->call ("numSlots", "");
-  if (!s.is_ok())
-  {
+static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus) {
+  const auto s = contract->call("numSlots", "");
+  *resStatus = s;
+  if (!s.is_ok()) {
     std::cout << "ERROR: " << s.msg << std::endl;
     return 0;
   }
 
-  json j_output = json::parse (s.msg);
-  const uint64 slots_number = std::stoul ((*j_output.begin()).get<std::string>());
+  json j_output = json::parse(s.msg);
+  const uint64 slots_number = std::stoul((*j_output.begin()).get<std::string>());
   return slots_number;
 }
 
-static std::vector<std::string> getOwners (std::shared_ptr<eth_contract> contract, uint64 numOfSlots, status& s)
-{
+static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract,
+                                          uint64 numOfSlots,
+                                          status* resStatus) {
   json j_input;
-  j_input.push_back (0);
-  j_input.push_back (numOfSlots);
+  j_input.push_back(0);
+  j_input.push_back(numOfSlots);
   const std::string params = j_input.dump();
 
   // Fetch owners.
-  s = contract->call ("getOwners", params);
-  if (! s.is_ok())
+  const auto s = contract->call("getOwners", params);
+  *resStatus = s;
+  if (!s.is_ok())
     return std::vector<std::string>();
 
   // Parse owners.
-  const auto j_output = json::parse (s.msg);
+  const auto j_output = json::parse(s.msg);
   std::vector<std::string> owners = (*j_output.begin()).get<std::vector<std::string>>();
   return owners;
 }
 
-static uint64 getLastProposalId (std::shared_ptr<eth_contract> contract, status& s)
-{
-  s = contract->call ("proposalsData", "");
-  if (! s.is_ok())
+static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus) {
+  const auto s = contract->call("proposalsData", "");
+  *resStatus = s;
+  if (!s.is_ok())
     return 0;
 
-  const json ballotBoxJson = json::parse (s.msg);
+  const json ballotBoxJson = json::parse(s.msg);
 
-  if (ballotBoxJson.size() >= 3)
-  {
-    const uint64 lastProposalId = std::stoul (ballotBoxJson[3].get<std::string>());
+  if (ballotBoxJson.size() >= 3) {
+    const uint64 lastProposalId = std::stoul(ballotBoxJson[3].get<std::string>());
     return lastProposalId;
   }
 
   return 0;
 }
 
-bool ProposalsManager::castVote (Proposal::Ptr proposal, uint64 choice)
-{
-  if (proposal->getId() <= 0)
-  {
-    AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-            "ERROR",
-            "The proposal is not valid");
+bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
+  if (proposal->getId() <= 0) {
+    AlertWindow::showMessageBoxAsync(
+      AlertWindow::WarningIcon,
+      "ERROR",
+      "The proposal is not valid");
   }
 
-  AsyncTask task ([=](AsyncTask* task)
-  {
+  AsyncTask task([=](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract (s);
-    if (! s.is_ok())
+    auto contract = getContract(&s);
+    if (!s.is_ok())
       return false;
 
-    task->setProgress (0.1);
+    task->setProgress(0.1);
 
-    const auto numOfSlots = getNumSlots (contract, s);
+    const auto numOfSlots = getNumSlots(contract, &s);
 
-    if (! s.is_ok())
+    if (!s.is_ok())
       return false;
 
-    const auto owners = getOwners (contract, numOfSlots, s);
+    const auto owners = getOwners(contract, numOfSlots, &s);
 
-    if (! s.is_ok())
+    if (!s.is_ok())
       return false;
 
-    const String callAddress = address.substr (2);
+    const String callAddress = static_cast<std::string>(address).substr(2);
 
     bool isOwnerForAnySlot = false;
-    for (uint64 slot = 0; slot < owners.size(); ++slot)
-    {
+    for (uint64 slot = 0; slot < owners.size(); ++slot) {
       String owner = owners[slot];
-      if (owner.equalsIgnoreCase (callAddress))
-      {
+      if (owner.equalsIgnoreCase(callAddress)) {
         isOwnerForAnySlot = true;
-        voteWithSlot (contract, proposal->getId(), slot, choice, s);
+        voteWithSlot(contract, proposal->getId(), slot, choice, &s);
 
-        if (! s.is_ok() || task->threadShouldExit())
+        if (!s.is_ok() || task->threadShouldExit())
           return false;
       }
 
-      task->setProgress (slot / (double)numOfSlots);
+      task->setProgress(slot / static_cast<double>(numOfSlots));
     }
 
-    if (! isOwnerForAnySlot)
-    {
+    if (!isOwnerForAnySlot) {
       s = status::internal("You own no single slot. Voting is impossible");
       return false;
     }
@@ -463,25 +442,21 @@ bool ProposalsManager::castVote (Proposal::Ptr proposal, uint64 choice)
   }, "Voting....");
 
 
-  if (task.runThread())
-  {
+  if (task.runThread()) {
     auto& s = task.m_status;
-    if (s.is_ok())
-    {
+    if (s.is_ok()) {
       return true;
+    } else {
+      AlertWindow::showMessageBoxAsync(
+        AlertWindow::WarningIcon,
+        "ERROR",
+        String("(") + String(s.code) + String(") :") + s.msg);
     }
-    else
-    {
-      AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-              "ERROR",
-              String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  }
-  else
-  {
-    AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-            "Canceled!",
-            "Operation aborted.");
+  } else {
+    AlertWindow::showMessageBoxAsync(
+      AlertWindow::WarningIcon,
+      "Canceled!",
+      "Operation aborted.");
   }
 
   return false;

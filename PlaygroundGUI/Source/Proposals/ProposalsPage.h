@@ -28,31 +28,30 @@ class ProposalsPage : public Component
                     , private CreateProposalComponent::Listener
                     , private Button::Listener
                     , private ComboBox::Listener
-                    , private TableListBoxModel
-{
-public:
+                    , private TableListBoxModel {
+ public:
   ProposalsPage();
   ~ProposalsPage();
 
-  void setModel (std::shared_ptr<ProposalsModel> model);
+  void setModel(std::shared_ptr<ProposalsModel> model);
 
-  void paint (Graphics&) override;
+  void paint(Graphics&) override;
   void resized() override;
 
   // AbstractListModelBase::Listener
-  void modelChanged (AbstractListModelBase*);
+  void modelChanged(AbstractListModelBase*);
 
-private:
-  void createProposalViewActionHappened (CreateProposalComponent* componentInWhichActionHappened, CreateProposalComponent::Action action) override;
+ private:
+  void createProposalViewActionHappened(CreateProposalComponent* componentInWhichActionHappened,
+                                        CreateProposalComponent::Action action) override;
 
-  void buttonClicked (Button* buttonThatWasClicked) override;
-  void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+  void buttonClicked(Button* buttonThatWasClicked) override;
+  void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
   void updateButtons();
 
   // TableListBoxModel
-  //==============================================================================
-  enum Columns
-  {
+  // ==============================================================================
+  enum Columns {
     ID = 1
     , CreatorAndTitle
     , ApprovalRating
@@ -66,20 +65,17 @@ private:
   };
 
   int getNumRows() override;
-  void sortOrderChanged (int columnId, bool isForwards) override;
-  void paintCell (Graphics& g,
-          int rowNumber,
-          int columnId,
-          int width,
-          int height,
-          bool rowIsSelected) override;
-  void paintRowBackground (Graphics& g,
-                           int rowNumber,
-                           int width,
-                           int height,
-                           bool rowIsSelected) override;
-  void selectedRowsChanged (int lastRowSelected) override;
-  //==============================================================================
+  void sortOrderChanged(int columnId, bool isForwards) override;
+  void paintCell(Graphics& g,
+                 int rowNumber, int columnId,
+                 int width, int height,
+                 bool rowIsSelected) override;
+  void paintRowBackground(Graphics& g,
+                          int rowNumber,
+                          int width, int height,
+                          bool rowIsSelected) override;
+  void selectedRowsChanged(int lastRowSelected) override;
+  // ==============================================================================
 
   std::unique_ptr<TableListBox> m_proposalsListBox;
   std::unique_ptr<TextButton> m_createProposalBtn;
@@ -93,5 +89,5 @@ private:
   std::unique_ptr<CreateProposalComponent> m_createProposalView;
   std::shared_ptr<ProposalsProxyModel> m_proxyModel;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProposalsPage);
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProposalsPage);
 };

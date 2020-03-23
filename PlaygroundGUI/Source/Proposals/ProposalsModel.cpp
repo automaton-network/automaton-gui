@@ -19,46 +19,40 @@
 
 #include "ProposalsModel.h"
 
-int ProposalsModel::size()
-{
+int ProposalsModel::size() const {
   return m_items.size();
 }
 
-Proposal::Ptr ProposalsModel::getAt (int index)
-{
+Proposal::Ptr ProposalsModel::getAt(int index) {
   return m_items[index];
 }
 
-Proposal::Ptr& ProposalsModel::getReferenceAt (int index)
-{
-  return m_items.getReference (index);
+Proposal::Ptr& ProposalsModel::getReferenceAt(int index) {
+  return m_items.getReference(index);
 }
 
-void ProposalsModel::addItem (Proposal::Ptr item, bool sendNotification)
-{
-  m_items.add (item);
+void ProposalsModel::addItem(Proposal::Ptr item, bool sendNotification) {
+  m_items.add(item);
 
   if (sendNotification)
     notifyModelChanged();
 }
 
-void ProposalsModel::clear (bool sendNotification)
-{
+void ProposalsModel::clear(bool sendNotification) {
   m_items.clearQuick();
   if (sendNotification)
     notifyModelChanged();
 }
 
-bool ProposalsProxyModel::isAccept (const Proposal::Ptr& item)
-{
-  switch (m_filter)
-  {
+bool ProposalsProxyModel::isAccept(const Proposal::Ptr& item) {
+  switch (m_filter) {
     case ProposalFilter::All:
       return true;
     case ProposalFilter::PayingGas:
       return item->getStatus() == Proposal::Status::Uninitialized;
     case ProposalFilter::Approved:
-      return true; //TODO
+      // TODO(Kirill)
+      return true;
     case ProposalFilter::Accepted:
       return item->getStatus() == Proposal::Status::Accepted;
     case ProposalFilter::Rejected:
@@ -70,24 +64,20 @@ bool ProposalsProxyModel::isAccept (const Proposal::Ptr& item)
   }
 }
 
-bool ProposalsProxyModel::withSorting()
-{
+bool ProposalsProxyModel::withSorting() {
   return m_sorterFun != nullptr;
 }
 
-void ProposalsProxyModel::setFilter (ProposalFilter filter)
-{
+void ProposalsProxyModel::setFilter(ProposalFilter filter) {
   m_filter = filter;
   filterChanged();
 }
 
-void ProposalsProxyModel::setSorter (std::function<int(Proposal*, Proposal*)> sorter)
-{
+void ProposalsProxyModel::setSorter(std::function<int(Proposal*, Proposal*)> sorter) {
   m_sorterFun = sorter;
   filterChanged();
 }
 
-int ProposalsProxyModel::compareData (const Proposal::Ptr& first, const Proposal::Ptr& second) const
-{
-  return m_sorterFun (first.get(), second.get());
+int ProposalsProxyModel::compareData(const Proposal::Ptr& first, const Proposal::Ptr& second) const {
+  return m_sorterFun(first.get(), second.get());
 }

@@ -37,114 +37,100 @@ using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
 class AsyncTask : public ThreadWithProgressWindow {
-public:
-  AsyncTask (std::function<bool(AsyncTask*)> fun, const String& title) :
-          ThreadWithProgressWindow (title, true, true),
-          m_status (status::ok()) {
+ public:
+  AsyncTask(std::function<bool(AsyncTask*)> fun, const String& title)
+    : ThreadWithProgressWindow(title, true, true)
+    , m_status(status::ok()) {
     m_fun = fun;
   }
 
   void run() {
-    m_fun (this);
+    m_fun(this);
   }
 
   status m_status;
 
-private:
+ private:
   std::function<bool(AsyncTask*)> m_fun;
 };
 
-static std::shared_ptr<eth_contract> getContract (status& s)
-{
+static std::shared_ptr<eth_contract> getContract(status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract (cd->contract_address);
+  const auto contract = eth_contract::get_contract(cd->contract_address);
   if (contract == nullptr)
-    s = status::internal ("Contract is NULL. Read appropriate contract data first.");
+    *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
 
   return contract;
 }
 
-OrdersManager::OrdersManager()
-{
+OrdersManager::OrdersManager() {
   m_model = std::make_shared<OrdersModel>();
 }
 
-OrdersManager::~OrdersManager()
-{
+OrdersManager::~OrdersManager() {
   clearSingletonInstance();
 }
 
-std::shared_ptr<OrdersModel> OrdersManager::getModel()
-{
+std::shared_ptr<OrdersModel> OrdersManager::getModel() {
   return m_model;
 }
 
-static uint64 getNumOrders (std::shared_ptr<eth_contract> contract, status& s)
-{
-  s = contract->call ("getOrdersLength", "");
-  if (! s.is_ok())
+static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resStatus) {
+  *resStatus = contract->call("getOrdersLength", "");
+  if (!resStatus->is_ok())
     return 0;
 
-  const json jsonData = json::parse (s.msg);
-  const uint64 ordersLength = std::stoul ((*jsonData.begin()).get<std::string>());
+  const json jsonData = json::parse(resStatus->msg);
+  const uint64 ordersLength = std::stoul((*jsonData.begin()).get<std::string>());
   return ordersLength;
 }
 
-bool OrdersManager::fetchOrders()
-{
+bool OrdersManager::fetchOrders() {
   Array<Order::Ptr> orders;
-  AsyncTask task ([&](AsyncTask* task)
-  {
+  AsyncTask task([&](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract (s);
-    if (! s.is_ok())
+    auto contract = getContract(&s);
+    if (!s.is_ok())
       return false;
 
-    m_model->clear (false);
+    m_model->clear(false);
 
-    const auto numOfOrders = getNumOrders (contract, s);
-    if (! s.is_ok())
+    const auto numOfOrders = getNumOrders(contract, &s);
+    if (!s.is_ok())
       return false;
 
-    for (int i = 1; i <= numOfOrders; ++i)
-    {
+    for (int i = 1; i <= numOfOrders; ++i) {
       json jInput;
-      jInput.push_back (i);
+      jInput.push_back(i);
 
-      s = contract->call ("getOrder", jInput.dump());
+      s = contract->call("getOrder", jInput.dump());
 
-      if (! s.is_ok())
+      if (!s.is_ok())
         return false;
 
-      auto order = std::make_shared<Order>(String (s.msg));
-      orders.add (order);
+      auto order = std::make_shared<Order>(String(s.msg));
+      orders.add(order);
     }
 
     return true;
   }, "Fetching orders...");
 
-  if (task.runThread())
-  {
+  if (task.runThread()) {
     auto& s = task.m_status;
-    if (s.is_ok())
-    {
-      m_model->clear (false);
-      m_model->addItems (orders, true);
+    if (s.is_ok()) {
+      m_model->clear(false);
+      m_model->addItems(orders, true);
       return true;
+    } else {
+      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                       "ERROR",
+                                       String("(") + String(s.code) + String(") :") + s.msg);
     }
-    else
-    {
-      AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-              "ERROR",
-              String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  }
-  else
-  {
+  } else {
     AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-            "Fetching orders canceled!",
-            "Current orders data may be broken.");
+                                     "Fetching orders canceled!",
+                                     "Current orders data may be broken.");
   }
 
   return false;

@@ -22,17 +22,16 @@
 #include "../Models/AbstractProxyModel.h"
 #include "Proposal.h"
 
-class ProposalsModel : public AbstractListModel<Proposal::Ptr>
-{
-public:
-  int size () override;
-  Proposal::Ptr getAt (int index) override;
-  Proposal::Ptr& getReferenceAt (int index) override;
+class ProposalsModel : public AbstractListModel<Proposal::Ptr> {
+ public:
+  int size() const override;
+  Proposal::Ptr getAt(int index) override;
+  Proposal::Ptr& getReferenceAt(int index) override;
 
-  void addItem (Proposal::Ptr item, bool sendNotification = true);
-  void clear (bool sendNotification = true);
+  void addItem(Proposal::Ptr item, bool sendNotification = true);
+  void clear(bool sendNotification = true);
 
-private:
+ private:
   Array<Proposal::Ptr> m_items;
 };
 
@@ -46,18 +45,17 @@ enum class ProposalFilter {
   , Completed
 };
 
-class ProposalsProxyModel : public AbstractProxyModel<Proposal::Ptr>
-{
-public:
-  void setFilter (ProposalFilter filter);
-  void setSorter (std::function<int(Proposal*, Proposal*)> sorter);
+class ProposalsProxyModel : public AbstractProxyModel<Proposal::Ptr> {
+ public:
+  void setFilter(ProposalFilter filter);
+  void setSorter(std::function<int(Proposal*, Proposal*)> sorter);
 
-protected:
-  bool isAccept (const Proposal::Ptr& item) override;
+ protected:
+  bool isAccept(const Proposal::Ptr& item) override;
   bool withSorting() override;
-  int compareData (const Proposal::Ptr& first, const Proposal::Ptr& second) const override;
+  int compareData(const Proposal::Ptr& first, const Proposal::Ptr& second) const override;
 
-private:
+ private:
   ProposalFilter m_filter = ProposalFilter::All;
   std::function<int(Proposal*, Proposal*)> m_sorterFun;
 };

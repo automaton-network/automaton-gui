@@ -24,41 +24,39 @@
 #include <string>
 
 
-class Proposal
-{
-public:
-  enum class Status
-  {
-    Uninitialized = 0   // there is no proposal connected to this ballot
+class Proposal {
+ public:
+  enum class Status {
+    Uninitialized = 0  // there is no proposal connected to this ballot
     // ACTIVE statuses
-    , Started   // first period of voting until initialEndDate
-    , Accepted  // enough "yes" votes during the initial voting period
-    , Contested // too many "no" votes after the first approval ot the proposal
+    , Started    // first period of voting until initialEndDate
+    , Accepted   // enough "yes" votes during the initial voting period
+    , Contested  // too many "no" votes after the first approval ot the proposal
     // INACTIVE statuses
-    , Rejected  // not enough "yes" votes during the initial period or during a contest period
-    , Completed // the proposal was successfully implemented
+    , Rejected   // not enough "yes" votes during the initial period or during a contest period
+    , Completed  // the proposal was successfully implemented
   };
 
   using Ptr = std::shared_ptr<Proposal>;
 
   Proposal();
-  Proposal (uint32_t id, const String& jsonString);
+  Proposal(uint32_t id, const String& jsonString);
 
-  static String getStatusStr (Proposal::Status status);
+  static String getStatusStr(Proposal::Status status);
 
-  void setId          (uint64 id)             { m_id = id; }
-  void setAmountSpent (uint64 amountSpent)    { m_amountSpent = amountSpent; }
-  void setBudget      (uint64 budget)         { m_budget = budget; }
-  void setNumPeriods  (uint64 numPeriods)     { m_numPeriods = numPeriods; }
-  void setTargetBonus (uint64 targetBonus)    { m_targetBonus = targetBonus; }
-  void setLengthDays  (uint64 lengthDays)     { m_lengthDays = lengthDays; }
-  void setApprovalRating  (int approvalRating)    { m_approvalRating = approvalRating; }
-  void setTimeLeftDays    (int timeLeftDays)      { m_timeLeft = timeLeftDays; }
-  void setTitle   (const String& title)   { m_title = title; }
-  void setCreator (const String& creator) { m_creator = creator; }
-  void setDocumentLink (const String& documentLink) { m_documentLink = documentLink; }
-  void setDocumentHash (const String& documentHash) { m_documentHash = documentHash; }
-  void setStatus (Proposal::Status status) { m_status = status; }
+  void setId(uint64 id) { m_id = id; }
+  void setAmountSpent(uint64 amountSpent) { m_amountSpent = amountSpent; }
+  void setBudget(uint64 budget) { m_budget = budget; }
+  void setNumPeriods(uint64 numPeriods) { m_numPeriods = numPeriods; }
+  void setTargetBonus(uint64 targetBonus) { m_targetBonus = targetBonus; }
+  void setLengthDays(uint64 lengthDays) { m_lengthDays = lengthDays; }
+  void setApprovalRating(int approvalRating) { m_approvalRating = approvalRating; }
+  void setTimeLeftDays(int timeLeftDays) { m_timeLeft = timeLeftDays; }
+  void setTitle(const String& title) { m_title = title; }
+  void setCreator(const String& creator) { m_creator = creator; }
+  void setDocumentLink(const String& documentLink) { m_documentLink = documentLink; }
+  void setDocumentHash(const String& documentHash) { m_documentHash = documentHash; }
+  void setStatus(Proposal::Status status) { m_status = status; }
 
   uint64 getId() const            { return m_id; }
   uint64 getAmountSpent() const   { return m_amountSpent; }
@@ -75,7 +73,7 @@ public:
   Proposal::Status getStatus() const { return m_status; }
 
 
-private:
+ private:
   uint64 m_id;
   uint64 m_amountSpent;
   uint64 m_budget;

@@ -23,9 +23,8 @@
 
 class OrdersModel;
 
-class OrdersManager : public DeletedAtShutdown
-{
-public:
+class OrdersManager : public DeletedAtShutdown {
+ public:
   OrdersManager();
   ~OrdersManager();
   std::shared_ptr<OrdersModel> getModel();
@@ -34,6 +33,6 @@ public:
 
   JUCE_DECLARE_SINGLETON(OrdersManager, true)
 
-private:
+ private:
   std::shared_ptr<OrdersModel> m_model;
 };

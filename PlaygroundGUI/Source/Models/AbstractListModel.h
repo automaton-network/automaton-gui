@@ -21,44 +21,38 @@
 
 #include <JuceHeader.h>
 
-class AbstractListModelBase
-{
-public:
-  class Listener
-  {
-  public:
+class AbstractListModelBase {
+ public:
+  class Listener {
+   public:
     virtual ~Listener() {}
-    virtual void modelChanged (AbstractListModelBase*) = 0;
+    virtual void modelChanged(AbstractListModelBase*) = 0;
   };
 
-  virtual ~AbstractListModelBase(){};
+  virtual ~AbstractListModelBase() {}
 
-  virtual int size() = 0;
+  virtual int size() const = 0;
 
-  virtual void notifyModelChanged()
-  {
-    m_listeners.call (&Listener::modelChanged, this);
+  virtual void notifyModelChanged() {
+    m_listeners.call(&Listener::modelChanged, this);
   }
 
-  void addListener (Listener* listener)
-  {
-    m_listeners.add (listener);
+  void addListener(Listener* listener) {
+    m_listeners.add(listener);
   }
 
-  void removeListener (Listener* listener)
-  {
-    m_listeners.remove (listener);
+  void removeListener(Listener* listener) {
+    m_listeners.remove(listener);
   }
 
-private:
+ private:
   ListenerList<Listener> m_listeners;
 };
 
 template<typename T>
-class AbstractListModel : public AbstractListModelBase
-{
-public:
-  virtual T getAt (int index) = 0;
-  virtual T& getReferenceAt (int index) = 0;
-  virtual int getIndexOf (const T&) {return -1;}
+class AbstractListModel : public AbstractListModelBase {
+ public:
+  virtual T getAt(int index) = 0;
+  virtual T& getReferenceAt(int index) = 0;
+  virtual int getIndexOf(const T&) { return -1; }
 };

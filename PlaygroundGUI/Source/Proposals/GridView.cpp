@@ -22,49 +22,41 @@
 
 //==============================================================================
 GridView::GridView():
-  m_verticalSpacing (35),
-  m_horizontalSpacing (25),
-  m_cellMinWidth (500),
-  m_cellRatio (2.0),
-  m_margins (50, 50, 50, 50)
-{
+  m_verticalSpacing(35),
+  m_horizontalSpacing(25),
+  m_cellMinWidth(500),
+  m_cellRatio(2.0),
+  m_margins(50, 50, 50, 50) {
   m_viewport = std::make_unique<Viewport>();
-  m_viewport->setScrollBarsShown (true, false, true);
-  m_viewport->setViewedComponent (&m_gridContent, false);
-  addAndMakeVisible (m_viewport.get());
+  m_viewport->setScrollBarsShown(true, false, true);
+  m_viewport->setViewedComponent(&m_gridContent, false);
+  addAndMakeVisible(m_viewport.get());
 }
 
-GridView::~GridView()
-{
+GridView::~GridView() {
 }
 
-void GridView::setSpacing (int horizontalSpacing, int verticalSpacing)
-{
+void GridView::setSpacing(int horizontalSpacing, int verticalSpacing) {
   m_horizontalSpacing = horizontalSpacing;
   m_verticalSpacing = verticalSpacing;
 }
 
-void GridView::setMargins (int leftMargin, int topMargin, int rightMargin, int bottomMargin)
-{
-  m_margins = BorderSize<int> (topMargin, leftMargin, bottomMargin, rightMargin);
+void GridView::setMargins(int leftMargin, int topMargin, int rightMargin, int bottomMargin) {
+  m_margins = BorderSize<int>(topMargin, leftMargin, bottomMargin, rightMargin);
 }
 
-void GridView::setCellMinimumWidth (int cellMinWidth)
-{
+void GridView::setCellMinimumWidth(int cellMinWidth) {
   m_cellMinWidth = cellMinWidth;
 }
 
-void GridView::setCellRatio (float cellRatio)
-{
+void GridView::setCellRatio(float cellRatio) {
   m_cellRatio = cellRatio;
 }
 
-void GridView::paint (Graphics& g)
-{
+void GridView::paint(Graphics& g) {
 }
 
-void GridView::resized()
-{
+void GridView::resized() {
   const int numOfItems = size();
   const int width = getWidth() - m_margins.getLeftAndRight();
 
@@ -72,48 +64,47 @@ void GridView::resized()
   if (m_numOfColumns == 0)
     return;
 
-  m_cellWidth  = int ((width - (m_numOfColumns - 1) * m_horizontalSpacing) / (float) m_numOfColumns);
-  m_cellHeight = int (m_cellWidth / m_cellRatio);
-  m_numOfRows  = int (std::ceil (numOfItems / (float)m_numOfColumns));
+  m_cellWidth  = static_cast<int>((width - (m_numOfColumns - 1) * m_horizontalSpacing)
+                                    / static_cast<float>(m_numOfColumns));
+  m_cellHeight = static_cast<int>(m_cellWidth / m_cellRatio);
+  m_numOfRows  = static_cast<int>(std::ceil(numOfItems/ static_cast<float>(m_numOfColumns)));
 
-  const int totalHeight = m_numOfRows * m_cellHeight + (m_numOfRows - 1) * m_verticalSpacing + m_margins.getTopAndBottom();
-  m_gridContent.setSize (getWidth(), totalHeight);
+  const int totalHeight = m_numOfRows * m_cellHeight
+                            + (m_numOfRows - 1) * m_verticalSpacing
+                            + m_margins.getTopAndBottom();
+  m_gridContent.setSize(getWidth(), totalHeight);
 
-  auto gridArea = m_margins.subtractedFrom (m_gridContent.getLocalBounds());
+  auto gridArea = m_margins.subtractedFrom(m_gridContent.getLocalBounds());
 
   int index = 0;
-  for (int row = 0; row < m_numOfRows; ++row)
-  {
-    auto rowArea = gridArea.removeFromTop (m_cellHeight);
+  for (int row = 0; row < m_numOfRows; ++row) {
+    auto rowArea = gridArea.removeFromTop(m_cellHeight);
 
-    for (int column = 0; column < m_numOfColumns && index < m_components.size(); ++column)
-    {
+    for (int column = 0; column < m_numOfColumns && index < m_components.size(); ++column) {
       if (auto comp = m_components[index])
-        comp->setBounds (rowArea.removeFromLeft (m_cellWidth));
+        comp->setBounds(rowArea.removeFromLeft(m_cellWidth));
 
-      rowArea.removeFromLeft (m_horizontalSpacing);
+      rowArea.removeFromLeft(m_horizontalSpacing);
       ++index;
     }
 
-    gridArea.removeFromTop (m_verticalSpacing);
+    gridArea.removeFromTop(m_verticalSpacing);
   }
 
-  m_viewport->setBounds (getLocalBounds());
+  m_viewport->setBounds(getLocalBounds());
 }
 
-void GridView::updateContent()
-{
+void GridView::updateContent() {
   const auto diffSize = m_components.size() - size();
   if (diffSize > 0)
-    m_components.removeRange (m_components.size() - 1 - diffSize, diffSize, true);
+    m_components.removeRange(m_components.size() - 1 - diffSize, diffSize, true);
 
-  for (int i = 0; i < size(); ++i)
-  {
+  for (int i = 0; i < size(); ++i) {
     const auto component = m_components[i];
-    const auto item = refreshComponent (i, component);
-    m_gridContent.addAndMakeVisible (item);
+    const auto item = refreshComponent(i, component);
+    m_gridContent.addAndMakeVisible(item);
 
     if (component == nullptr)
-      m_components.add (item);
+      m_components.add(item);
   }
 }

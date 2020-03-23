@@ -20,49 +20,40 @@
 #include "OrdersModel.h"
 
 
-int OrdersModel::size()
-{
+int OrdersModel::size() const {
   return m_items.size();
 }
 
-Order::Ptr OrdersModel::getAt (int index)
-{
+Order::Ptr OrdersModel::getAt(int index) {
   return m_items[index];
 }
 
-Order::Ptr& OrdersModel::getReferenceAt (int index)
-{
-  return m_items.getReference (index);
+Order::Ptr& OrdersModel::getReferenceAt(int index) {
+  return m_items.getReference(index);
 }
 
-void OrdersModel::addItem (Order::Ptr item, bool sendNotification)
-{
-  m_items.add (item);
+void OrdersModel::addItem(Order::Ptr item, bool sendNotification) {
+  m_items.add(item);
 
   if (sendNotification)
     notifyModelChanged();
 }
 
-void OrdersModel::addItems (Array<Order::Ptr> items, bool sendNotification)
-{
-  m_items.addArray (items);
+void OrdersModel::addItems(Array<Order::Ptr> items, bool sendNotification) {
+  m_items.addArray(items);
 
   if (sendNotification)
     notifyModelChanged();
 }
 
-void OrdersModel::clear (bool sendNotification)
-{
+void OrdersModel::clear(bool sendNotification) {
   m_items.clearQuick();
   if (sendNotification)
     notifyModelChanged();
 }
 
-
-bool OrdersProxyModel::isAccept (const Order::Ptr& item)
-{
-  switch (m_filter)
-  {
+bool OrdersProxyModel::isAccept(const Order::Ptr& item) {
+  switch (m_filter) {
     case OrderFilter::All:
       return true;
     case OrderFilter::Buy:
@@ -74,24 +65,20 @@ bool OrdersProxyModel::isAccept (const Order::Ptr& item)
   }
 }
 
-bool OrdersProxyModel::withSorting()
-{
+bool OrdersProxyModel::withSorting() {
   return m_sorterFun != nullptr;
 }
 
-void OrdersProxyModel::setFilter (OrderFilter filter)
-{
+void OrdersProxyModel::setFilter(OrderFilter filter) {
   m_filter = filter;
   filterChanged();
 }
 
-void OrdersProxyModel::setSorter (std::function<int(Order*, Order*)> sorter)
-{
+void OrdersProxyModel::setSorter(std::function<int(Order*, Order*)> sorter) {
   m_sorterFun = sorter;
   filterChanged();
 }
 
-int OrdersProxyModel::compareData (const Order::Ptr& first, const Order::Ptr& second) const
-{
-  return m_sorterFun (first.get(), second.get());
+int OrdersProxyModel::compareData(const Order::Ptr& first, const Order::Ptr& second) const {
+  return m_sorterFun(first.get(), second.get());
 }

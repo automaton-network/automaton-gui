@@ -21,25 +21,25 @@
 
 #include <JuceHeader.h>
 
-class GridView : public Component
-{
-public:
+class GridView : public Component {
+ public:
   GridView();
   ~GridView();
 
-  void setSpacing (int horizontalSpacing, int verticalSpacing);
-  void setMargins (int leftMargin, int topMargin, int rightMargin, int bottomMargin);
-  void setCellMinimumWidth (int cellMinWidth);
-  void setCellRatio (float cellRatio);
+  void setSpacing(int horizontalSpacing, int verticalSpacing);
+  void setMargins(int leftMargin, int topMargin, int rightMargin, int bottomMargin);
+  void setCellMinimumWidth(int cellMinWidth);
+  void setCellRatio(float cellRatio);
 
-  void paint (Graphics&) override;
+  void paint(Graphics&) override;
   void resized() override;
 
   void updateContent();
-  virtual Component* refreshComponent (int index, Component* const componentToUpdate) = 0;
-  virtual int size() = 0;
+  virtual Component* refreshComponent(int index, Component* const componentToUpdate) = 0;
+  virtual int size() const = 0;
 
-private:
+
+ private:
   BorderSize<int> m_margins;
   float m_cellRatio;
   int m_numOfColumns;
@@ -54,5 +54,5 @@ private:
   std::unique_ptr<Viewport> m_viewport;
   OwnedArray<Component> m_components;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GridView)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GridView)
 };

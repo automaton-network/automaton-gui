@@ -22,93 +22,77 @@
 #include "AbstractListModel.h"
 
 template<typename T>
-class AbstractProxyModel : public AbstractListModel<T>,
-  private AbstractListModelBase::Listener
-{
-public:
-  AbstractProxyModel()
-  {
+class AbstractProxyModel : public AbstractListModel<T>
+                         , private AbstractListModelBase::Listener {
+ public:
+  AbstractProxyModel() { }
+
+  virtual ~AbstractProxyModel() {
+    if (m_model != nullptr)
+      m_model->removeListener(this);
   }
 
-  virtual ~AbstractProxyModel()
-  {
+  void setModel(std::shared_ptr<AbstractListModel<T>> model) {
     if (m_model != nullptr)
-      m_model->removeListener (this);
-  }
-
-  void setModel (std::shared_ptr<AbstractListModel<T>> model)
-  {
-    if (m_model != nullptr)
-      m_model->removeListener (this);
+      m_model->removeListener(this);
 
     m_model = model;
 
     if (m_model != nullptr)
-      m_model->addListener (this);
+      m_model->addListener(this);
 
-    modelChanged (m_model.get());
+    modelChanged(m_model.get());
   }
 
-  virtual void filterChanged()
-  {
-    if (auto model = m_model)
-    {
+  virtual void filterChanged() {
+    if (auto model = m_model) {
       m_proxyArray.clearQuick();
-      m_proxyArray.ensureStorageAllocated (model->size());
+      m_proxyArray.ensureStorageAllocated(model->size());
 
       const auto size = model->size();
 
-      for (int i = 0; i < size; ++i)
-      {
-        if (isAccept (model->getReferenceAt (i)))
-          m_proxyArray.add (i);
+      for (int i = 0; i < size; ++i) {
+        if (isAccept(model->getReferenceAt(i)))
+          m_proxyArray.add(i);
       }
 
       if (withSorting())
-        m_proxyArray.sort (*this, true);
+        m_proxyArray.sort(*this, true);
       this->notifyModelChanged();
     }
   }
 
-  int size() override
-  {
+  int size() const override {
     return m_proxyArray.size();
   }
 
-  virtual T getAt (int index) override
-  {
-    return m_model->getAt (m_proxyArray[index]);
+  T getAt(int index) override {
+    return m_model->getAt(m_proxyArray[index]);
   }
 
-  virtual T& getReferenceAt (int index) override
-  {
-    return m_model->getReferenceAt (m_proxyArray[index]);
+  T& getReferenceAt(int index) override {
+    return m_model->getReferenceAt(m_proxyArray[index]);
   }
 
-  virtual int getIndexOf (const T& item) override
-  {
-    auto index = m_model->getIndexOf (item);
+  int getIndexOf(const T& item) override {
+    auto index = m_model->getIndexOf(item);
     if (index >= 0)
-      return m_proxyArray.indexOf (index);
+      return m_proxyArray.indexOf(index);
 
     return -1;
   }
 
-  int compareElements (const int first, const int second) const
-  {
-    return compareData (m_model->getAt (m_proxyArray[first]),
-                        m_model->getAt (m_proxyArray[second]));
+  int compareElements(const int first, const int second) const {
+    return compareData(m_model->getAt(m_proxyArray[first]),
+                       m_model->getAt(m_proxyArray[second]));
   }
 
-private:
-  void modelChanged (AbstractListModelBase*) override
-  {
-    if (m_model != nullptr)
-    {
+
+ private:
+  void modelChanged(AbstractListModelBase*) override {
+    if (m_model != nullptr) {
       filterChanged();
-    }
-    else
-    {
+    } else {
       m_proxyArray.clear();
       this->notifyModelChanged();
     }
@@ -117,8 +101,9 @@ private:
   Array<int> m_proxyArray;
   std::shared_ptr<AbstractListModel<T>> m_model;
 
-protected:
-  virtual bool isAccept (const T& index) = 0;
+
+ protected:
+  virtual bool isAccept(const T& index) = 0;
   virtual bool withSorting() = 0;
-  virtual int compareData (const T& first, const T& second) const = 0;
+  virtual int compareData(const T& first, const T& second) const = 0;
 };

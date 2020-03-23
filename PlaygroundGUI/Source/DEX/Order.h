@@ -22,11 +22,9 @@
 #include <JuceHeader.h>
 
 
-class Order
-{
-public:
-  enum class Type
-  {
+class Order {
+ public:
+  enum class Type {
     None = 0
     , Buy
     , Sell
@@ -35,14 +33,14 @@ public:
 
   using Ptr = std::shared_ptr<Order>;
 
-  Order (const String& jsonString);
+  Order(const String& jsonString);
 
   BigInteger getAuto() const { return m_auto; }
   BigInteger getEth() const { return m_eth; }
   const String& getOwner() const { return m_owner; }
   Type getType() const { return m_type; }
 
-private:
+ private:
   BigInteger m_auto = 0;
   BigInteger m_eth = 0;
   String m_owner;

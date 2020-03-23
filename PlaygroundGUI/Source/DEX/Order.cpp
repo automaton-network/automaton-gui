@@ -24,11 +24,10 @@
 
 using json = nlohmann::json;
 
-Order::Order (const String& jsonString)
-{
-  json jsonData = json::parse (jsonString.toStdString());
-  m_auto.parseString (jsonData.at (0).get<std::string>(), 10);
-  m_eth.parseString (jsonData.at (1).get<std::string>(), 10);
-  m_owner = jsonData.at (2).get<std::string>();
-  m_type = static_cast<Order::Type> (std::stoul (jsonData.at (3).get<std::string>()));
+Order::Order(const String& jsonString) {
+  json jsonData = json::parse(jsonString.toStdString());
+  m_auto.parseString(jsonData.at(0).get<std::string>(), 10);
+  m_eth.parseString(jsonData.at(1).get<std::string>(), 10);
+  m_owner = jsonData.at(2).get<std::string>();
+  m_type = static_cast<Order::Type>(std::stoul(jsonData.at(3).get<std::string>()));
 }

@@ -24,18 +24,17 @@
 #include "Order.h"
 
 
-class OrdersModel : public AbstractListModel<Order::Ptr>
-{
-public:
-  int size () override;
-  Order::Ptr getAt (int index) override;
-  Order::Ptr& getReferenceAt (int index) override;
+class OrdersModel : public AbstractListModel<Order::Ptr> {
+ public:
+  int size() const override;
+  Order::Ptr getAt(int index) override;
+  Order::Ptr& getReferenceAt(int index) override;
 
-  void addItem (Order::Ptr item, bool sendNotification = true);
-  void addItems (Array<Order::Ptr> items, bool sendNotification = true);
-  void clear (bool sendNotification = true);
+  void addItem(Order::Ptr item, bool sendNotification = true);
+  void addItems(Array<Order::Ptr> items, bool sendNotification = true);
+  void clear(bool sendNotification = true);
 
-private:
+ private:
   Array<Order::Ptr> m_items;
 };
 
@@ -46,18 +45,17 @@ enum class OrderFilter {
   , Auction
 };
 
-class OrdersProxyModel : public AbstractProxyModel<Order::Ptr>
-{
-public:
-  void setFilter (OrderFilter filter);
-  void setSorter (std::function<int(Order*, Order*)> sorter);
+class OrdersProxyModel : public AbstractProxyModel<Order::Ptr> {
+ public:
+  void setFilter(OrderFilter filter);
+  void setSorter(std::function<int(Order*, Order*)> sorter);
 
-protected:
-  bool isAccept (const Order::Ptr& item) override;
+ protected:
+  bool isAccept(const Order::Ptr& item) override;
   bool withSorting() override;
-  int compareData (const Order::Ptr& first, const Order::Ptr& second) const override;
+  int compareData(const Order::Ptr& first, const Order::Ptr& second) const override;
 
-private:
+ private:
   OrderFilter m_filter = OrderFilter::All;
   std::function<int(Order*, Order*)> m_sorterFun;
 };
