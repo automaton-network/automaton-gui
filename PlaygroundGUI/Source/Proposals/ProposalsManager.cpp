@@ -139,6 +139,7 @@ bool ProposalsManager::fetchProposals() {
 
 bool ProposalsManager::addProposal(const Proposal& proposal, bool sendNotification) {
   m_model->addItem(std::make_shared<Proposal>(proposal), sendNotification);
+  return true;
 }
 
 // TODO(Kirill): pass address and privateKey
