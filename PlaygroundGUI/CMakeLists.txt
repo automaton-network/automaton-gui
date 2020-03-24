@@ -70,7 +70,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
   endif()
   set(G3LOGGER_LIB ${automaton_PATH}/lib/g3logger)
   set(LUA LIB ${automaton_PATH}/lib/lua)
-  set(AUTOMATON_CORE_LIB ${automaton_PATH}/lib/automaton-core;${automaton_PATH}/lib/blockchain_cpp_node;${automaton_PATH}/lib/secp256k1;${automaton_PATH}/lib/ed25519)
+  set(AUTOMATON_CORE_LIB "${automaton_PATH}/lib/automaton-core.lib;${automaton_PATH}/lib/blockchain_cpp_node.lib;${automaton_PATH}/lib/secp256k1.lib;${automaton_PATH}/lib/ed25519.lib")
   target_compile_definitions(Playground PUBLIC
     _WINDOWS
     WIN32
