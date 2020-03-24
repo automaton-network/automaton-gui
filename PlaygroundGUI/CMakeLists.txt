@@ -6,6 +6,12 @@ if (POLICY CMP0091)
 endif()
 option(automaton_STATIC_RUNTIME "Use static C runtime" ON)
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+  option(automaton_USE_OPENSSL "Use OpenSSL" ON)
+else()
+  set(automaton_USE_OPENSSL ON)
+endif()
+
 set(automaton_PATH ${CMAKE_SOURCE_DIR}/../automaton/src/local_third_party CACHE FILEPATH "Directory with automaton")
 
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
