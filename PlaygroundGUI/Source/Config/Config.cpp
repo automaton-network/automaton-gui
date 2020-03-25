@@ -112,36 +112,41 @@ status Config::save_to_local_file() {
   return status::ok();
 }
 
-std::string Config::get_json(const std::string& field) const {
+std::string Config::get_json(const std::string& field, const std::string& default_value) const {
   const ScopedLock Lock(critical_section);
   if (json_obj.find(field) != json_obj.end() && !json_obj[field].is_null()) {
     return json_obj[field].dump();
   }
-  throw status::not_found("Field was not found!");
+  return default_value;
 }
 
-bool Config::get_bool(const std::string& field) const {
+bool Config::get_bool(const std::string& field, bool default_value) const {
   const ScopedLock Lock(critical_section);
   if (json_obj.find(field) != json_obj.end() && json_obj[field].is_boolean()) {
     return json_obj[field].get<bool>();
   }
-  throw status::not_found("Field was not found!");
+  return default_value;
 }
 
-int64_t Config::get_number(const std::string& field) const {
+int64_t Config::get_number(const std::string& field, int64_t default_value) const {
   const ScopedLock Lock(critical_section);
   if (json_obj.find(field) != json_obj.end() && json_obj[field].is_number()) {
     return json_obj[field].get<int64_t>();
   }
-  throw status::not_found("Field was not found!");
+  return default_value;
 }
 
-std::string Config::get_string(const std::string& field) const {
+bool Config::hasField(const std::string& field) const {
+  const ScopedLock Lock(critical_section);
+  return json_obj.find(field) != json_obj.end();
+}
+
+std::string Config::get_string(const std::string& field, const std::string& default_value) const {
   const ScopedLock Lock(critical_section);
   if (json_obj.find(field) != json_obj.end() && json_obj[field].is_string()) {
     return json_obj[field].get<std::string>();
   }
-  throw status::not_found("Field was not found!");
+  return default_value;
 }
 
 std::string Config::get_abi() const {

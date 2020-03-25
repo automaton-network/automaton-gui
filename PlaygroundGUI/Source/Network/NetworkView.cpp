@@ -328,6 +328,42 @@ void NetworkView::buttonClicked(Button* btn) {
       conf->set_string("eth_address", eth_address_hex);
       conf->unlock();
     }
+  } else if (txt == "Import Private Key") {
+    AlertWindow w("Import Private Key",
+                  "Enter your private key and it will be imported.",
+                  AlertWindow::QuestionIcon);
+
+    w.addTextEditor("privkey", "", "Private Key:", true);
+    w.addButton("OK",     1, KeyPress(KeyPress::returnKey, 0, 0));
+    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+    if (w.runModalLoop() == 1) {
+      // this is the text they entered..
+      auto privkey_hex = w.getTextEditorContents("privkey");
+      if (privkey_hex.startsWith("0x")) {
+        privkey_hex = privkey_hex.substring(2);
+      }
+      if (privkey_hex.length() != 64) {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                "Invalid Private Key!",
+                "Private key should be exactly 32 bytes!");
+        return;
+      }
+
+      auto private_key = hex2bin(privkey_hex.toStdString());
+      auto eth_address_hex = "0x" + bin2hex(gen_ethereum_address((unsigned char *)private_key.c_str()));
+      txtEthAddress->setText(eth_address_hex);
+
+      auto cd = AutomatonContractData::getInstance();
+      cd->eth_address = eth_address_hex;
+      cd->private_key = privkey_hex.toStdString();
+
+      auto conf = Config::getInstance();
+      conf->lock();
+      conf->set_string("private_key", privkey_hex.toStdString());
+      conf->set_string("eth_address", eth_address_hex);
+      conf->unlock();
+    }
   }
 }
 

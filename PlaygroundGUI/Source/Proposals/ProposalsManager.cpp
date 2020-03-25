@@ -338,7 +338,7 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
 }
 
 static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus) {
-  const auto s = contract->call("numSlots", "");
+  auto s = contract->call("numSlots", "");
   *resStatus = s;
   if (!s.is_ok()) {
     std::cout << "ERROR: " << s.msg << std::endl;
@@ -359,7 +359,7 @@ static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract
   const std::string params = j_input.dump();
 
   // Fetch owners.
-  const auto s = contract->call("getOwners", params);
+  auto s = contract->call("getOwners", params);
   *resStatus = s;
   if (!s.is_ok())
     return std::vector<std::string>();
@@ -371,7 +371,7 @@ static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract
 }
 
 static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus) {
-  const auto s = contract->call("proposalsData", "");
+  auto s = contract->call("proposalsData", "");
   *resStatus = s;
   if (!s.is_ok())
     return 0;

@@ -32,23 +32,15 @@ class AutomatonContractData {
  public:
   AutomatonContractData() {
     auto conf = Config::getInstance();
-    private_key = conf->get_string("private_key");
-    eth_address = conf->get_string("eth_address");
+    private_key = conf->get_string("private_key", "");
+    eth_address = conf->get_string("eth_address", "");
 
-    eth_url = conf->get_string("eth_url");
-    contract_address = conf->get_string("contract_address");
-    mask = conf->get_string("mask");
-    min_difficulty = conf->get_string("min_difficulty");
-    try {
-      slots_number = conf->get_number("slots_number");
-    } catch (...) {
-      slots_number = 0;
-    }
-    try {
-      slots_claimed = conf->get_number("slots_claimed");
-    } catch (...) {
-      slots_claimed = 0;
-    }
+    eth_url = conf->get_string("eth_url", "");
+    contract_address = conf->get_string("contract_address", "");
+    mask = conf->get_string("mask", "");
+    min_difficulty = conf->get_string("min_difficulty", "");
+    slots_number = conf->get_number("slots_number", 0);
+    slots_claimed = conf->get_number("slots_claimed", 0);
 
     conf->get_abi();
 
