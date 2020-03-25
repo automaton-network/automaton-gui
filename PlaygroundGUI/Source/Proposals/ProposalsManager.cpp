@@ -137,7 +137,7 @@ bool ProposalsManager::fetchProposals() {
   return false;
 }
 
-bool ProposalsManager::addProposal(const Proposal& proposal, bool sendNotification) {
+void ProposalsManager::addProposal(const Proposal& proposal, bool sendNotification) {
   m_model->addItem(std::make_shared<Proposal>(proposal), sendNotification);
 }
 

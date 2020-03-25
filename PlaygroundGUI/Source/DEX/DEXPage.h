@@ -35,7 +35,7 @@ class DEXPage : public Component
   void resized() override;
 
   // AbstractListModelBase::Listener
-  void modelChanged(AbstractListModelBase* model);
+  void modelChanged(AbstractListModelBase* model) override;
 
  private:
   std::unique_ptr<OrdersUIModel> m_sellingUIModel;
