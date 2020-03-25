@@ -141,10 +141,6 @@ bool ProposalsManager::addProposal(const Proposal& proposal, bool sendNotificati
   m_model->addItem(std::make_shared<Proposal>(proposal), sendNotification);
 }
 
-// TODO(Kirill): pass address and privateKey
-static const char privateKey[] = "f7bb62b8c66184e7fdcf60b749d5a5da463b434bc80c4a6c417484cdfeffd52b";
-static const char address[] = "0xE22095F4f6d4a1bFbE7037Ae88AC055B67348d8e";
-
 bool ProposalsManager::createProposal(Proposal::Ptr proposal, const std::string& contributor) {
   AsyncTask task([=](AsyncTask* task) {
     auto& s = task->m_status;
@@ -160,7 +156,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const std::string&
     proposal->setId(lastProposalId + 1);
     task->setProgress(0.25);
 
-    s = eth_getTransactionCount(cd->eth_url, address);
+    s = eth_getTransactionCount(cd->eth_url, cd->eth_address);
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -195,7 +191,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const std::string&
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
-    s = contract->call("createProposal", transaction.sign_tx(privateKey));
+    s = contract->call("createProposal", transaction.sign_tx(cd->private_key));
 
     if (!s.is_ok())
       return false;
@@ -247,7 +243,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
 
     task->setProgress(0.1);
 
-    s = eth_getTransactionCount(cd->eth_url, address);
+    s = eth_getTransactionCount(cd->eth_url, cd->eth_address);
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -272,7 +268,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
-    s = contract->call("payForGas", transaction.sign_tx(privateKey));
+    s = contract->call("payForGas", transaction.sign_tx(cd->private_key));
 
     if (!s.is_ok())
       return false;
@@ -311,7 +307,7 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
                          uint64 id, uint64 slot, uint64 choice,
                          status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  const auto s = eth_getTransactionCount(cd->eth_url, address);
+  const auto s = eth_getTransactionCount(cd->eth_url, cd->eth_address);
   *resStatus = s;
   const auto nonce = s.is_ok() ? s.msg : "0";
   if (!s.is_ok())
@@ -338,7 +334,7 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
   transaction.value = "";
   transaction.data = txData.str();
   transaction.chain_id = "01";
-  *resStatus = contract->call("castVote", transaction.sign_tx(privateKey));
+  *resStatus = contract->call("castVote", transaction.sign_tx(cd->private_key));
 }
 
 static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus) {
@@ -417,7 +413,8 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
     if (!s.is_ok())
       return false;
 
-    const String callAddress = static_cast<std::string>(address).substr(2);
+    const auto cd = AutomatonContractData::getInstance();
+    const String callAddress = cd->eth_address.substr(2);
 
     bool isOwnerForAnySlot = false;
     for (uint64 slot = 0; slot < owners.size(); ++slot) {

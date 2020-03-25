@@ -50,6 +50,7 @@ class NetworkView:
  private:
   TextEditor* txtURL;
   TextEditor* txtContractAddress;
+  TextEditor* txtEthAddress;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NetworkView)
 };
