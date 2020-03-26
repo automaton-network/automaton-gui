@@ -110,6 +110,18 @@ bool ProposalsManager::fetchProposals() {
         return false;
 
       Proposal proposal(i, String(s.msg));
+
+      s = contract->call("calcVoteDifference", params);
+      if (!s.is_ok())
+        return false;
+
+      json j_output = json::parse(s.msg);
+      const int approvalRating = std::stoi((*j_output.begin()).get<std::string>());
+      if (!s.is_ok())
+        return false;
+
+      proposal.setApprovalRating(approvalRating);
+
       addProposal(proposal, false);
     }
 
