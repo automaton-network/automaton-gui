@@ -29,7 +29,7 @@ class ProposalsManager : public DeletedAtShutdown {
   ~ProposalsManager();
 
   bool fetchProposals();
-  bool addProposal(const Proposal& proposal, bool sendNotification = true);
+  void addProposal(const Proposal& proposal, bool sendNotification = true);
   bool createProposal(Proposal::Ptr proposal, const std::string& contributor);
   bool payForGas(Proposal::Ptr proposal, uint64 slotsToPay);
   bool castVote(Proposal::Ptr proposal, uint64 choice);

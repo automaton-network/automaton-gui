@@ -40,10 +40,12 @@ class Config {
   void set_bool(const std::string& field, bool data);
   void set_number(const std::string& field, int64_t data);
 
-  std::string get_json(const std::string& field) const;
-  std::string get_string(const std::string& field) const;
-  bool get_bool(const std::string& field) const;
-  int64_t get_number(const std::string& field) const;
+  std::string get_json(const std::string& field, const std::string& default_value) const;
+  std::string get_string(const std::string& field, const std::string& default_value) const;
+  bool get_bool(const std::string& field, bool default_value) const;
+  int64_t get_number(const std::string& field, int64_t default_value) const;
+
+  bool hasField(const std::string& field) const;
 
   std::string get_abi() const;
 

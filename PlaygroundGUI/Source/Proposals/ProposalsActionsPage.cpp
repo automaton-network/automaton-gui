@@ -22,7 +22,8 @@
 #include "GridView.h"
 #include "ProposalsManager.h"
 
-class ProposalComponent : public Component {
+class ProposalComponent : public Component
+                        , private Button::Listener {
  public:
   ProposalComponent() {
     m_title = std::make_unique<Label>();
@@ -30,6 +31,9 @@ class ProposalComponent : public Component {
     m_linkToDocBtn = std::make_unique<HyperlinkButton>(translate("Link to documentation"), URL());
     m_approveBtn = std::make_unique<TextButton>(translate("Approve"));
     m_rejectBtn = std::make_unique<TextButton>(translate("Reject"));
+
+    m_approveBtn->addListener(this);
+    m_rejectBtn->addListener(this);
 
     addAndMakeVisible(m_title.get());
     addAndMakeVisible(m_linkToDocBtn.get());
@@ -70,6 +74,16 @@ class ProposalComponent : public Component {
     g.strokePath(p, PathStrokeType(2.0f));
 
     g.drawText(m_proposalState, static_cast<int>(topLeftLineWidth) + 5, 0, stateStrWidth, 12, Justification::topLeft);
+  }
+
+ private:
+  void buttonClicked(Button* buttonThatWasClicked) override {
+    // Might be better to move that responsibility to top layers in the future (when more vote choices are added)
+    if (buttonThatWasClicked == m_approveBtn.get()) {
+        ProposalsManager::getInstance()->castVote(m_proposal, 1);
+    } else if (buttonThatWasClicked == m_rejectBtn.get()) {
+        ProposalsManager::getInstance()->castVote(m_proposal, 0);
+    }
   }
 
  private:
