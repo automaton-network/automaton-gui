@@ -45,45 +45,35 @@ class DemoBlank: public Component {
 };
 
 
-DemosMainComponent::DemosMainComponent() {
-  // menuBar.reset(new MenuBarComponent(this));
-  // addAndMakeVisible(menuBar.get());
+DemosMainComponent::DemosMainComponent(PropertySet* config) : m_config(config) {
+  m_proposalsManager = std::make_unique<ProposalsManager>(m_config);
 
-  tabbedComponent.reset(new TabbedComponent(TabbedButtonBar::TabsAtTop));
-  addAndMakeVisible(tabbedComponent.get());
-  tabbedComponent->setTabBarDepth(37);
-  tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040), new NetworkView(), true);
-  tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(), true);
-  tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
+  m_tabbedComponent.reset(new TabbedComponent(TabbedButtonBar::TabsAtTop));
+  addAndMakeVisible(m_tabbedComponent.get());
+  m_tabbedComponent->setTabBarDepth(37);
+  m_tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040),
+                            new NetworkView(m_proposalsManager.get()), true);
+  m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(), true);
+  m_tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
 
-  auto proposalsPage = new ProposalsPage();
-  tabbedComponent->addTab(TRANS("Proposals"), Colour(0xff404040), proposalsPage, true);
-  tabbedComponent->addTab(TRANS("Proposals Actions"), Colour(0xff404040), new ProposalsActionsPage(), true);
-  tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(), true);
+  auto proposalsPage = new ProposalsPage(m_proposalsManager.get());
+  m_tabbedComponent->addTab(TRANS("Proposals"), Colour(0xff404040), proposalsPage, true);
+  m_tabbedComponent->addTab(TRANS("Proposals Actions"), Colour(0xff404040),
+                            new ProposalsActionsPage(m_proposalsManager.get()), true);
+  m_tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(), true);
 
-  tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
-  tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
-  tabbedComponent->addTab(TRANS("DApps"), Colour(0xff404040), new DemoBlank(), true);
-  tabbedComponent->addTab(TRANS("Demo Grid"), Colour(0xff404040), new DemoGrid(), true);
+  m_tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
+  m_tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
+  m_tabbedComponent->addTab(TRANS("DApps"), Colour(0xff404040), new DemoBlank(), true);
+  m_tabbedComponent->addTab(TRANS("Demo Grid"), Colour(0xff404040), new DemoGrid(), true);
   // tabbedComponent->addTab(TRANS("Network Simulation"), Colour(0xff404040), new DemoSimNet(), true);
-  tabbedComponent->setCurrentTabIndex(0);
+  m_tabbedComponent->setCurrentTabIndex(0);
 
   setSize(1024, 768);
-
-  for (int i = 0; i < 20; ++i) {
-    auto p = std::make_shared<Proposal>();
-    p->setId(i);
-    p->setTitle("Proposal" + String(i));
-    p->setAmountSpent(i);
-    p->setNumPeriods(i + 20);
-    p->setStatus((Proposal::Status) jlimit(0, 5, i));
-    ProposalsManager::getInstance()->getModel()->addItem(p);
-  }
-  proposalsPage->setModel(ProposalsManager::getInstance()->getModel());
 }
 
 DemosMainComponent::~DemosMainComponent() {
-  tabbedComponent = nullptr;
+  m_tabbedComponent = nullptr;
 }
 
 //==============================================================================
@@ -96,5 +86,5 @@ void DemosMainComponent::resized() {
   // auto height = LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight();
   // menuBar->setBounds(b.removeFromTop(height));
 
-  tabbedComponent->setBounds(8, 8, getWidth() - 16, getHeight() - 16);
+  m_tabbedComponent->setBounds(8, 8, getWidth() - 16, getHeight() - 16);
 }

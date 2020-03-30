@@ -28,32 +28,23 @@ struct ValidatorSlot {
   std::string last_claim_time;
 };
 
-class AutomatonContractData {
+class AutomatonContractData : DeletedAtShutdown {
  public:
-  AutomatonContractData() {
-    auto conf = Config::getInstance();
-    private_key = conf->get_string("private_key", "");
-    eth_address = conf->get_string("eth_address", "");
+  AutomatonContractData();
+  ~AutomatonContractData();
+  void init(PropertySet* _config);
+  void setData(const std::string& _eth_url,
+               const std::string& _contractAddress,
+               const std::string& _mask,
+               const std::string& _min_difficulty,
+               uint32_t _slots_number,
+               uint32_t _slots_claimed,
+               const std::vector<ValidatorSlot>& _slots);
 
-    eth_url = conf->get_string("eth_url", "");
-    contract_address = conf->get_string("contract_address", "");
-    mask = conf->get_string("mask", "");
-    min_difficulty = conf->get_string("min_difficulty", "");
-    slots_number = conf->get_number("slots_number", 0);
-    slots_claimed = conf->get_number("slots_claimed", 0);
+  const std::string& get_abi();
+  bool load_abi();
 
-    conf->get_abi();
-
-    // TEST
-    conf->lock();
-    conf->set_number("test_field", 17);
-    conf->set_json("test_field2", "[\"non\",\"empty\"]");
-    conf->save_to_local_file();
-    conf->unlock();
-  }
-
-  std::string private_key;
-  std::string eth_address;
+  std::string contract_abi;
   std::string eth_url;
   std::string contract_address;
   std::string mask;
@@ -65,4 +56,7 @@ class AutomatonContractData {
   JUCE_DECLARE_SINGLETON(AutomatonContractData, true)
 
   CriticalSection criticalSection;
+
+ private:
+  PropertySet* config;
 };

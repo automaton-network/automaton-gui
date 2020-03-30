@@ -21,7 +21,7 @@
 #include "ProposalsManager.h"
 
 //==============================================================================
-ProposalsPage::ProposalsPage() {
+ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
   m_proposalsListBox = std::make_unique<TableListBox>();
   m_proposalsListBox->setRowHeight(50);
   m_proposalsListBox->setRowSelectedOnMouseDown(true);
@@ -40,6 +40,8 @@ ProposalsPage::ProposalsPage() {
   tableHeader.addColumn(translate("Target Bonus"), Columns::Bonus, 75);
   tableHeader.addColumn(translate("Time Left"), Columns::TimeLeft, 75);
 
+  m_fetchProposalsBtn = std::make_unique<TextButton>(translate("Fetch Proposals"));
+  m_fetchProposalsBtn->addListener(this);
   m_createProposalBtn = std::make_unique<TextButton>(translate("Create Proposal"));
   m_createProposalBtn->addListener(this);
   m_payForGasBtn = std::make_unique<TextButton>(translate("Pay for Gas"));
@@ -75,6 +77,7 @@ ProposalsPage::ProposalsPage() {
   m_createProposalView->addListener(this);
   addChildComponent(m_createProposalView.get());
 
+  addAndMakeVisible(m_fetchProposalsBtn.get());
   addAndMakeVisible(m_createProposalBtn.get());
   addAndMakeVisible(m_payForGasBtn.get());
   addAndMakeVisible(m_FilterBtn.get());
@@ -82,6 +85,8 @@ ProposalsPage::ProposalsPage() {
   addAndMakeVisible(m_voteNoBtn.get());
   addAndMakeVisible(m_filterByStatusComboBox.get());
   addAndMakeVisible(m_proposalsListBox.get());
+
+  setModel(m_proposalsManager->getModel());
 }
 
 ProposalsPage::~ProposalsPage() {
@@ -101,6 +106,8 @@ void ProposalsPage::resized() {
   const int buttonsHeight = 50;
   const int buttonsSpacing = 10;
   auto buttonsArea = bounds.removeFromTop(buttonsHeight);
+  m_fetchProposalsBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
+  buttonsArea.removeFromLeft(buttonsSpacing);
   m_createProposalBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
   m_payForGasBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
@@ -128,7 +135,7 @@ void ProposalsPage::createProposalViewActionHappened(CreateProposalComponent* co
   if (action == CreateProposalComponent::Action::ProposalCreated) {
     componentInWhichActionHappened->setVisible(false);
     // TODO(Kirill): remove hardcoded contributor
-    ProposalsManager::getInstance()->createProposal(componentInWhichActionHappened->getProposal(),
+    m_proposalsManager->createProposal(componentInWhichActionHappened->getProposal(),
                                                     "a6C8015476f6F4c646C95488c5fc7f5174A4E0ef");
   } else if (action == CreateProposalComponent::Action::Cancelled) {
     componentInWhichActionHappened->setVisible(false);
@@ -141,10 +148,10 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_createProposalView->setAlwaysOnTop(true);
   } else if (buttonThatWasClicked == m_voteYesBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    ProposalsManager::getInstance()->castVote(proposal, 1);
+    m_proposalsManager->castVote(proposal, 1);
   } else if (buttonThatWasClicked == m_voteNoBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    ProposalsManager::getInstance()->castVote(proposal, 0);
+    m_proposalsManager->castVote(proposal, 0);
   } else if (buttonThatWasClicked == m_payForGasBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
     AlertWindow w("Pay for gas of " + proposal->getTitle(),
@@ -158,13 +165,15 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     if (w.runModalLoop() == 1) {
       auto slotsToPay = w.getTextEditorContents("slotsToPay").getLargeIntValue();
       if (slotsToPay > 0) {
-        ProposalsManager::getInstance()->payForGas(proposal, slotsToPay);
+        m_proposalsManager->payForGas(proposal, slotsToPay);
       } else {
         AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
                                          "Invalid data",
                                          "Enter correct number of slots");
       }
     }
+  } else if (buttonThatWasClicked == m_fetchProposalsBtn.get()) {
+    m_proposalsManager->fetchProposals();
   }
 }
 

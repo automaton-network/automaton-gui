@@ -23,6 +23,8 @@
 #include "ProposalsModel.h"
 #include "CreateProposalComponent.h"
 
+class ProposalsManager;
+
 class ProposalsPage : public Component
                     , public AbstractListModelBase::Listener
                     , private CreateProposalComponent::Listener
@@ -30,7 +32,7 @@ class ProposalsPage : public Component
                     , private ComboBox::Listener
                     , private TableListBoxModel {
  public:
-  ProposalsPage();
+  ProposalsPage(ProposalsManager* proposalsManager);
   ~ProposalsPage();
 
   void setModel(std::shared_ptr<ProposalsModel> model);
@@ -84,10 +86,12 @@ class ProposalsPage : public Component
   std::unique_ptr<TextButton> m_FilterBtn;
   std::unique_ptr<TextButton> m_voteYesBtn;
   std::unique_ptr<TextButton> m_voteNoBtn;
+  std::unique_ptr<TextButton> m_fetchProposalsBtn;
   std::unique_ptr<ComboBox> m_filterByStatusComboBox;
 
   std::unique_ptr<CreateProposalComponent> m_createProposalView;
   std::shared_ptr<ProposalsProxyModel> m_proxyModel;
+  ProposalsManager* m_proposalsManager;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProposalsPage);
 };

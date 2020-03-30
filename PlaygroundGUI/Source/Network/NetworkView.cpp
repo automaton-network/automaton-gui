@@ -45,30 +45,6 @@ using automaton::core::io::hex2bin;
 using automaton::core::io::hex2dec;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
 
-// TODO(asen): Move Ethereum utilities to automaton/core/interop.
-
-static std::string gen_ethereum_address(const unsigned char* priv_key) {
-  Keccak_256_cryptopp hash;
-  secp256k1_context* context = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
-  secp256k1_pubkey* pubkey = new secp256k1_pubkey();
-
-  if (!secp256k1_ec_pubkey_create(context, pubkey, priv_key)) {
-    LOG(WARNING) << "Invalid priv_key " << bin2hex(std::string(reinterpret_cast<const char*>(priv_key), 32));
-    delete pubkey;
-    secp256k1_context_destroy(context);
-    return "";
-  }
-
-  uint8_t pub_key_serialized[65];
-  uint8_t eth_address[32];
-  size_t outLen = 65;
-  secp256k1_ec_pubkey_serialize(context, pub_key_serialized, &outLen, pubkey, SECP256K1_EC_UNCOMPRESSED);
-  hash.calculate_digest(pub_key_serialized + 1, 64, eth_address);
-  delete pubkey;
-  secp256k1_context_destroy(context);
-  return std::string(reinterpret_cast<char*>(eth_address + 12), 20);
-}
-
 //==============================================================================
 //  ReadContractThread
 //==============================================================================
@@ -94,8 +70,8 @@ class ReadContractThread: public ThreadWithProgressWindow {
   {}
 
   void run() override {
-    auto conf = Config::getInstance();
-    eth_contract::register_contract(url, contract_addr, conf->get_abi());
+    auto cd = AutomatonContractData::getInstance();
+    eth_contract::register_contract(url, contract_addr, cd->get_abi());
     auto contract = eth_contract::get_contract(contract_addr);
     if (contract == nullptr) {
       std::cout << "ERROR: Contract is NULL" << std::endl;
@@ -209,7 +185,7 @@ class ReadContractThread: public ThreadWithProgressWindow {
 //  NetworkView
 //==============================================================================
 
-NetworkView::NetworkView() {
+NetworkView::NetworkView(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
   auto cd = AutomatonContractData::getInstance();
   ScopedLock lock(cd->criticalSection);
 
@@ -226,14 +202,7 @@ NetworkView::NetworkView() {
   txtContractAddress->setText(cd->contract_address);
 
   y += 30;
-  LBL("Ethereum Address: ", 20, y, 100, 24);
-  txtEthAddress = TXT("ADDR", 120, y, 500, 24);
-  txtEthAddress->setReadOnly(true);
-  txtEthAddress->setText(cd->eth_address);
-
-  y += 30;
   TB("Read Contract", 120, y, 120, 24);
-  TB("Import Private Key", 300, y, 120, 24);
 }
 
 NetworkView::~NetworkView() {
@@ -250,14 +219,10 @@ void NetworkView::paint(Graphics& g) {
 void NetworkView::buttonClicked(Button* btn) {
   auto txt = btn->getButtonText();
   if (txt == "Read Contract") {
-    std::string url = txtURL->getText().toStdString();
-    std::string address = txtContractAddress->getText().toStdString();
-    auto conf = Config::getInstance();
-    conf->lock();
-    conf->set_string("eth_url", url);
-    conf->set_string("contract_address", address);
-    conf->unlock();
-    ReadContractThread t(url, address);
+    const auto url = txtURL->getText();
+    const auto address = txtContractAddress->getText();
+
+    ReadContractThread t(url.toStdString(), address.toStdString());
     if (t.runThread(9)) {
       if (!t.s.is_ok()) {
       AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
@@ -265,21 +230,9 @@ void NetworkView::buttonClicked(Button* btn) {
                                        t.s.msg);
       } else {
         auto cd = AutomatonContractData::getInstance();
-        ScopedLock lock(cd->criticalSection);
-        cd->contract_address = t.contract_addr;
-        cd->mask = t.mask;
-        cd->min_difficulty = t.min_difficulty;
-        cd->slots = t.slots;
-        cd->slots_number = t.slots_number;
-        cd->slots_claimed = t.slots_claimed;
-
-        auto conf = Config::getInstance();
-        conf->lock();
-        conf->set_string("mask", t.mask);
-        conf->set_string("min_difficulty", t.min_difficulty);
-        conf->set_number("slots_number", t.slots_number);
-        conf->set_number("slots_claimed", t.slots_claimed);
-        conf->unlock();
+        cd->setData(url.toStdString(), t.contract_addr, t.mask,
+                    t.min_difficulty, t.slots_number,
+                    t.slots_claimed, t.slots);
 
         AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,
                                          "Operation successful!",
@@ -290,80 +243,8 @@ void NetworkView::buttonClicked(Button* btn) {
                                        "Operation aborted!",
                                        "Current settings were not affected.");
     }
-    ProposalsManager::getInstance()->fetchProposals();
+    m_proposalsManager->fetchProposals();
     OrdersManager::getInstance()->fetchOrders();
-  } else if (txt == "Import Private Key") {
-    AlertWindow w("Import Private Key",
-                  "Enter your private key and it will be imported.",
-                  AlertWindow::QuestionIcon);
-
-    w.addTextEditor("privkey", "", "Private Key:", true);
-    w.addButton("OK",     1, KeyPress(KeyPress::returnKey, 0, 0));
-    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-
-    if (w.runModalLoop() == 1) {
-      // this is the text they entered..
-      auto privkey_hex = w.getTextEditorContents("privkey");
-      if (privkey_hex.startsWith("0x")) {
-        privkey_hex = privkey_hex.substring(2);
-      }
-      if (privkey_hex.length() != 64) {
-        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                "Invalid Private Key!",
-                "Private key should be exactly 32 bytes!");
-        return;
-      }
-
-      auto private_key = hex2bin(privkey_hex.toStdString());
-      auto eth_address_hex = "0x" + bin2hex(gen_ethereum_address((unsigned char *)private_key.c_str()));
-      txtEthAddress->setText(eth_address_hex);
-
-      auto cd = AutomatonContractData::getInstance();
-      cd->eth_address = eth_address_hex;
-      cd->private_key = privkey_hex.toStdString();
-
-      auto conf = Config::getInstance();
-      conf->lock();
-      conf->set_string("private_key", privkey_hex.toStdString());
-      conf->set_string("eth_address", eth_address_hex);
-      conf->unlock();
-    }
-  } else if (txt == "Import Private Key") {
-    AlertWindow w("Import Private Key",
-                  "Enter your private key and it will be imported.",
-                  AlertWindow::QuestionIcon);
-
-    w.addTextEditor("privkey", "", "Private Key:", true);
-    w.addButton("OK",     1, KeyPress(KeyPress::returnKey, 0, 0));
-    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-
-    if (w.runModalLoop() == 1) {
-      // this is the text they entered..
-      auto privkey_hex = w.getTextEditorContents("privkey");
-      if (privkey_hex.startsWith("0x")) {
-        privkey_hex = privkey_hex.substring(2);
-      }
-      if (privkey_hex.length() != 64) {
-        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                "Invalid Private Key!",
-                "Private key should be exactly 32 bytes!");
-        return;
-      }
-
-      auto private_key = hex2bin(privkey_hex.toStdString());
-      auto eth_address_hex = "0x" + bin2hex(gen_ethereum_address((unsigned char *)private_key.c_str()));
-      txtEthAddress->setText(eth_address_hex);
-
-      auto cd = AutomatonContractData::getInstance();
-      cd->eth_address = eth_address_hex;
-      cd->private_key = privkey_hex.toStdString();
-
-      auto conf = Config::getInstance();
-      conf->lock();
-      conf->set_string("private_key", privkey_hex.toStdString());
-      conf->set_string("eth_address", eth_address_hex);
-      conf->unlock();
-    }
   }
 }
 

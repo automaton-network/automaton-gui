@@ -20,6 +20,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
 #include "Data/AutomatonContractData.h"
+#include "LoginComponent.h"
 
 #include <curl/curl.h>
 
@@ -55,7 +56,18 @@ class PlaygroundGUIApplication: public JUCEApplication {
   void initialise(const String& commandLine) override {
     curl_global_init(CURL_GLOBAL_ALL);
 
-    mainWindow.reset(new MainWindow(getApplicationName()));
+    appPropertiesLock = std::make_unique<InterProcessLock>("appPropertiesLock");
+    PropertiesFile::Options options;
+    options.applicationName = "automaton";
+    options.filenameSuffix = ".settings";
+    options.folderName = "Automaton";
+    options.osxLibrarySubFolder = "Application Support";
+    options.processLock = appPropertiesLock.get();
+    appProperties = std::make_unique<ApplicationProperties>();
+    appProperties->setStorageParameters(options);
+
+    AutomatonContractData::getInstance()->init(appProperties->getUserSettings());
+    mainWindow.reset(new MainWindow(getApplicationName(), appProperties->getUserSettings()));
 
     // const Font& fontPlay = fonts.getPlay();
     // typefacePlay = LookAndFeel::getDefaultLookAndFeel().getTypefaceForFont(fontPlay);
@@ -63,9 +75,6 @@ class PlaygroundGUIApplication: public JUCEApplication {
   }
 
   void shutdown() override {
-    AutomatonContractData::deleteInstance();
-    Config::deleteInstance();
-
     mainWindow = nullptr;
 
     curl_global_cleanup();
@@ -93,7 +102,7 @@ class PlaygroundGUIApplication: public JUCEApplication {
    public:
     LookAndFeel_V4 lnf;
 
-    MainWindow(String name):
+    MainWindow(String name, PropertiesFile* userSettings):
       DocumentWindow(name,
                      Desktop::getInstance()
                        .getDefaultLookAndFeel()
@@ -102,11 +111,12 @@ class PlaygroundGUIApplication: public JUCEApplication {
       LookAndFeel::setDefaultLookAndFeel(&lnf);
 
       setUsingNativeTitleBar(true);
-      setContentOwned(new DemosMainComponent(), true);
+      setContentOwned(new LoginComponent(userSettings), true);
 
       setFullScreen(true);
       setResizable(true, true);
-      setResizeLimits(1200, 800, 10000, 10000);
+      setResizeLimits(600, 400, 10000, 10000);
+      centreWithSize(600, 400);
 
       setVisible(true);
     }
@@ -130,6 +140,8 @@ class PlaygroundGUIApplication: public JUCEApplication {
   };
 
  private:
+  std::unique_ptr<InterProcessLock> appPropertiesLock;
+  std::unique_ptr<ApplicationProperties> appProperties;
   std::unique_ptr<MainWindow> mainWindow;
   EmbeddedFonts fonts;
   Typeface::Ptr typefacePlay;

@@ -91,6 +91,12 @@
         <FILE id="zxKSKI" name="NetworkView.cpp" compile="1" resource="0" file="Source/Network/NetworkView.cpp"/>
         <FILE id="zDEJP7" name="NetworkView.h" compile="0" resource="0" file="Source/Network/NetworkView.h"/>
       </GROUP>
+      <FILE id="upiiZw" name="Utils.cpp" compile="1" resource="0" file="Source/Utils.cpp"/>
+      <FILE id="AUY9pH" name="Utils.h" compile="0" resource="0" file="Source/Utils.h"/>
+      <FILE id="LbEEYC" name="LoginComponent.cpp" compile="1" resource="0"
+            file="Source/LoginComponent.cpp"/>
+      <FILE id="fdFH2x" name="LoginComponent.h" compile="0" resource="0"
+            file="Source/LoginComponent.h"/>
       <FILE id="f60Dju" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="dBsD3K" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>

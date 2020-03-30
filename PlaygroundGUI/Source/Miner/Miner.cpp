@@ -657,8 +657,7 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
 
     std::string transaction_receipt = "";
 
-    auto conf = Config::getInstance();
-    eth_contract::register_contract(cd->eth_url, cd->contract_address, conf->get_abi());
+    eth_contract::register_contract(cd->eth_url, cd->contract_address, cd->get_abi());
     auto contract = eth_contract::get_contract(cd->contract_address);
     if (contract == nullptr) {
       s = status::internal("Contract is NULL!");

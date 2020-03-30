@@ -19,42 +19,35 @@
 
 #pragma once
 
-#include "../../JuceLibraryCode/JuceHeader.h"
-#include "../Components/FormMaker.h"
+#include <JuceHeader.h>
 
-#include "automaton/core/crypto/cryptopp/secure_random_cryptopp.h"
-#include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
-#include "automaton/core/io/io.h"
+class DemosMainComponent;
+class AccountWindow;
 
-class ProposalsManager;
 
-class NetworkView:
-  public FormMaker,
-  private Timer {
+class LoginComponent  : public Component
+                      , public ComponentListener
+                      , public Button::Listener
+                      , public ComboBox::Listener {
  public:
-  //==============================================================================
-  NetworkView(ProposalsManager* proposalsManager);
-  ~NetworkView();
+  LoginComponent(PropertiesFile* configFile);
+  ~LoginComponent();
 
-  void paint(Graphics& g) override;
+  void paint(Graphics&) override;
   void resized() override;
-
-  void update();
-
-  // Button::Listener overrides.
   void buttonClicked(Button* btn) override;
-
-  // TextEditor::Listener overrides.
-  void textEditorTextChanged(TextEditor &) override;
-
-  void timerCallback() override;
+  void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
+  void componentVisibilityChanged(Component& component) override;
 
  private:
-  TextEditor* txtURL;
-  TextEditor* txtContractAddress;
-  TextEditor* txtEthAddress;
+  AccountWindow* getWindowByAddress(const String& address);
 
-  ProposalsManager* m_proposalsManager;
+  std::unique_ptr<ComboBox> m_accountsComboBox;
+  std::unique_ptr<TextButton> m_importPrivateKeyBtn;
+  std::unique_ptr<TextButton> m_openAccountBtn;
+  OwnedArray<AccountWindow> m_accountWindows;
+  std::map<String, PropertySet> m_accountsConfigs;
+  PropertiesFile* m_configFile;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NetworkView)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoginComponent)
 };

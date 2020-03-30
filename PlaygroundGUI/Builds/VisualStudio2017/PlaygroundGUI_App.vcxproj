@@ -162,6 +162,8 @@
     <ClCompile Include="..\..\Source\Demos\DemoMiner.cpp"/>
     <ClCompile Include="..\..\Source\Miner\Miner.cpp"/>
     <ClCompile Include="..\..\Source\Network\NetworkView.cpp"/>
+    <ClCompile Include="..\..\Source\Utils.cpp"/>
+    <ClCompile Include="..\..\Source\LoginComponent.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_AbstractFifo.cpp">
@@ -1371,6 +1373,8 @@
     <ClInclude Include="..\..\Source\Demos\DemoMiner.h"/>
     <ClInclude Include="..\..\Source\Miner\Miner.h"/>
     <ClInclude Include="..\..\Source\Network\NetworkView.h"/>
+    <ClInclude Include="..\..\Source\Utils.h"/>
+    <ClInclude Include="..\..\Source\LoginComponent.h"/>
     <ClInclude Include="..\..\Source\MainComponent.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_AbstractFifo.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_Array.h"/>

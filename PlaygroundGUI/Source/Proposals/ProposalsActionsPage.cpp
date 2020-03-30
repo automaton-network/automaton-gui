@@ -25,6 +25,12 @@
 class ProposalComponent : public Component
                         , private Button::Listener {
  public:
+  class Listener {
+   public:
+    virtual ~Listener() = default;
+    virtual void castVote(Proposal::Ptr proposal, uint64 choice) = 0;
+  };
+
   ProposalComponent() {
     m_title = std::make_unique<Label>();
     m_title->setFont(m_title->getFont().withHeight(25));
@@ -76,13 +82,15 @@ class ProposalComponent : public Component
     g.drawText(m_proposalState, static_cast<int>(topLeftLineWidth) + 5, 0, stateStrWidth, 12, Justification::topLeft);
   }
 
+  ListenerList<Listener> m_listeners;
+
  private:
   void buttonClicked(Button* buttonThatWasClicked) override {
     // Might be better to move that responsibility to top layers in the future (when more vote choices are added)
     if (buttonThatWasClicked == m_approveBtn.get()) {
-        ProposalsManager::getInstance()->castVote(m_proposal, 1);
+      m_listeners.call(&Listener::castVote, m_proposal, 1);
     } else if (buttonThatWasClicked == m_rejectBtn.get()) {
-        ProposalsManager::getInstance()->castVote(m_proposal, 0);
+      m_listeners.call(&Listener::castVote, m_proposal, 0);
     }
   }
 
@@ -98,8 +106,16 @@ class ProposalComponent : public Component
 };
 
 class ProposalsGrid : public GridView
-                    , public AbstractListModelBase::Listener {
+                    , public AbstractListModelBase::Listener
+                    , public ProposalComponent::Listener {
  public:
+  ProposalsGrid(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
+  }
+
+  void castVote(Proposal::Ptr proposal, uint64 choice) {
+    m_proposalsManager->castVote(proposal, choice);
+  }
+
   void setModel(std::shared_ptr<AbstractListModel<Proposal::Ptr>> model) {
     m_model = model;
     m_model->addListener(this);
@@ -116,6 +132,7 @@ class ProposalsGrid : public GridView
     if (comp == nullptr)
       comp = new ProposalComponent();
 
+    comp->m_listeners.add(this);
     comp->setData(m_model->getAt(index));
     return comp;
   }
@@ -126,17 +143,18 @@ class ProposalsGrid : public GridView
 
  private:
   std::shared_ptr<AbstractListModel<Proposal::Ptr>> m_model;
+  ProposalsManager* m_proposalsManager;
 };
 
 //==============================================================================
-ProposalsActionsPage::ProposalsActionsPage() {
+ProposalsActionsPage::ProposalsActionsPage(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
   m_titleLabel = std::make_unique<Label>("m_titleLabel", translate("Validator Actions Required:"));
   m_titleLabel->setColour(Label::textColourId, Colours::white);
   m_titleLabel->setFont(m_titleLabel->getFont().withHeight(45));
   addAndMakeVisible(m_titleLabel.get());
 
-  m_proposalsGrid = std::make_unique<ProposalsGrid>();
-  m_proposalsGrid->setModel(ProposalsManager::getInstance()->getModel());
+  m_proposalsGrid = std::make_unique<ProposalsGrid>(proposalsManager);
+  m_proposalsGrid->setModel(m_proposalsManager->getModel());
   m_proposalsGrid->setMargins(50, 25, 50, 50);
   m_proposalsGrid->setCellMinimumWidth(350);
   m_proposalsGrid->setCellRatio(1.75);
