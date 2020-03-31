@@ -20,6 +20,7 @@ jobs:
     env:
       build_dir: ./build
       dist_dir: ./build/local_third_party
+      inst_dir: ./build/inst
       automaton_version: v0.1.10a      
     steps:
     - uses: actions/checkout@v2
@@ -29,6 +30,7 @@ jobs:
       run: |        
         mkdir ${{ env.build_dir }}
         mkdir ${{ env.dist_dir }}
+        mkdir ${{ env.inst_dir }}
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
@@ -38,12 +40,25 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.0    
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -A ${{ matrix.platform }} -Dautomaton_PATH=./local_third_party
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -A ${{ matrix.platform }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=${{ env.inst_dir }}
       shell: cmd
     - name: build
       working-directory: ${{ env.build_dir }}
-      run: msbuild automaton-playground.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }}
+      run: msbuild /t:Build INSTALL.vcxproj /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }}
       shell: cmd
+    - name: Archive
+      if: startsWith(github.ref, 'refs/tags/v')
+      working-directory: ${{ env.inst_dir }}
+      run: zip -r ../../Playground-Windows-${{ matrix.configuration}}-${{ matrix.platform}}-${{ steps.tag.outputs.result }}.zip .
+      shell: cmd
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        files: Playground-Windows-${{ matrix.configuration }}-${{ matrix.platform}}-${{ steps.tag.outputs.result }}.zip
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ubuntu:
     runs-on: ubuntu-latest
     strategy:
@@ -52,11 +67,14 @@ jobs:
     env:
       build_dir: ./build
       dist_dir: ./build/local_third_party
+      inst_dir: ./build/inst
       automaton_version: v0.1.10a
     steps:
     - uses: actions/checkout@v2
     - name: prepare
-      run: mkdir -p ${{ env.dist_dir }}
+      run: |
+        mkdir -p ${{ env.dist_dir }}
+        mkdir -p ${{ env.inst_dir }}
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
@@ -65,10 +83,22 @@ jobs:
         unzip automaton-Linux-${{ matrix.configuration}}-${{ env.automaton_version }}.zip
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=${{ env.inst_dir }}
     - name: build
       working-directory: ${{ env.build_dir }}
-      run: make
+      run: make install
+    - name: Archive
+      if: startsWith(github.ref, 'refs/tags/v')
+      working-directory: ${{ env.inst_dir }}
+      run: zip -r ../../Playground-Linux-${{ matrix.configuration}}-${{ steps.tag.outputs.result }}.zip .      
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        files: Playground-Windows-${{ matrix.configuration }}-${{ steps.tag.outputs.result }}.zip
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   macos:
     runs-on: macos-latest
     strategy:
@@ -77,11 +107,14 @@ jobs:
     env:
       build_dir: ./build
       dist_dir: ./build/local_third_party
+      inst_dir: ./build/inst
       automaton_version: v0.1.10a
     steps:
     - uses: actions/checkout@v2
     - name: prepare
-      run: mkdir -p ${{ env.dist_dir }}
+      run: |
+        mkdir -p ${{ env.dist_dir }}
+        mkdir -p ${{ env.inst_dir }}
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
@@ -89,10 +122,22 @@ jobs:
         unzip automaton-macOS-${{ matrix.configuration}}-${{ env.automaton_version }}.zip
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=${{ env.inst_dir }}
     - name: build
       working-directory: ${{ env.build_dir }}
-      run: make
+      run: make install
+    - name: Archive
+      if: startsWith(github.ref, 'refs/tags/v')
+      working-directory: ${{ env.inst_dir }}
+      run: zip -r ../../Playground-macOS-${{ matrix.configuration}}-${{ steps.tag.outputs.result }}.zip .      
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        files: Playground-macOS-${{ matrix.configuration }}-${{ steps.tag.outputs.result }}.zip
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   lint:
     runs-on: ubuntu-latest
     steps:
