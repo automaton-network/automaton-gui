@@ -155,7 +155,10 @@ target_link_libraries(
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
   set_target_properties(Playground PROPERTIES
-    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/Builds/MacOSX/Info-App.plist
+    MACOSX_BUNDLE_GUI_IDENTIFIER com.Liberatix.PlaygroundGUI
+    MACOSX_BUNDLE_NAME Playground
+    MACOSX_BUNDLE_VERSION 0.0.1
+    MACOSX_BUNDLE_ICON_FILE ${CMAKE_SOURCE_DIR}/Builds/MacOSX/Icon.icns
   )
   set(CMAKE_EXE_LINKER_FLAGS "-framework Cocoa -framework Foundation -framework IOKit -framework CoreImage -w")
 endif()
