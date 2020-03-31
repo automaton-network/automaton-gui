@@ -1,18 +1,26 @@
 cmake_minimum_required(VERSION 3.1)
-project(automaton-playground)
 
 if (POLICY CMP0091)
   cmake_policy(SET CMP0091 NEW) # MSVC_RUNTIME_VERSION support
 endif()
+
+project(automaton-playground)
+
 option(automaton_STATIC_RUNTIME "Use static C runtime" ON)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+  if (automaton_STATIC_RUNTIME)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+  endif()
   option(automaton_USE_OPENSSL "Use OpenSSL" ON)
 else()
   set(automaton_USE_OPENSSL ON)
 endif()
 
 set(automaton_PATH ${CMAKE_SOURCE_DIR}/../automaton/src/local_third_party CACHE FILEPATH "Directory with automaton")
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(JUCE)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
 set(CPACK_PACKAGE_VERSION_MINOR "1")
@@ -49,9 +57,6 @@ include_directories(${automaton_PATH}/JUCE/modules)
 add_executable(Playground MACOSX_BUNDLE ${PLAYGROUND_FILES})
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-  if (automaton_STATIC_RUNTIME)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-  endif()
   set(CRYPTOPP_LIB ${automaton_PATH}/lib/cryptopp-static.lib)
   set(PROTOBUF_LIB ${automaton_PATH}/lib/libprotobuf.lib)
   set(CURL_LIB ${automaton_PATH}/lib/libcurl.lib)
