@@ -21,7 +21,7 @@ jobs:
       build_dir: ./build
       dist_dir: ./build/local_third_party
       inst_dir: ./build/inst
-      automaton_version: v0.1.10a      
+      automaton_version: v0.1.11
     steps:
     - uses: actions/checkout@v2
     - name: Install build dependencies
@@ -31,6 +31,15 @@ jobs:
         mkdir ${{ env.build_dir }}
         mkdir ${{ env.dist_dir }}
         mkdir ${{ env.inst_dir }}
+    - name: Get tag information
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: tag
+      uses: actions/github-script@0.9.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+          return context.payload.ref.replace(/refs\/tags\//, '');
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
@@ -68,13 +77,22 @@ jobs:
       build_dir: ./build
       dist_dir: ./build/local_third_party
       inst_dir: ./build/inst
-      automaton_version: v0.1.10a
+      automaton_version: v0.1.11
     steps:
     - uses: actions/checkout@v2
     - name: prepare
       run: |
         mkdir -p ${{ env.dist_dir }}
         mkdir -p ${{ env.inst_dir }}
+    - name: Get tag information
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: tag
+      uses: actions/github-script@0.9.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+          return context.payload.ref.replace(/refs\/tags\//, '');
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
@@ -108,13 +126,22 @@ jobs:
       build_dir: ./build
       dist_dir: ./build/local_third_party
       inst_dir: ./build/inst
-      automaton_version: v0.1.10a
+      automaton_version: v0.1.11
     steps:
     - uses: actions/checkout@v2
     - name: prepare
       run: |
         mkdir -p ${{ env.dist_dir }}
         mkdir -p ${{ env.inst_dir }}
+    - name: Get tag information
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: tag
+      uses: actions/github-script@0.9.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+          return context.payload.ref.replace(/refs\/tags\//, '');
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
