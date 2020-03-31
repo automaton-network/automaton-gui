@@ -1,5 +1,7 @@
 include(FetchContent)
 
+set(FETCHCONTENT_QUIET OFF)
+
 FetchContent_Declare(JUCE
   GIT_REPOSITORY "https://github.com/WeAreROLI/JUCE.git"
   GIT_TAG "dddeb1ad68f8539f5ea2fbac36c07532f12bf9cf"
