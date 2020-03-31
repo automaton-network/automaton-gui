@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.1)
-project(automaton-playground)
 
 if (POLICY CMP0091)
   cmake_policy(SET CMP0091 NEW) # MSVC_RUNTIME_VERSION support
 endif()
+
+project(automaton-playground)
+
 option(automaton_STATIC_RUNTIME "Use static C runtime" ON)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
