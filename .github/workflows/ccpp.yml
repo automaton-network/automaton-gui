@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install build dependencies
-      run: choco install unzip
+      run: choco install unzip zip
     - name: prepare
       run: |        
         mkdir ${{ env.build_dir }}
@@ -49,7 +49,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.0    
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -A ${{ matrix.platform }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=${{ env.inst_dir }}
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -A ${{ matrix.platform }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=./inst
       shell: cmd
     - name: build
       working-directory: ${{ env.build_dir }}
@@ -101,7 +101,7 @@ jobs:
         unzip automaton-Linux-${{ matrix.configuration}}-${{ env.automaton_version }}.zip
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=${{ env.inst_dir }}
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=./inst
     - name: build
       working-directory: ${{ env.build_dir }}
       run: make install
@@ -149,7 +149,7 @@ jobs:
         unzip automaton-macOS-${{ matrix.configuration}}-${{ env.automaton_version }}.zip
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=${{ env.inst_dir }}
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=./inst
     - name: build
       working-directory: ${{ env.build_dir }}
       run: make install
