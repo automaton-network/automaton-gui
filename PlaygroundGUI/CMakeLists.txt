@@ -46,7 +46,7 @@ file(
 include_directories(${automaton_PATH}/include)
 include_directories(${automaton_PATH}/JUCE/modules)
 
-add_executable(Playground ${PLAYGROUND_FILES})
+add_executable(Playground MACOSX_BUNDLE ${PLAYGROUND_FILES})
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
   if (automaton_STATIC_RUNTIME)
@@ -154,6 +154,12 @@ target_link_libraries(
 )
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+  set_target_properties(Playground PROPERTIES
+    MACOSX_BUNDLE_GUI_IDENTIFIER com.Liberatix.PlaygroundGUI
+    MACOSX_BUNDLE_NAME Playground
+    MACOSX_BUNDLE_VERSION 0.0.1
+    MACOSX_BUNDLE_ICON_FILE ${CMAKE_SOURCE_DIR}/Builds/MacOSX/Icon.icns
+  )
   set(CMAKE_EXE_LINKER_FLAGS "-framework Cocoa -framework Foundation -framework IOKit -framework CoreImage -w")
 endif()
 
@@ -184,5 +190,7 @@ endif()
 
 install(TARGETS Playground
   RUNTIME
+    DESTINATION bin
+  BUNDLE
     DESTINATION bin
 )
