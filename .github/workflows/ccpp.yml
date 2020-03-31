@@ -95,7 +95,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/v')
       with:
-        files: Playground-Windows-${{ matrix.configuration }}-${{ steps.tag.outputs.result }}.zip
+        files: Playground-Linux-${{ matrix.configuration }}-${{ steps.tag.outputs.result }}.zip
         prerelease: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
