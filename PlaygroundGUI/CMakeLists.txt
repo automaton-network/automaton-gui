@@ -14,6 +14,9 @@ endif()
 
 set(automaton_PATH ${CMAKE_SOURCE_DIR}/../automaton/src/local_third_party CACHE FILEPATH "Directory with automaton")
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(JUCE)
+
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
 set(CPACK_PACKAGE_VERSION_MINOR "1")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
