@@ -25,7 +25,7 @@ class ProposalsManager : public DeletedAtShutdown {
  public:
   std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
 
-  ProposalsManager();
+  ProposalsManager(PropertySet* config);
   ~ProposalsManager();
 
   bool fetchProposals();
@@ -36,9 +36,8 @@ class ProposalsManager : public DeletedAtShutdown {
 
   void notifyProposalsUpdated();
 
-  JUCE_DECLARE_SINGLETON(ProposalsManager, true)
-
-
  private:
   std::shared_ptr<ProposalsModel> m_model;
+  std::string m_privateKey;
+  std::string m_ethAddress;
 };

@@ -125,6 +125,14 @@
 			isa = PBXBuildFile;
 			fileRef = 08D1D043B252AE5AA9E7A223;
 		};
+		DC28DB98D6CD9590DC30C89D = {
+			isa = PBXBuildFile;
+			fileRef = 3A56070EF92B1A08D0E377C5;
+		};
+		6C9C4D661AD1A8A6D28ED3EC = {
+			isa = PBXBuildFile;
+			fileRef = 9390DCB6F3BF8053269F8617;
+		};
 		9A3C098021D839B8BA421107 = {
 			isa = PBXBuildFile;
 			fileRef = D2896F2FBEFBC7DB297DCD12;
@@ -280,6 +288,13 @@
 			path = ../../Source/Proposals/CreateProposalComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		2442CDA25E1722A28DB0106F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Utils.h;
+			path = ../../Source/Utils.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		24A90FD816B6497603F90864 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -320,6 +335,13 @@
 			lastKnownFileType = file;
 			name = "juce_gui_basics";
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_gui_basics";
+			sourceTree = "SOURCE_ROOT";
+		};
+		3A56070EF92B1A08D0E377C5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Utils.cpp;
+			path = ../../Source/Utils.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		3D9D6A70A43B37B489172BDD = {
@@ -476,6 +498,13 @@
 			path = System/Library/Frameworks/Cocoa.framework;
 			sourceTree = SDKROOT;
 		};
+		9390DCB6F3BF8053269F8617 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = LoginComponent.cpp;
+			path = ../../Source/LoginComponent.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		960F41F1CCAE949D7CDBFC7B = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -551,6 +580,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Miner.cpp;
 			path = ../../Source/Miner/Miner.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C1F2D76D38BDE27BCE51CA6C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = LoginComponent.h;
+			path = ../../Source/LoginComponent.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C2F43D9037B8E387725FF91E = {
@@ -814,6 +850,10 @@
 				D42076CCB651D5CCB42A7F0D,
 				32CC0634FEFEA14E371BC412,
 				6BBA852623D8A64A3A5A7043,
+				3A56070EF92B1A08D0E377C5,
+				2442CDA25E1722A28DB0106F,
+				9390DCB6F3BF8053269F8617,
+				C1F2D76D38BDE27BCE51CA6C,
 				F37DC7F8EC888D82E793ED31,
 				D2896F2FBEFBC7DB297DCD12,
 				960F41F1CCAE949D7CDBFC7B,
@@ -1152,6 +1192,8 @@
 				EED2358D21B09846AA8B17BD,
 				6C764B7D3E1A849226C54B02,
 				474A5E736DC9996D96CBC820,
+				DC28DB98D6CD9590DC30C89D,
+				6C9C4D661AD1A8A6D28ED3EC,
 				9A3C098021D839B8BA421107,
 				0721950C61ADA44331EC5DB3,
 				EF0B0FEE0E3E3DF8F720110A,

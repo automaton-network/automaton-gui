@@ -307,6 +307,12 @@
     <ClCompile Include="..\..\Source\Network\NetworkView.cpp">
       <Filter>PlaygroundGUI\Source\Network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Utils.cpp">
+      <Filter>PlaygroundGUI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LoginComponent.cpp">
+      <Filter>PlaygroundGUI\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\MainComponent.cpp">
       <Filter>PlaygroundGUI\Source</Filter>
     </ClCompile>
@@ -1658,6 +1664,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Network\NetworkView.h">
       <Filter>PlaygroundGUI\Source\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Utils.h">
+      <Filter>PlaygroundGUI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LoginComponent.h">
+      <Filter>PlaygroundGUI\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\MainComponent.h">
       <Filter>PlaygroundGUI\Source</Filter>

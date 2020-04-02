@@ -1,7 +1,7 @@
 /*
  * Automaton Playground
- * Copyright (c) 2020 The Automaton Authors.
- * Copyright (c) 2020 The automaton.network Authors.
+ * Copyright (c) 2019 The Automaton Authors.
+ * Copyright (c) 2019 The automaton.network Authors.
  *
  * Automaton Playground is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,24 +18,9 @@
  */
 
 #pragma once
+#include <string>
 
-#include <JuceHeader.h>
-
-class ProposalsGrid;
-class ProposalsManager;
-
-class ProposalsActionsPage : public Component {
+class Utils {
  public:
-  ProposalsActionsPage(ProposalsManager* proposalsManager);
-  ~ProposalsActionsPage();
-
-  void paint(Graphics& g) override;
-  void resized() override;
-
- private:
-  std::unique_ptr<Label> m_titleLabel;
-  std::unique_ptr<ProposalsGrid> m_proposalsGrid;
-  ProposalsManager* m_proposalsManager;
-
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProposalsActionsPage)
+  static std::string gen_ethereum_address(const std::string& privkey_hex);
 };
