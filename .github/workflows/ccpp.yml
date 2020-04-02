@@ -17,33 +17,64 @@ jobs:
       matrix:
         configuration: [Debug, Release]
         platform: [Win32, x64]
+        runtime_link: [MD, MT]
     env:
       build_dir: ./build
       dist_dir: ./build/local_third_party
-      automaton_version: v0.1.10a      
+      inst_dir: ./build/inst
+      static_runtime: ON
+      automaton_version: v0.1.11a
     steps:
     - uses: actions/checkout@v2
     - name: Install build dependencies
-      run: choco install unzip
+      run: choco install unzip zip
     - name: prepare
       run: |        
         mkdir ${{ env.build_dir }}
         mkdir ${{ env.dist_dir }}
+        mkdir ${{ env.inst_dir }}
+    - name: Check for runtime link option
+      if: matrix.runtime_link == 'MD'
+      run: |
+        echo "::set-env name=static_runtime::OFF"
+      shell: bash
+    - name: Get tag information
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: tag
+      uses: actions/github-script@0.9.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+          return context.payload.ref.replace(/refs\/tags\//, '');
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
-        curl -L -O https://github.com/automaton-network/automaton/releases/download/${{ env.automaton_version }}/automaton-Windows-${{ matrix.configuration }}-${{ matrix.platform }}-${{ env.automaton_version }}.zip
-        unzip automaton-Windows-${{ matrix.configuration }}-${{ matrix.platform }}-${{ env.automaton_version }}.zip
+        curl -L -O https://github.com/automaton-network/automaton/releases/download/${{ env.automaton_version }}/automaton-Windows-${{ matrix.configuration }}-${{ matrix.runtime_link }}-${{ matrix.platform }}-${{ env.automaton_version }}.zip
+        unzip automaton-Windows-${{ matrix.configuration }}-${{ matrix.runtime_link }}-${{ matrix.platform }}-${{ env.automaton_version }}.zip
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0    
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -A ${{ matrix.platform }} -Dautomaton_PATH=./local_third_party
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -A ${{ matrix.platform }} -Dautomaton_STATIC_RUNTIME=${{ env.static_runtime }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=./inst
       shell: cmd
     - name: build
       working-directory: ${{ env.build_dir }}
-      run: msbuild automaton-playground.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }}
+      run: msbuild /t:Build INSTALL.vcxproj /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }}
       shell: cmd
+    - name: Archive
+      if: startsWith(github.ref, 'refs/tags/v')
+      working-directory: ${{ env.inst_dir }}
+      run: zip -r ../../Playground-Windows-${{ matrix.configuration}}-${{ matrix.runtime_link }}-${{ matrix.platform}}-${{ steps.tag.outputs.result }}.zip .
+      shell: cmd
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        files: Playground-Windows-${{ matrix.configuration }}-${{ matrix.runtime_link }}-${{ matrix.platform}}-${{ steps.tag.outputs.result }}.zip
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ubuntu:
     runs-on: ubuntu-latest
     strategy:
@@ -52,11 +83,23 @@ jobs:
     env:
       build_dir: ./build
       dist_dir: ./build/local_third_party
-      automaton_version: v0.1.10a
+      inst_dir: ./build/inst
+      automaton_version: v0.1.11a
     steps:
     - uses: actions/checkout@v2
     - name: prepare
-      run: mkdir -p ${{ env.dist_dir }}
+      run: |
+        mkdir -p ${{ env.dist_dir }}
+        mkdir -p ${{ env.inst_dir }}
+    - name: Get tag information
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: tag
+      uses: actions/github-script@0.9.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+          return context.payload.ref.replace(/refs\/tags\//, '');
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
@@ -65,10 +108,22 @@ jobs:
         unzip automaton-Linux-${{ matrix.configuration}}-${{ env.automaton_version }}.zip
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=./inst
     - name: build
       working-directory: ${{ env.build_dir }}
-      run: make
+      run: make install
+    - name: Archive
+      if: startsWith(github.ref, 'refs/tags/v')
+      working-directory: ${{ env.inst_dir }}
+      run: zip -r ../../Playground-Linux-${{ matrix.configuration}}-${{ steps.tag.outputs.result }}.zip .      
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        files: Playground-Linux-${{ matrix.configuration }}-${{ steps.tag.outputs.result }}.zip
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   macos:
     runs-on: macos-latest
     strategy:
@@ -77,11 +132,23 @@ jobs:
     env:
       build_dir: ./build
       dist_dir: ./build/local_third_party
-      automaton_version: v0.1.10a
+      inst_dir: ./build/inst
+      automaton_version: v0.1.11a
     steps:
     - uses: actions/checkout@v2
     - name: prepare
-      run: mkdir -p ${{ env.dist_dir }}
+      run: |
+        mkdir -p ${{ env.dist_dir }}
+        mkdir -p ${{ env.inst_dir }}
+    - name: Get tag information
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: tag
+      uses: actions/github-script@0.9.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+          return context.payload.ref.replace(/refs\/tags\//, '');
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
@@ -89,10 +156,22 @@ jobs:
         unzip automaton-macOS-${{ matrix.configuration}}-${{ env.automaton_version }}.zip
     - name: configure
       working-directory: ${{ env.build_dir }}
-      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party
+      run: cmake ../PlaygroundGUI -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -Dautomaton_PATH=./local_third_party -DCMAKE_INSTALL_PREFIX=./inst
     - name: build
       working-directory: ${{ env.build_dir }}
-      run: make
+      run: make install
+    - name: Archive
+      if: startsWith(github.ref, 'refs/tags/v')
+      working-directory: ${{ env.inst_dir }}
+      run: zip -r ../../Playground-macOS-${{ matrix.configuration}}-${{ steps.tag.outputs.result }}.zip .      
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        files: Playground-macOS-${{ matrix.configuration }}-${{ steps.tag.outputs.result }}.zip
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   lint:
     runs-on: ubuntu-latest
     steps:
