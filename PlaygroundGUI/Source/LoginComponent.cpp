@@ -38,10 +38,10 @@ class AccountWindow : public DocumentWindow {
     setUsingNativeTitleBar(true);
     setContentOwned(new DemosMainComponent(m_accountConfig), true);
 
-    setFullScreen(true);
+    setFullScreen(false);
     setResizable(true, true);
-    setResizeLimits(1200, 800, 10000, 10000);
-    centreWithSize(600, 400);
+    setResizeLimits(800, 600, 10000, 10000);
+    centreWithSize(800, 600);
 
     setVisible(true);
   }
@@ -67,7 +67,21 @@ class AccountWindow : public DocumentWindow {
 
 //==============================================================================
 LoginComponent::LoginComponent(PropertiesFile* configFile) : m_configFile(configFile) {
-  m_accountsComboBox = std::make_unique<ComboBox>();
+  m_model = std::make_shared<AccountsModel>();
+  m_model->addListener(this);
+  m_accountsTable = std::make_unique<TableListBox>();
+  m_accountsTable->setRowHeight(50);
+  m_accountsTable->setRowSelectedOnMouseDown(true);
+  m_accountsTable->setClickingTogglesRowSelection(true);
+  m_accountsTable->setMultipleSelectionEnabled(false);
+  m_accountsTable->setModel(this);
+  addAndMakeVisible(m_accountsTable.get());
+
+  auto& tableHeader = m_accountsTable->getHeader();
+  tableHeader.setStretchToFitActive(true);
+  tableHeader.addColumn(translate("Alias"), 1, 50);
+  tableHeader.addColumn(translate("Address"), 2, 400);
+
 
   if (auto accountsXml = m_configFile->getXmlValue("accounts")) {
     PropertySet accounts;
@@ -75,34 +89,27 @@ LoginComponent::LoginComponent(PropertiesFile* configFile) : m_configFile(config
     auto keys = accounts.getAllProperties().getAllKeys();
 
     for (int i = 0; i < keys.size(); ++i) {
-      auto account = keys[i];
-      accounts.getAllProperties().getValue(account, "");
-      auto accountConfig = accounts.getXmlValue(account);
-      m_accountsConfigs[account].restoreFromXml(*accountConfig);
-      m_accountsComboBox->addItem(account, i + 1);
+      Account account(keys[i]);
+      accounts.getAllProperties().getValue(account.getAddress(), "");
+      auto accountConfig = accounts.getXmlValue(account.getAddress());
+      account.getConfig().restoreFromXml(*accountConfig);
+      m_model->addItem(account, false);
     }
   }
-
-  m_accountsComboBox->addListener(this);
-  addAndMakeVisible(m_accountsComboBox.get());
 
   m_importPrivateKeyBtn = std::make_unique<TextButton>("Import Private Key");
   addAndMakeVisible(m_importPrivateKeyBtn.get());
   m_importPrivateKeyBtn->addListener(this);
-
-  m_openAccountBtn = std::make_unique<TextButton>("Open account");
-  m_openAccountBtn->setEnabled(false);
-  addAndMakeVisible(m_openAccountBtn.get());
-  m_openAccountBtn->addListener(this);
 
   setSize(600, 400);
 }
 
 LoginComponent::~LoginComponent() {
   PropertySet accounts;
-  for (auto& item : m_accountsConfigs) {
-    auto accountConfig = item.second.createXml("account");
-    accounts.setValue(item.first, accountConfig.get());
+  for (int i = 0; i < m_model->size(); ++i) {
+    auto& item = m_model->getReferenceAt(i);
+    auto accountConfig = item.getConfig().createXml("account");
+    accounts.setValue(item.getAddress(), accountConfig.get());
   }
   auto accountsXml = accounts.createXml("accounts");
   m_configFile->setValue("accounts", accountsXml.get());
@@ -114,12 +121,10 @@ void LoginComponent::paint(Graphics& g) {
 
 void LoginComponent::resized() {
   auto bounds = getLocalBounds().reduced(20);
-  m_accountsComboBox->setBounds(bounds.removeFromTop(40));
+  m_accountsTable->setBounds(bounds.removeFromTop(300));
   bounds.removeFromTop(20);
   auto btnBounds = bounds.removeFromTop(40);
-  m_importPrivateKeyBtn->setBounds(btnBounds.removeFromLeft(200));
-  btnBounds.removeFromLeft(20);
-  m_openAccountBtn->setBounds(btnBounds.removeFromLeft(200));
+  m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(200, 40));
 }
 
 void LoginComponent::buttonClicked(Button* btn) {
@@ -129,6 +134,7 @@ void LoginComponent::buttonClicked(Button* btn) {
                   AlertWindow::QuestionIcon);
 
     w.addTextEditor("privkey", "", "Private Key:", true);
+    w.addTextEditor("alias", "", "Alias:", false);
     w.addButton("OK",     1, KeyPress(KeyPress::returnKey, 0, 0));
     w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
@@ -145,27 +151,16 @@ void LoginComponent::buttonClicked(Button* btn) {
         return;
       }
 
-      auto eth_address_hex = Utils::gen_ethereum_address(privkeyHex.toStdString());
-      m_accountsConfigs[eth_address_hex].setValue("private_key", privkeyHex);
-      m_accountsConfigs[eth_address_hex].setValue("eth_address", String(eth_address_hex));
-      m_accountsComboBox->addItem(eth_address_hex, m_accountsComboBox->getNumItems() + 1);
-    }
-  } else if (btn == m_openAccountBtn.get()) {
-    const auto account = m_accountsComboBox->getText();
+      const auto accountAlias = w.getTextEditorContents("alias");
 
-    if (auto accountWindow = getWindowByAddress(account)) {
-      accountWindow->toFront(true);
-    } else {
-      accountWindow = new AccountWindow("Account " + account, account, &m_accountsConfigs[account]);
-      accountWindow->addComponentListener(this);
-      m_accountWindows.add(accountWindow);
+      auto eth_address_hex = Utils::gen_ethereum_address(privkeyHex.toStdString());
+      Account account(eth_address_hex);
+      account.getConfig().setValue("private_key", privkeyHex);
+      account.getConfig().setValue("eth_address", String(eth_address_hex));
+      account.getConfig().setValue("account_alias", accountAlias);
+      m_model->addItem(account, true);
     }
   }
-}
-
-void LoginComponent::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
-  const auto selectedIndex = m_accountsComboBox->getSelectedItemIndex();
-  m_openAccountBtn->setEnabled(selectedIndex >= 0);
 }
 
 void LoginComponent::componentVisibilityChanged(Component& component) {
@@ -182,4 +177,82 @@ AccountWindow* LoginComponent::getWindowByAddress(const String& address) {
   }
 
   return nullptr;
+}
+
+void LoginComponent::modelChanged(AbstractListModelBase* base) {
+  m_accountsTable->updateContent();
+  m_accountsTable->repaint();
+}
+
+void LoginComponent::openAccount(Account* account) {
+  if (auto accountWindow = getWindowByAddress(account->getAddress())) {
+    accountWindow->toFront(true);
+  } else {
+    accountWindow = new AccountWindow("Account " + account->getAlias(), account->getAddress(), &account->getConfig());
+    accountWindow->addComponentListener(this);
+    m_accountWindows.add(accountWindow);
+  }
+}
+
+void LoginComponent::removeAccount(const Account& account) {
+  m_accountWindows.removeObject(getWindowByAddress(account.getAddress()), true);
+  m_model->removeItem(account);
+}
+
+// TableListBoxModel
+//==============================================================================
+
+int LoginComponent::getNumRows() {
+  return m_model->size();
+}
+
+void LoginComponent::paintCell(Graphics& g,
+                               int rowNumber, int columnId,
+                               int width, int height,
+                               bool rowIsSelected) {
+  auto item = m_model->getAt(rowNumber);
+  g.setColour(Colours::white);
+
+  switch (columnId) {
+    case 1: {
+      g.drawText(item.getAlias(), 0, 0, width, height, Justification::centred);
+      break;
+    }
+    case 2: {
+      g.drawText(item.getAddress(), 0, 0, width, height, Justification::centredLeft);
+      break;
+    }
+    default: {
+    }
+  }
+}
+
+void LoginComponent::paintRowBackground(Graphics& g,
+                                        int rowNumber,
+                                        int width, int height,
+                                        bool rowIsSelected) {
+  auto colour = LookAndFeel::getDefaultLookAndFeel().findColour(TableListBox::backgroundColourId);
+  g.setColour(rowIsSelected ? colour.darker(0.3f) : colour);
+  g.fillRect(0, 0, width, height);
+}
+
+void LoginComponent::cellClicked(int rowNumber, int columnId, const MouseEvent& e) {
+    if (e.mods.isRightButtonDown()) {
+    PopupMenu menu;
+    menu.addItem("Open", [=] {
+      openAccount(&m_model->getReferenceAt(rowNumber));
+    });
+
+    menu.addItem("Remove", [=] {
+      removeAccount(m_model->getReferenceAt(rowNumber));
+    });
+
+    menu.showAt(m_accountsTable->getCellComponent(columnId, rowNumber));
+  }
+}
+
+void LoginComponent::cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) {
+  if (e.mods.isLeftButtonDown()) {
+    openAccount(&m_model->getReferenceAt(rowNumber));
+  }
 }
