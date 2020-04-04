@@ -20,7 +20,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
 #include "Data/AutomatonContractData.h"
-#include "LoginComponent.h"
+#include "Login/LoginComponent.h"
 
 #include <curl/curl.h>
 

@@ -19,73 +19,11 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "Models/AbstractProxyModel.h"
+#include "../Models/AbstractProxyModel.h"
+#include "AccountsModel.h"
 
 class DemosMainComponent;
 class AccountWindow;
-
-class Account {
- public:
-  Account() {
-  }
-
-  Account(const String& address) {
-    m_address = address;
-  }
-
-  const String& getAddress() const noexcept {
-    return m_address;
-  }
-
-  String getAlias() const noexcept {
-    return m_config.getValue("account_alias");
-  }
-
-  PropertySet& getConfig() noexcept {
-    return m_config;
-  }
-
-  bool operator==(const Account& other) const noexcept {
-    return m_address == other.m_address;
-  }
-
- private:
-  String m_address;
-  PropertySet m_config;
-};
-
-class AccountsModel : public AbstractListModel<Account>{
- public:
-  int size() const override {
-    return m_accounts.size();
-  }
-
-  Account getAt(int index) override {
-    return m_accounts[index];
-  }
-
-  Account& getReferenceAt(int index) override {
-    return m_accounts.getReference(index);
-  }
-
-  void addItem(Account account, bool sendNotification = true) {
-    m_accounts.addIfNotAlreadyThere(account);
-
-    if (sendNotification)
-      notifyModelChanged();
-  }
-
-  void removeItem(const Account& account, bool sendNotification = true) {
-    m_accounts.removeFirstMatchingValue(account);
-
-    if (sendNotification)
-      notifyModelChanged();
-  }
-
- private:
-  Array<Account> m_accounts;
-};
 
 class LoginComponent  : public Component
                       , public ComponentListener
@@ -118,6 +56,7 @@ class LoginComponent  : public Component
                           bool rowIsSelected) override;
   void cellClicked(int rowNumber, int columnId, const MouseEvent&) override;
   void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent&) override;
+
 
  private:
   AccountWindow* getWindowByAddress(const String& address);

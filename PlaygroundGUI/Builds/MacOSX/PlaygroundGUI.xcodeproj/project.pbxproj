@@ -41,6 +41,14 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
+		2BF750FDBC8DCF0149147F2E = {
+			isa = PBXBuildFile;
+			fileRef = 417321119444057352E75D2E;
+		};
+		6A954FA3C51846B51AA555E4 = {
+			isa = PBXBuildFile;
+			fileRef = 983C39C12CA4D0F8F53A86E9;
+		};
 		5A3DA206190F057B44FDA6A4 = {
 			isa = PBXBuildFile;
 			fileRef = 146CF7EBB22338825418D3E9;
@@ -128,10 +136,6 @@
 		DC28DB98D6CD9590DC30C89D = {
 			isa = PBXBuildFile;
 			fileRef = 3A56070EF92B1A08D0E377C5;
-		};
-		6C9C4D661AD1A8A6D28ED3EC = {
-			isa = PBXBuildFile;
-			fileRef = 9390DCB6F3BF8053269F8617;
 		};
 		9A3C098021D839B8BA421107 = {
 			isa = PBXBuildFile;
@@ -351,6 +355,13 @@
 			path = ../../Source/DEX/Order.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		417321119444057352E75D2E = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = AccountsModel.cpp;
+			path = ../../Source/Login/AccountsModel.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		426447579678A29AC4896E2B = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
@@ -435,6 +446,20 @@
 			path = "../../Resources/default_config.json";
 			sourceTree = "SOURCE_ROOT";
 		};
+		6E20455EDB2D36EF90214650 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = AccountsModel.h;
+			path = ../../Source/Login/AccountsModel.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		7CD743C8F4204EBC883A2C7F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = LoginComponent.h;
+			path = ../../Source/Login/LoginComponent.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		82B2A1E48CC113E63E1DE5AA = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.objcpp;
@@ -498,18 +523,18 @@
 			path = System/Library/Frameworks/Cocoa.framework;
 			sourceTree = SDKROOT;
 		};
-		9390DCB6F3BF8053269F8617 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = LoginComponent.cpp;
-			path = ../../Source/LoginComponent.cpp;
-			sourceTree = "SOURCE_ROOT";
-		};
 		960F41F1CCAE949D7CDBFC7B = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Main.cpp;
 			path = ../../Source/Main.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		983C39C12CA4D0F8F53A86E9 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = LoginComponent.cpp;
+			path = ../../Source/Login/LoginComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		999124BB54C7EFFB15C28C9A = {
@@ -580,13 +605,6 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Miner.cpp;
 			path = ../../Source/Miner/Miner.cpp;
-			sourceTree = "SOURCE_ROOT";
-		};
-		C1F2D76D38BDE27BCE51CA6C = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = LoginComponent.h;
-			path = ../../Source/LoginComponent.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C2F43D9037B8E387725FF91E = {
@@ -733,6 +751,17 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		A5F3935FE58429F9F2E04941 = {
+			isa = PBXGroup;
+			children = (
+				417321119444057352E75D2E,
+				6E20455EDB2D36EF90214650,
+				983C39C12CA4D0F8F53A86E9,
+				7CD743C8F4204EBC883A2C7F,
+			);
+			name = Login;
+			sourceTree = "<group>";
+		};
 		687803636958C453C18D7987 = {
 			isa = PBXGroup;
 			children = (
@@ -841,6 +870,7 @@
 		883895BF3FD94AEF68720830 = {
 			isa = PBXGroup;
 			children = (
+				A5F3935FE58429F9F2E04941,
 				687803636958C453C18D7987,
 				4576C75266FC9F8B83F83140,
 				C2050576413F623B249937CF,
@@ -852,8 +882,6 @@
 				6BBA852623D8A64A3A5A7043,
 				3A56070EF92B1A08D0E377C5,
 				2442CDA25E1722A28DB0106F,
-				9390DCB6F3BF8053269F8617,
-				C1F2D76D38BDE27BCE51CA6C,
 				F37DC7F8EC888D82E793ED31,
 				D2896F2FBEFBC7DB297DCD12,
 				960F41F1CCAE949D7CDBFC7B,
@@ -1171,6 +1199,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2BF750FDBC8DCF0149147F2E,
+				6A954FA3C51846B51AA555E4,
 				5A3DA206190F057B44FDA6A4,
 				3FAABEF679539A4A35C12933,
 				658A3370960D604062B98387,
@@ -1193,7 +1223,6 @@
 				6C764B7D3E1A849226C54B02,
 				474A5E736DC9996D96CBC820,
 				DC28DB98D6CD9590DC30C89D,
-				6C9C4D661AD1A8A6D28ED3EC,
 				9A3C098021D839B8BA421107,
 				0721950C61ADA44331EC5DB3,
 				EF0B0FEE0E3E3DF8F720110A,

@@ -18,9 +18,9 @@
  */
 
 #include <JuceHeader.h>
-#include "MainComponent.h"
 #include "LoginComponent.h"
-#include "Utils.h"
+#include "../MainComponent.h"
+#include "../Utils.h"
 
 
 class AccountWindow : public DocumentWindow {
