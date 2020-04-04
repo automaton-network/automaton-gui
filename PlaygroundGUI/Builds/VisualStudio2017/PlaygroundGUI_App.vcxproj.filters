@@ -2888,6 +2888,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Resources\logo_white_on_transparent_8x8.svg">
+      <Filter>PlaygroundGUI\Resources</Filter>
+    </None>
     <None Include="..\..\Resources\default_config.json">
       <Filter>PlaygroundGUI\Resources</Filter>
     </None>

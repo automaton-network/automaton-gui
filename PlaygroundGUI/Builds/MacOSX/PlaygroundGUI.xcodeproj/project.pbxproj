@@ -600,6 +600,13 @@
 			path = ../../Source/DEX/OrdersModel.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		BB8CA00A0AC6F0E148EACDA7 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file.svg;
+			name = "logo_white_on_transparent_8x8.svg";
+			path = "../../Resources/logo_white_on_transparent_8x8.svg";
+			sourceTree = "SOURCE_ROOT";
+		};
 		BEF8E95313BF13AE8C0A6AC7 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -743,6 +750,7 @@
 		B2BE99BC504D58542BEE5CEB = {
 			isa = PBXGroup;
 			children = (
+				BB8CA00A0AC6F0E148EACDA7,
 				6987C350E8D76C73DEEE0CF6,
 				8B0AAA0091A485A31E7E7FB9,
 				14E041721C1B23214867CB2B,

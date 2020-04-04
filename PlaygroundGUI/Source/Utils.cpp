@@ -58,3 +58,8 @@ std::string Utils::gen_ethereum_address(const std::string& privkey_hex) {
 
   return "0x" + bin2hex(std::string(reinterpret_cast<char*>(eth_address + 12), 20));
 }
+
+std::unique_ptr<Drawable> Utils::loadSVG(const String& xmlData) {
+  auto svg = XmlDocument::parse(xmlData);
+  return std::unique_ptr<Drawable>(Drawable::createFromSVG(*svg));
+}

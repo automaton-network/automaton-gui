@@ -18,9 +18,11 @@
  */
 
 #pragma once
-#include <string>
+
+#include "JuceHeader.h"
 
 class Utils {
  public:
   static std::string gen_ethereum_address(const std::string& privkey_hex);
+  static std::unique_ptr<Drawable> loadSVG(const String& xmlData);
 };

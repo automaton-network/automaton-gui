@@ -101,6 +101,11 @@ LoginComponent::LoginComponent(PropertiesFile* configFile) : m_configFile(config
   addAndMakeVisible(m_importPrivateKeyBtn.get());
   m_importPrivateKeyBtn->addListener(this);
 
+  m_logoButton = std::make_unique<DrawableButton> ("iconButton", DrawableButton::ImageStretched);
+  auto logoImage = Utils::loadSVG(BinaryData::logo_white_on_transparent_8x8_svg);
+  m_logoButton->setImages(logoImage.get());
+  addAndMakeVisible(m_logoButton.get());
+
   setSize(600, 400);
 }
 
@@ -120,9 +125,14 @@ void LoginComponent::paint(Graphics& g) {
 }
 
 void LoginComponent::resized() {
-  auto bounds = getLocalBounds().reduced(20);
+  auto bounds = getLocalBounds().reduced(20, 40);
+
+  auto logoBounds = bounds.removeFromTop(45);
+  m_logoButton->setBounds(logoBounds.withSizeKeepingCentre(380, 45));
+
+  bounds.removeFromTop(40);
   m_accountsTable->setBounds(bounds.removeFromTop(300));
-  bounds.removeFromTop(20);
+  bounds.removeFromTop(40);
   auto btnBounds = bounds.removeFromTop(40);
   m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(200, 40));
 }

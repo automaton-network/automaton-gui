@@ -7,8 +7,46 @@
 namespace BinaryData
 {
 
-//================== BIG_A_BLACK_CIRCLE_BACK_1000x1000.png ==================
+//================== logo_white_on_transparent_8x8.svg ==================
 static const unsigned char temp_binary_data_0[] =
+"<svg height=\"39\" version=\"1.1\" width=\"231\" xmlns=\"http://www.w3.org/2000/svg\" style=\"overflow: hidden; position: relative;\"><defs style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"8\" y=\"8\" width=\"22\" height=\"6\" r=\""
+"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"8\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-widt"
+"h=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"24\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/"
+"><rect x=\"8\" y=\"16\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"16\" y=\"24\" width=\"6\" height=\"6\" r=\"0\" rx=\"0\""
+" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"32\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" sty"
+"le=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"48\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\""
+"32\" y=\"24\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"40\" y=\"8\" width=\"6\" height=\"14\" r=\"0\" rx=\"0\" ry=\"0\""
+" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"56\" y=\"8\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-web"
+"kit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"64\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"56\" y=\""
+"16\" width=\"6\" height=\"14\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"72\" y=\"16\" width=\"6\" height=\"14\" r=\"0\" rx=\"0\" ry=\"0\" fill=\""
+"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"80\" y=\"8\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-"
+"highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"80\" y=\"24\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"80\" y=\"8\" wid"
+"th=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"96\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\""
+" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"88\" y=\"16\" width=\"6\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight"
+"-color: rgba(0, 0, 0, 0);\"/><rect x=\"104\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"104\" y=\"8\" width=\"22\""
+" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"112\" y=\"8\" width=\"6\" height=\"14\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke="
+"\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"120\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color:"
+" rgba(0, 0, 0, 0);\"/><rect x=\"112\" y=\"24\" width=\"6\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"128\" y=\"8\" width=\"22\" heigh"
+"t=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"128\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000"
+"\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"144\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba("
+"0, 0, 0, 0);\"/><rect x=\"128\" y=\"16\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"136\" y=\"24\" width=\"6\" height=\"6"
+"\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"152\" y=\"8\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" st"
+"roke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"160\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0,"
+" 0, 0);\"/><rect x=\"152\" y=\"16\" width=\"6\" height=\"14\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"168\" y=\"16\" width=\"6\" height=\"14\" r"
+"=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"176\" y=\"8\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke"
+"-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"176\" y=\"24\" width=\"22\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0,"
+" 0);\"/><rect x=\"176\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"192\" y=\"8\" width=\"6\" height=\"22\" r=\"0\""
+" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"184\" y=\"16\" width=\"6\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width"
+"=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"200\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/"
+"><rect x=\"216\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"200\" y=\"8\" width=\"14\" height=\"6\" r=\"0\" rx=\""
+"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"208\" y=\"8\" width=\"6\" height=\"22\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\""
+" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/><rect x=\"208\" y=\"24\" width=\"14\" height=\"6\" r=\"0\" rx=\"0\" ry=\"0\" fill=\"#ffffff\" stroke=\"#000\" stroke-width=\"0\" style=\"-webkit-tap-highlight-color: rgba(0, 0, 0, 0);\"/></sv"
+"g>\n";
+
+const char* logo_white_on_transparent_8x8_svg = (const char*) temp_binary_data_0;
+
+//================== BIG_A_BLACK_CIRCLE_BACK_1000x1000.png ==================
+static const unsigned char temp_binary_data_1[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,3,232,0,0,3,232,8,6,0,0,0,77,163,212,228,0,0,1,27,105,84,88,116,88,77,76,58,99,111,109,46,97,100,111,98,101,46,120,109,112,0,0,0,0,0,60,63,120,112,97,99,107,101,116,32,98,101,103,105,110,61,34,239,187,
 191,34,32,105,100,61,34,87,53,77,48,77,112,67,101,104,105,72,122,114,101,83,122,78,84,99,122,107,99,57,100,34,63,62,10,60,120,58,120,109,112,109,101,116,97,32,120,109,108,110,115,58,120,61,34,97,100,111,98,101,58,110,115,58,109,101,116,97,47,34,32,120,
 58,120,109,112,116,107,61,34,88,77,80,32,67,111,114,101,32,53,46,53,46,48,34,62,10,32,60,114,100,102,58,82,68,70,32,120,109,108,110,115,58,114,100,102,61,34,104,116,116,112,58,47,47,119,119,119,46,119,51,46,111,114,103,47,49,57,57,57,47,48,50,47,50,50,
@@ -866,10 +904,10 @@ static const unsigned char temp_binary_data_0[] =
 73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,73,146,36,41,171,252,
 63,99,177,191,99,153,158,182,254,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
 
-const char* BIG_A_BLACK_CIRCLE_BACK_1000x1000_png = (const char*) temp_binary_data_0;
+const char* BIG_A_BLACK_CIRCLE_BACK_1000x1000_png = (const char*) temp_binary_data_1;
 
 //================== default_config.json ==================
-static const unsigned char temp_binary_data_1[] =
+static const unsigned char temp_binary_data_2[] =
 "{\n"
 "  \"eth_url\":\"http://54.174.16.2:7545\",\n"
 "  \"contract_address\":\"0xc6A2d391fe7471EEF1D17bba1035351439bEcbBE\",\n"
@@ -878,10 +916,10 @@ static const unsigned char temp_binary_data_1[] =
 "  \"slots_number\":16\n"
 "}\n";
 
-const char* default_config_json = (const char*) temp_binary_data_1;
+const char* default_config_json = (const char*) temp_binary_data_2;
 
 //================== king_automaton_abi.json ==================
-static const unsigned char temp_binary_data_2[] =
+static const unsigned char temp_binary_data_3[] =
 "[\n"
 "  {\n"
 "    \"inputs\": [\n"
@@ -2338,10 +2376,10 @@ static const unsigned char temp_binary_data_2[] =
 "  }\n"
 "]";
 
-const char* king_automaton_abi_json = (const char*) temp_binary_data_2;
+const char* king_automaton_abi_json = (const char*) temp_binary_data_3;
 
 //================== Play-Bold.ttf ==================
-static const unsigned char temp_binary_data_3[] =
+static const unsigned char temp_binary_data_4[] =
 { 0,1,0,0,0,18,1,0,0,4,0,32,68,83,73,71,0,0,0,1,0,3,55,8,0,0,0,8,71,68,69,70,216,36,218,200,0,0,1,44,0,0,2,132,71,80,79,83,13,68,161,50,0,0,3,176,0,0,31,6,71,83,85,66,33,174,104,136,0,0,34,184,0,0,21,154,79,83,47,50,86,239,160,177,0,0,56,84,0,0,0,96,99,
 109,97,112,14,6,131,104,0,0,56,180,0,0,10,136,99,118,116,32,24,211,57,226,0,3,39,172,0,0,1,10,102,112,103,109,81,38,142,123,0,3,40,184,0,0,13,109,103,97,115,112,0,0,0,16,0,3,39,164,0,0,0,8,103,108,121,102,207,171,160,158,0,0,67,60,0,2,142,26,104,101,
 97,100,12,3,240,58,0,2,209,88,0,0,0,54,104,104,101,97,6,210,7,237,0,2,209,144,0,0,0,36,104,109,116,120,235,223,103,176,0,2,209,180,0,0,17,248,108,111,99,97,5,216,241,154,0,2,227,172,0,0,17,252,109,97,120,112,5,230,14,122,0,2,245,168,0,0,0,32,110,97,109,
@@ -4654,10 +4692,10 @@ static const unsigned char temp_binary_data_3[] =
 0,64,0,64,0,64,0,64,0,64,0,64,0,64,0,64,0,8,0,9,42,177,3,0,68,177,36,1,136,81,88,176,64,136,88,177,3,100,68,177,38,1,136,81,88,186,8,128,0,1,4,64,136,99,84,88,177,3,0,68,89,89,89,89,64,18,133,0,117,6,101,6,85,6,73,4,65,2,49,6,35,5,8,12,42,184,1,255,133,
 176,4,141,177,2,0,68,179,5,100,6,0,68,68,0,0,0,1,0,0,0,0,0,0 };
 
-const char* PlayBold_ttf = (const char*) temp_binary_data_3;
+const char* PlayBold_ttf = (const char*) temp_binary_data_4;
 
 //================== Play-Regular.ttf ==================
-static const unsigned char temp_binary_data_4[] =
+static const unsigned char temp_binary_data_5[] =
 { 0,1,0,0,0,18,1,0,0,4,0,32,68,83,73,71,0,0,0,1,0,3,9,100,0,0,0,8,71,68,69,70,228,47,230,205,0,0,1,44,0,0,2,156,71,80,79,83,11,14,87,207,0,0,3,200,0,0,34,34,71,83,85,66,33,174,104,136,0,0,37,236,0,0,21,154,79,83,47,50,85,195,157,180,0,0,59,136,0,0,0,96,
 99,109,97,112,14,6,131,104,0,0,59,232,0,0,10,136,99,118,116,32,22,169,55,134,0,2,250,8,0,0,1,10,102,112,103,109,81,38,142,123,0,2,251,20,0,0,13,109,103,97,115,112,0,0,0,16,0,2,250,0,0,0,0,8,103,108,121,102,101,109,191,218,0,0,70,112,0,2,93,30,104,101,
 97,100,11,187,240,46,0,2,163,144,0,0,0,54,104,104,101,97,6,139,7,249,0,2,163,200,0,0,0,36,104,109,116,120,111,251,154,134,0,2,163,236,0,0,17,248,108,111,99,97,5,96,246,30,0,2,181,228,0,0,17,252,109,97,120,112,5,222,14,123,0,2,199,224,0,0,0,32,110,97,
@@ -6844,7 +6882,7 @@ static const unsigned char temp_binary_data_4[] =
 8,8,42,177,0,7,66,64,18,133,0,123,6,107,6,91,6,77,4,67,2,55,6,40,5,8,8,42,177,0,15,66,65,10,33,0,29,0,25,0,21,0,18,0,16,0,12,0,8,128,0,8,0,9,42,177,0,23,66,65,10,0,64,0,64,0,64,0,64,0,64,0,64,0,64,0,64,0,8,0,9,42,177,3,0,68,177,36,1,136,81,88,176,64,
 136,88,177,3,100,68,177,38,1,136,81,88,186,8,128,0,1,4,64,136,99,84,88,177,3,0,68,89,89,89,89,64,18,133,0,117,6,101,6,85,6,73,4,65,2,49,6,35,5,8,12,42,184,1,255,133,176,4,141,177,2,0,68,179,5,100,6,0,68,68,0,0,0,1,0,0,0,0,0,0 };
 
-const char* PlayRegular_ttf = (const char*) temp_binary_data_4;
+const char* PlayRegular_ttf = (const char*) temp_binary_data_5;
 
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
@@ -6857,6 +6895,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 
     switch (hash)
     {
+        case 0xbd53593a:  numBytes = 7070; return logo_white_on_transparent_8x8_svg;
         case 0x356357bc:  numBytes = 60500; return BIG_A_BLACK_CIRCLE_BACK_1000x1000_png;
         case 0xca3ab6c7:  numBytes = 294; return default_config_json;
         case 0x8b891876:  numBytes = 27433; return king_automaton_abi_json;
@@ -6871,6 +6910,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 
 const char* namedResourceList[] =
 {
+    "logo_white_on_transparent_8x8_svg",
     "BIG_A_BLACK_CIRCLE_BACK_1000x1000_png",
     "default_config_json",
     "king_automaton_abi_json",
@@ -6880,6 +6920,7 @@ const char* namedResourceList[] =
 
 const char* originalFilenames[] =
 {
+    "logo_white_on_transparent_8x8.svg",
     "BIG_A_BLACK_CIRCLE_BACK_1000x1000.png",
     "default_config.json",
     "king_automaton_abi.json",

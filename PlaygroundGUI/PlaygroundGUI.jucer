@@ -4,6 +4,8 @@
               version="0.0.1" companyName="Liberatix" companyWebsite="https://liberatix.com">
   <MAINGROUP id="r0wjCp" name="PlaygroundGUI">
     <GROUP id="{874C0493-36CA-5084-DAA0-C4287D2E83CF}" name="Resources">
+      <FILE id="mRg0Yf" name="logo_white_on_transparent_8x8.svg" compile="0"
+            resource="1" file="Resources/logo_white_on_transparent_8x8.svg"/>
       <FILE id="MDnkQK" name="BIG_A_BLACK_CIRCLE_BACK_1000x1000.png" compile="0"
             resource="1" file="Resources/BIG_A_BLACK_CIRCLE_BACK_1000x1000.png"
             xcodeResource="1"/>
