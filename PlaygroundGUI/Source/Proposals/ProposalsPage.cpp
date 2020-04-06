@@ -154,7 +154,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_proposalsManager->castVote(proposal, 1);
   } else if (buttonThatWasClicked == m_voteNoBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    m_proposalsManager->castVote(proposal, 0);
+    m_proposalsManager->castVote(proposal, 2);
   } else if (buttonThatWasClicked == m_payForGasBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
     AlertWindow w("Pay for gas of " + proposal->getTitle(),
