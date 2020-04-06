@@ -45,6 +45,7 @@ file(
   Source/Data/*.cpp
   Source/Demos/*.cpp
   Source/Miner/*.cpp
+  Source/Login/*.cpp
   Source/Network/*.cpp
   Source/DEX/*.cpp
   Source/Proposals/*.cpp
