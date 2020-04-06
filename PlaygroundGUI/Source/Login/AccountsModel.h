@@ -21,6 +21,7 @@
 #define ACCOUNTSMODEL_H_INCLUDED
 
 #include "../Models/AbstractProxyModel.h"
+#include "../Config/Config.h"
 
 class Account {
  public:
@@ -29,13 +30,13 @@ class Account {
 
   const String& getAddress() const noexcept;
   String getAlias() const noexcept;
-  PropertySet& getConfig() noexcept;
+  Config& getConfig() noexcept;
 
   bool operator==(const Account& other) const noexcept;
 
  private:
   String m_address;
-  PropertySet m_config;
+  Config m_config;
 };
 
 class AccountsModel : public AbstractListModel<Account> {

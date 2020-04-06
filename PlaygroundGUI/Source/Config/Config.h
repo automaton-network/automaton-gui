@@ -30,35 +30,41 @@ using json = nlohmann::json;
 class Config {
  public:
   Config();
-  ~Config();
+  Config(const Config& other);
+  Config& operator=(const Config& other);
+  virtual ~Config();
 
-  automaton::core::common::status load();
-  automaton::core::common::status save_to_local_file();
-
-  void set_json(const std::string& field, const std::string& data);
+  void set_json(const std::string& field, const json& data);
   void set_string(const std::string& field, const std::string& data);
   void set_bool(const std::string& field, bool data);
   void set_number(const std::string& field, int64_t data);
 
-  std::string get_json(const std::string& field, const std::string& default_value) const;
-  std::string get_string(const std::string& field, const std::string& default_value) const;
-  bool get_bool(const std::string& field, bool default_value) const;
-  int64_t get_number(const std::string& field, int64_t default_value) const;
-
+  json get_json(const std::string& field, const json& default_value = json()) const;
+  std::string get_string(const std::string& field, const std::string& default_value = std::string()) const;
+  bool get_bool(const std::string& field, bool default_value = false) const;
+  int64_t get_number(const std::string& field, int64_t default_value = 0) const;
   bool hasField(const std::string& field) const;
 
-  std::string get_abi() const;
+  const json& to_json();
+  void restoreFrom_json(const json& data);
 
-  File get_local_config_file();
+ protected:
+  virtual void config_changed();
+  json json_obj;
+  CriticalSection critical_section;
+};
 
-  void lock();
-  void unlock();
+class ConfigFile : public Config
+                 , public DeletedAtShutdown {
+ public:
+  ConfigFile();
+  ~ConfigFile();
 
-  JUCE_DECLARE_SINGLETON(Config, false)
+  automaton::core::common::status load();
+  automaton::core::common::status save_to_local_file();
+
+  JUCE_DECLARE_SINGLETON(ConfigFile, false)
 
  private:
-  std::string contract_abi;
-  json json_obj;
-
-  CriticalSection critical_section;
+  File get_local_config_file();
 };

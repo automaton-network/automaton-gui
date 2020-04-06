@@ -21,11 +21,11 @@
 #include "LoginComponent.h"
 #include "../MainComponent.h"
 #include "../Utils.h"
-
+#include "../Config/Config.h"
 
 class AccountWindow : public DocumentWindow {
  public:
-  AccountWindow(String title, String accountAddress, PropertySet* accountConfig)
+  AccountWindow(String title, String accountAddress, Config* accountConfig)
       : DocumentWindow(title,
                     Desktop::getInstance()
                     .getDefaultLookAndFeel()
@@ -60,13 +60,13 @@ class AccountWindow : public DocumentWindow {
  private:
   LookAndFeel_V4 m_lnf;
   String m_accountAddress;
-  PropertySet* m_accountConfig;
+  Config* m_accountConfig;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AccountWindow)
 };
 
 //==============================================================================
-LoginComponent::LoginComponent(PropertiesFile* configFile) : m_configFile(configFile) {
+LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile) {
   m_model = std::make_shared<AccountsModel>();
   m_model->addListener(this);
   m_accountsTable = std::make_unique<TableListBox>();
@@ -83,18 +83,11 @@ LoginComponent::LoginComponent(PropertiesFile* configFile) : m_configFile(config
   tableHeader.addColumn(translate("Address"), 2, 400);
 
 
-  if (auto accountsXml = m_configFile->getXmlValue("accounts")) {
-    PropertySet accounts;
-    accounts.restoreFromXml(*accountsXml);
-    auto keys = accounts.getAllProperties().getAllKeys();
-
-    for (int i = 0; i < keys.size(); ++i) {
-      Account account(keys[i]);
-      accounts.getAllProperties().getValue(account.getAddress(), "");
-      auto accountConfig = accounts.getXmlValue(account.getAddress());
-      account.getConfig().restoreFromXml(*accountConfig);
-      m_model->addItem(account, false);
-    }
+  auto accountsJson = m_configFile->get_json("accounts");
+  for (const auto& el : accountsJson.items()) {
+    Account account(el.key());
+    account.getConfig().restoreFrom_json(el.value());
+    m_model->addItem(account, false);
   }
 
   m_importPrivateKeyBtn = std::make_unique<TextButton>("Import Private Key");
@@ -110,15 +103,14 @@ LoginComponent::LoginComponent(PropertiesFile* configFile) : m_configFile(config
 }
 
 LoginComponent::~LoginComponent() {
-  PropertySet accounts;
+  json accounts;
   for (int i = 0; i < m_model->size(); ++i) {
     auto& item = m_model->getReferenceAt(i);
-    auto accountConfig = item.getConfig().createXml("account");
-    accounts.setValue(item.getAddress(), accountConfig.get());
+    accounts[item.getAddress().toStdString()] = item.getConfig().to_json();
   }
-  auto accountsXml = accounts.createXml("accounts");
-  m_configFile->setValue("accounts", accountsXml.get());
-  m_configFile->save();
+
+  m_configFile->set_json("accounts", accounts);
+  m_configFile->save_to_local_file();
 }
 
 void LoginComponent::paint(Graphics& g) {
@@ -165,9 +157,9 @@ void LoginComponent::buttonClicked(Button* btn) {
 
       auto eth_address_hex = Utils::gen_ethereum_address(privkeyHex.toStdString());
       Account account(eth_address_hex);
-      account.getConfig().setValue("private_key", privkeyHex);
-      account.getConfig().setValue("eth_address", String(eth_address_hex));
-      account.getConfig().setValue("account_alias", accountAlias);
+      account.getConfig().set_string("private_key", privkeyHex.toStdString());
+      account.getConfig().set_string("eth_address", eth_address_hex);
+      account.getConfig().set_string("account_alias", accountAlias.toStdString());
       m_model->addItem(account, true);
     }
   }

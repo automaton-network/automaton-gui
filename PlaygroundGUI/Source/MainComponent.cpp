@@ -45,7 +45,7 @@ class DemoBlank: public Component {
 };
 
 
-DemosMainComponent::DemosMainComponent(PropertySet* config) : m_config(config) {
+DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
   m_proposalsManager = std::make_unique<ProposalsManager>(m_config);
 
   m_tabbedComponent.reset(new TabbedComponent(TabbedButtonBar::TabsAtTop));

@@ -24,6 +24,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 class ProposalsManager;
+class Config;
 
 class DemosMainComponent:
   public Component,
@@ -33,7 +34,7 @@ class DemosMainComponent:
   enum CommandIDs {
   };
 
-  DemosMainComponent(PropertySet* config);
+  DemosMainComponent(Config* config);
   ~DemosMainComponent();
 
   void paint(Graphics& g) override;
@@ -70,7 +71,7 @@ class DemosMainComponent:
   std::unique_ptr<MenuBarComponent> m_menuBar;
   std::unique_ptr<TabbedComponent> m_tabbedComponent;
   std::unique_ptr<ProposalsManager> m_proposalsManager;
-  PropertySet* m_config;
+  Config* m_config;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemosMainComponent)
 };

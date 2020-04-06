@@ -20,12 +20,13 @@
 #pragma once
 
 #include "ProposalsModel.h"
+class Config;
 
 class ProposalsManager : public DeletedAtShutdown {
  public:
   std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
 
-  ProposalsManager(PropertySet* config);
+  ProposalsManager(Config* config);
   ~ProposalsManager();
 
   bool fetchProposals();

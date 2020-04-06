@@ -24,6 +24,7 @@
 
 class DemosMainComponent;
 class AccountWindow;
+class ConfigFile;
 
 class LoginComponent  : public Component
                       , public ComponentListener
@@ -31,7 +32,7 @@ class LoginComponent  : public Component
                       , public TableListBoxModel
                       , public AbstractListModelBase::Listener {
  public:
-  LoginComponent(PropertiesFile* configFile);
+  LoginComponent(ConfigFile* configFile);
   ~LoginComponent();
 
   void paint(Graphics&) override;
@@ -65,7 +66,7 @@ class LoginComponent  : public Component
   std::unique_ptr<TableListBox> m_accountsTable;
   std::unique_ptr<TextButton> m_importPrivateKeyBtn;
   OwnedArray<AccountWindow> m_accountWindows;
-  PropertiesFile* m_configFile;
+  ConfigFile* m_configFile;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoginComponent)
 };

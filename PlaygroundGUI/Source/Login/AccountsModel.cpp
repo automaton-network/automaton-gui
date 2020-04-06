@@ -32,10 +32,10 @@ const String& Account::getAddress() const noexcept {
 }
 
 String Account::getAlias() const noexcept {
-  return m_config.getValue("account_alias");
+  return m_config.get_string("account_alias");
 }
 
-PropertySet& Account::getConfig() noexcept {
+Config& Account::getConfig() noexcept {
   return m_config;
 }
 

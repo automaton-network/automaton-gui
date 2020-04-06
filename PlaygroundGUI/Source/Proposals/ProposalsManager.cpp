@@ -74,11 +74,11 @@ class AsyncTask : public ThreadWithProgressWindow {
 };
 
 
-ProposalsManager::ProposalsManager(PropertySet* config)
+ProposalsManager::ProposalsManager(Config* config)
   : m_model(std::make_shared<ProposalsModel>()) {
-  m_privateKey = config->getValue("private_key").toStdString();
-  m_ethAddress = config->getValue("eth_address").toStdString();
-  m_ethAddressAlias = config->getValue("account_alias").toStdString();
+  m_privateKey = config->get_string("private_key");
+  m_ethAddress = config->get_string("eth_address");
+  m_ethAddressAlias = config->get_string("account_alias");
 }
 
 ProposalsManager::~ProposalsManager() {

@@ -56,18 +56,8 @@ class PlaygroundGUIApplication: public JUCEApplication {
   void initialise(const String& commandLine) override {
     curl_global_init(CURL_GLOBAL_ALL);
 
-    appPropertiesLock = std::make_unique<InterProcessLock>("appPropertiesLock");
-    PropertiesFile::Options options;
-    options.applicationName = "automaton";
-    options.filenameSuffix = ".settings";
-    options.folderName = "Automaton";
-    options.osxLibrarySubFolder = "Application Support";
-    options.processLock = appPropertiesLock.get();
-    appProperties = std::make_unique<ApplicationProperties>();
-    appProperties->setStorageParameters(options);
-
-    AutomatonContractData::getInstance()->init(appProperties->getUserSettings());
-    mainWindow.reset(new MainWindow(getApplicationName(), appProperties->getUserSettings()));
+    AutomatonContractData::getInstance()->init(ConfigFile::getInstance());
+    mainWindow.reset(new MainWindow(getApplicationName(), ConfigFile::getInstance()));
 
     // const Font& fontPlay = fonts.getPlay();
     // typefacePlay = LookAndFeel::getDefaultLookAndFeel().getTypefaceForFont(fontPlay);
@@ -102,7 +92,7 @@ class PlaygroundGUIApplication: public JUCEApplication {
    public:
     LookAndFeel_V4 lnf;
 
-    MainWindow(String name, PropertiesFile* userSettings):
+    MainWindow(String name, ConfigFile* userSettings):
       DocumentWindow(name,
                      Desktop::getInstance()
                        .getDefaultLookAndFeel()
@@ -140,8 +130,6 @@ class PlaygroundGUIApplication: public JUCEApplication {
   };
 
  private:
-  std::unique_ptr<InterProcessLock> appPropertiesLock;
-  std::unique_ptr<ApplicationProperties> appProperties;
   std::unique_ptr<MainWindow> mainWindow;
   EmbeddedFonts fonts;
   Typeface::Ptr typefacePlay;
