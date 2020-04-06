@@ -320,7 +320,8 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Budget: {
-      g.drawText(Utils::fromWei(EthUnit::ether, item->getBudget()) + String (" ETH"), 0, 0, width, height, Justification::centred);
+      g.drawText(Utils::fromWei(EthUnit::ether, item->getBudget()) + String(" ETH"),
+                 0, 0, width, height, Justification::centred);
       break;
     }
     case Periods: {
