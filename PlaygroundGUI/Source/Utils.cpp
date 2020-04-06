@@ -26,7 +26,7 @@
 #include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
 #include "automaton/core/crypto/cryptopp/Keccak_256_cryptopp.h"
-
+#include <boost/multiprecision/cpp_int.hpp>
 using json = nlohmann::json;
 
 using automaton::core::interop::ethereum::eth_contract;
@@ -62,4 +62,50 @@ std::string Utils::gen_ethereum_address(const std::string& privkey_hex) {
 std::unique_ptr<Drawable> Utils::loadSVG(const String& xmlData) {
   auto svg = XmlDocument::parse(xmlData);
   return std::unique_ptr<Drawable>(Drawable::createFromSVG(*svg));
+}
+
+static std::map<EthUnit, String> ethUnitsFactor{
+    {EthUnit::Gwei,  "1000000000"},
+    {EthUnit::ether, "1000000000000000000"}
+};
+
+String Utils::fromWei(EthUnit unitTo, const String& value) {
+  BigInteger whole;
+  whole.parseString(value, 10);
+  BigInteger factor;
+  factor.parseString(ethUnitsFactor[unitTo], 10);
+  BigInteger remainder;
+  whole.divideBy(factor, remainder);
+
+  auto decimals = remainder.toString(10).paddedLeft('0', static_cast<int>(unitTo)).trimCharactersAtEnd("0");
+  if (decimals.isEmpty())
+    return whole.toString(10);
+
+  return whole.toString(10) + "." + decimals;
+}
+
+String Utils::toWei(EthUnit unitTo, const String& value) {
+  StringArray tokens;
+  tokens.addTokens(value, ".", "");
+  if (tokens.size() > 2) {
+    return "";  // More than one dot
+  }
+
+  String whole = tokens[0];
+  String decimals;
+  if (tokens.size() > 1) {
+    decimals = tokens[1];
+  }
+
+  BigInteger factor;
+  auto unitFactor = ethUnitsFactor[unitTo].dropLastCharacters(decimals.length());
+  if (unitFactor.isEmpty())
+    return "";  // Exceeds max precision
+
+  factor.parseString(unitFactor, 10);
+
+  BigInteger result;
+  result.parseString(whole + decimals, 10);
+
+  return (result * factor).toString(10);
 }

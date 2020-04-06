@@ -19,6 +19,7 @@
 
 #include "ProposalsPage.h"
 #include "ProposalsManager.h"
+#include "../Utils.h"
 
 //==============================================================================
 ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
@@ -232,14 +233,14 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     case Spent: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<uint64>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
+                * DefaultElementComparator<String>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
       };
       break;
     }
     case Budget: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<uint64>::compareElements(p1->getBudget(), p2->getBudget());
+                * DefaultElementComparator<String>::compareElements(p1->getBudget(), p2->getBudget());
       };
       break;
     }
@@ -252,14 +253,14 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     case Length: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<uint64>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
+                * DefaultElementComparator<String>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
       };
       break;
     }
     case Bonus: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<uint64>::compareElements(p1->getTargetBonus(), p2->getTargetBonus());
+                * DefaultElementComparator<String>::compareElements(p1->getTargetBonus(), p2->getTargetBonus());
       };
       break;
     }
@@ -314,13 +315,12 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Spent: {
-      const auto percent = item->getBudget() ? item->getAmountSpent() / item->getBudget() : 0.f;
-      const String text = String(item->getAmountSpent()) + "(" + getPercentStr(percent) + ")";
+      const String text = item->getAmountSpent() + "(" + getPercentStr(item->getSpentPrecent()) + ")";
       g.drawText(text, 0, 0, width, height, Justification::centred);
       break;
     }
     case Budget: {
-      g.drawText(String(item->getBudget()), 0, 0, width, height, Justification::centred);
+      g.drawText(Utils::fromWei(EthUnit::ether, item->getBudget()) + String (" ETH"), 0, 0, width, height, Justification::centred);
       break;
     }
     case Periods: {
@@ -337,8 +337,8 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Bonus: {
-      const auto percent = item->getBudget() ? item->getTargetBonus() / item->getBudget() : 0.f;
-      const String text = String(item->getTargetBonus()) + "(" + getPercentStr(percent) + ")";
+      const String text = Utils::fromWei(EthUnit::ether, item->getTargetBonus()) + String(" ETH ")
+          + "(" + getPercentStr(item->getBounusPrecent()) + ")";
       g.drawText(text, 0, 0, width, height, Justification::centred);
       break;
     }

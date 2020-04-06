@@ -18,22 +18,24 @@
  */
 
 #include "CreateProposalComponent.h"
+#include "../Utils.h"
 
 CreateProposalComponent::CreateProposalComponent() {
   m_titleEditor = std::make_unique<TextEditor>(translate("Title"));
   addAndMakeVisible(m_titleEditor.get());
 
   const String numericalIntegersAllowed("0123456789");
-  m_budgetEditor = std::make_unique<TextEditor>(translate("Budget"));
-  m_budgetEditor->setInputRestrictions(8, numericalIntegersAllowed);
+  const String numericalFloatAllowed("0123456789.");
+  m_budgetEditor = std::make_unique<TextEditor>(translate("Budget (ETH)"));
+  m_budgetEditor->setInputRestrictions(8, numericalFloatAllowed);
   addAndMakeVisible(m_budgetEditor.get());
 
   m_numPeriodsEditor = std::make_unique<TextEditor>(translate("Num periods"));
   m_numPeriodsEditor->setInputRestrictions(5, numericalIntegersAllowed);
   addAndMakeVisible(m_numPeriodsEditor.get());
 
-  m_targetBonusEditor = std::make_unique<TextEditor>(translate("Target bonus"));
-  m_targetBonusEditor->setInputRestrictions(8, numericalIntegersAllowed);
+  m_targetBonusEditor = std::make_unique<TextEditor>(translate("Target bonus (ETH)"));
+  m_targetBonusEditor->setInputRestrictions(8, numericalFloatAllowed);
   addAndMakeVisible(m_targetBonusEditor.get());
 
   m_lengthDaysEditor = std::make_unique<TextEditor>(translate("Length (days)"));
@@ -126,11 +128,11 @@ void CreateProposalComponent::buttonClicked(Button* buttonThatWasClicked) {
     // Length days could be empty
 
     m_proposal->setTitle(m_titleEditor->getText());
-    m_proposal->setBudget(m_budgetEditor->getText().getIntValue());
-    m_proposal->setNumPeriods(m_numPeriodsEditor->getText().getIntValue());
-    m_proposal->setTargetBonus(m_targetBonusEditor->getText().getIntValue());
+    m_proposal->setBudget(Utils::toWei(EthUnit::ether, m_budgetEditor->getText()));
+    m_proposal->setNumPeriods(static_cast<uint64>(m_numPeriodsEditor->getText().getLargeIntValue()));
+    m_proposal->setTargetBonus(Utils::toWei(EthUnit::ether, m_targetBonusEditor->getText()));
     if (!m_lengthDaysEditor->isEmpty())
-      m_proposal->setLengthDays(m_lengthDaysEditor->getText().getIntValue());
+      m_proposal->setLengthDays(static_cast<uint64>(m_lengthDaysEditor->getText().getLargeIntValue()));
 
     m_listeners.call(&CreateProposalComponent::Listener::createProposalViewActionHappened,
                      this,

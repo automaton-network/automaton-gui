@@ -189,7 +189,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     jProposal.push_back("BA5EC0DE");
     jProposal.push_back(proposal->getLengthDays());
     jProposal.push_back(proposal->getNumPeriods());
-    jProposal.push_back(proposal->getBudget());
+    jProposal.push_back(proposal->getBudget().toStdString());
 
     json jSignature;
     jSignature.push_back("address");

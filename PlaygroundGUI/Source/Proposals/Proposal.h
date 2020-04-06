@@ -45,10 +45,10 @@ class Proposal {
   static String getStatusStr(Proposal::Status status);
 
   void setId(uint64 id)                             { m_id = id; }
-  void setAmountSpent(uint64 amountSpent)           { m_amountSpent = amountSpent; }
-  void setBudget(uint64 budget)                     { m_budget = budget; }
+  void setAmountSpent(const String& amountSpent)    { m_amountSpent = amountSpent; }
+  void setBudget(const String& budget)              { m_budget = budget; }
   void setNumPeriods(uint64 numPeriods)             { m_numPeriods = numPeriods; }
-  void setTargetBonus(uint64 targetBonus)           { m_targetBonus = targetBonus; }
+  void setTargetBonus(const String& targetBonus)    { m_targetBonus = targetBonus; }
   void setLengthDays(uint64 lengthDays)             { m_lengthDays = lengthDays; }
   void setApprovalRating(int approvalRating)        { m_approvalRating = approvalRating; }
   void setTimeLeftDays(int timeLeftDays)            { m_timeLeft = timeLeftDays; }
@@ -60,10 +60,10 @@ class Proposal {
   void setStatus(Proposal::Status status)           { m_status = status; }
 
   uint64 getId() const noexcept               { return m_id; }
-  uint64 getAmountSpent() const noexcept      { return m_amountSpent; }
-  uint64 getBudget() const noexcept           { return m_budget; }
+  String getAmountSpent() const noexcept      { return m_amountSpent; }
+  String getBudget() const noexcept           { return m_budget; }
   uint64 getNumPeriods() const  noexcept      { return m_numPeriods; }
-  uint64 getTargetBonus() const noexcept      { return m_targetBonus; }
+  String getTargetBonus() const noexcept      { return m_targetBonus; }
   uint64 getLengthDays() const noexcept       { return m_lengthDays; }
   int getApprovalRating() const noexcept      { return m_approvalRating; }
   int getTimeLeftDays() const noexcept        { return m_timeLeft; }
@@ -74,13 +74,15 @@ class Proposal {
   String getDocumentHash() const noexcept     { return m_documentHash; }
   Proposal::Status getStatus() const noexcept { return m_status; }
 
+  float getSpentPrecent() const;
+  float getBounusPrecent() const;
 
  private:
   uint64 m_id;
-  uint64 m_amountSpent;
-  uint64 m_budget;
+  String m_amountSpent;
+  String m_budget;
   uint64 m_numPeriods;
-  uint64 m_targetBonus;
+  String m_targetBonus;
   uint32 m_lengthDays;
 
   int32 m_approvalRating;
