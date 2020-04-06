@@ -40,8 +40,8 @@ class AccountWindow : public DocumentWindow {
 
     setFullScreen(false);
     setResizable(true, true);
-    setResizeLimits(800, 600, 10000, 10000);
-    centreWithSize(800, 600);
+    setResizeLimits(1200, 700, 10000, 10000);
+    centreWithSize(1200, 700);
 
     setVisible(true);
   }

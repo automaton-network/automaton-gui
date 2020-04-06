@@ -30,14 +30,19 @@ class ProposalsManager : public DeletedAtShutdown {
 
   bool fetchProposals();
   void addProposal(const Proposal& proposal, bool sendNotification = true);
-  bool createProposal(Proposal::Ptr proposal, const std::string& contributor);
+  bool createProposal(Proposal::Ptr proposal, const String& contributor);
   bool payForGas(Proposal::Ptr proposal, uint64 slotsToPay);
   bool castVote(Proposal::Ptr proposal, uint64 choice);
+
+  std::string getEthAddress() const noexcept { return m_ethAddress; }
+  std::string getEthAddressAlias() const noexcept { return m_ethAddressAlias; }
 
   void notifyProposalsUpdated();
 
  private:
   std::shared_ptr<ProposalsModel> m_model;
+
   std::string m_privateKey;
   std::string m_ethAddress;
+  std::string m_ethAddressAlias;
 };

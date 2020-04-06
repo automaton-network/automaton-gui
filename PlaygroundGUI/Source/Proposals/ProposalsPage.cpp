@@ -134,9 +134,11 @@ void ProposalsPage::createProposalViewActionHappened(CreateProposalComponent* co
                                                      CreateProposalComponent::Action action) {
   if (action == CreateProposalComponent::Action::ProposalCreated) {
     componentInWhichActionHappened->setVisible(false);
-    // TODO(Kirill): remove hardcoded contributor
-    m_proposalsManager->createProposal(componentInWhichActionHappened->getProposal(),
-                                                    "a6C8015476f6F4c646C95488c5fc7f5174A4E0ef");
+    auto proposal = componentInWhichActionHappened->getProposal();
+    proposal->setCreatorAlias(m_proposalsManager->getEthAddressAlias());
+    proposal->setCreator(m_proposalsManager->getEthAddress());
+    m_proposalsManager->createProposal(proposal,
+                                       proposal->getCreator());
   } else if (action == CreateProposalComponent::Action::Cancelled) {
     componentInWhichActionHappened->setVisible(false);
   }
@@ -291,7 +293,11 @@ void ProposalsPage::paintCell(Graphics& g,
     case CreatorAndTitle: {
       g.drawText(String(item->getTitle()), 0, height / 2, width, height / 2, Justification::centredLeft);
       g.setFont(g.getCurrentFont().boldened());
-      g.drawText(String(item->getCreator()), 0, 0, width, height / 2, Justification::centredLeft);
+      const auto creatorAlias = item->getCreatorAlias();
+      const auto creatorText = creatorAlias.isEmpty()
+          ? item->getCreator()
+          : creatorAlias + String(" (") + item->getCreator() + String(")");
+      g.drawText(creatorText, 0, 0, width, height / 2, Justification::centredLeft);
       break;
     }
     case ApprovalRating: {
