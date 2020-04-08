@@ -50,7 +50,7 @@ jobs:
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
-        curl -L -O https://github.com/automaton-network/automaton/releases/download/${{ env.automaton_version }}/automaton-Windows-${{ matrix.configuration }}-${{ matrix.runtime_link }}-${{ matrix.platform }}-${{ env.automaton_version }}.zip
+        curl -L -O https://github.com/automaton-network/automaton-core/releases/download/${{ env.automaton_version }}/automaton-Windows-${{ matrix.configuration }}-${{ matrix.runtime_link }}-${{ matrix.platform }}-${{ env.automaton_version }}.zip
         unzip automaton-Windows-${{ matrix.configuration }}-${{ matrix.runtime_link }}-${{ matrix.platform }}-${{ env.automaton_version }}.zip
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0    
@@ -104,7 +104,7 @@ jobs:
       working-directory: ${{ env.dist_dir }}
       run: |
         sudo apt install libfreetype6-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev
-        curl -L -O https://github.com/automaton-network/automaton/releases/download/${{ env.automaton_version }}/automaton-Linux-${{ matrix.configuration }}-${{ env.automaton_version }}.zip
+        curl -L -O https://github.com/automaton-network/automaton-core/releases/download/${{ env.automaton_version }}/automaton-Linux-${{ matrix.configuration }}-${{ env.automaton_version }}.zip
         unzip automaton-Linux-${{ matrix.configuration}}-${{ env.automaton_version }}.zip
     - name: configure
       working-directory: ${{ env.build_dir }}
@@ -152,7 +152,7 @@ jobs:
     - name: Fetch dependencies
       working-directory: ${{ env.dist_dir }}
       run: |
-        curl -L -O https://github.com/automaton-network/automaton/releases/download/${{ env.automaton_version }}/automaton-macOS-${{ matrix.configuration }}-${{ env.automaton_version }}.zip
+        curl -L -O https://github.com/automaton-network/automaton-core/releases/download/${{ env.automaton_version }}/automaton-macOS-${{ matrix.configuration }}-${{ env.automaton_version }}.zip
         unzip automaton-macOS-${{ matrix.configuration}}-${{ env.automaton_version }}.zip
     - name: configure
       working-directory: ${{ env.build_dir }}
