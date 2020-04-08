@@ -62,7 +62,7 @@ class LoginComponent  : public Component
  private:
   AccountWindow* getWindowByAddress(const String& address);
   std::shared_ptr<AccountsModel> m_model;
-  std::unique_ptr<DrawableButton> m_logoButton;
+  std::unique_ptr<Drawable> m_logo;
   std::unique_ptr<TableListBox> m_accountsTable;
   std::unique_ptr<TextButton> m_importPrivateKeyBtn;
   OwnedArray<AccountWindow> m_accountWindows;

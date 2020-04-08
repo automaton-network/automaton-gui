@@ -35,13 +35,14 @@ class AccountWindow : public DocumentWindow {
       , m_accountConfig(accountConfig) {
     LookAndFeel::setDefaultLookAndFeel(&m_lnf);
 
-    setUsingNativeTitleBar(true);
+    setUsingNativeTitleBar(false);
     setContentOwned(new DemosMainComponent(m_accountConfig), true);
+    setTitleBarButtonsRequired(closeButton | minimiseButton | maximiseButton, false);
 
     setFullScreen(false);
     setResizable(true, true);
-    setResizeLimits(1200, 700, 10000, 10000);
-    centreWithSize(1200, 700);
+    setResizeLimits(800, 600, 10000, 10000);
+    centreWithSize(800, 600);
 
     setVisible(true);
   }
@@ -70,7 +71,7 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   m_model = std::make_shared<AccountsModel>();
   m_model->addListener(this);
   m_accountsTable = std::make_unique<TableListBox>();
-  m_accountsTable->setRowHeight(50);
+  m_accountsTable->setRowHeight(32);
   m_accountsTable->setRowSelectedOnMouseDown(true);
   m_accountsTable->setClickingTogglesRowSelection(true);
   m_accountsTable->setMultipleSelectionEnabled(false);
@@ -80,7 +81,7 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   auto& tableHeader = m_accountsTable->getHeader();
   tableHeader.setStretchToFitActive(true);
   tableHeader.addColumn(translate("Alias"), 1, 50);
-  tableHeader.addColumn(translate("Address"), 2, 400);
+  tableHeader.addColumn(translate("Address"), 2, 300);
 
 
   auto accountsJson = m_configFile->get_json("accounts");
@@ -90,16 +91,16 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
     m_model->addItem(account, false);
   }
 
-  m_importPrivateKeyBtn = std::make_unique<TextButton>("Import Private Key");
+  m_importPrivateKeyBtn = std::make_unique<TextButton>("Import");
   addAndMakeVisible(m_importPrivateKeyBtn.get());
   m_importPrivateKeyBtn->addListener(this);
 
-  m_logoButton = std::make_unique<DrawableButton> ("iconButton", DrawableButton::ImageStretched);
-  auto logoImage = Utils::loadSVG(BinaryData::logo_white_on_transparent_8x8_svg);
-  m_logoButton->setImages(logoImage.get());
-  addAndMakeVisible(m_logoButton.get());
+  m_logo = Drawable::createFromImageData(
+      BinaryData::logo_white_on_transparent_8x8_svg,
+      BinaryData::logo_white_on_transparent_8x8_svgSize);
+  addAndMakeVisible(m_logo.get());
 
-  setSize(600, 400);
+  setSize(350, 600);
 }
 
 LoginComponent::~LoginComponent() {
@@ -119,14 +120,14 @@ void LoginComponent::paint(Graphics& g) {
 void LoginComponent::resized() {
   auto bounds = getLocalBounds().reduced(20, 40);
 
-  auto logoBounds = bounds.removeFromTop(45);
-  m_logoButton->setBounds(logoBounds.withSizeKeepingCentre(380, 45));
+  auto logoBounds = bounds.removeFromTop(39);
+  m_logo->setBounds(logoBounds.withSizeKeepingCentre(231, 39));
 
   bounds.removeFromTop(40);
-  m_accountsTable->setBounds(bounds.removeFromTop(300));
+  m_accountsTable->setBounds(bounds.removeFromTop(250));
   bounds.removeFromTop(40);
   auto btnBounds = bounds.removeFromTop(40);
-  m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(200, 40));
+  m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(120, 40));
 }
 
 void LoginComponent::buttonClicked(Button* btn) {
@@ -217,10 +218,12 @@ void LoginComponent::paintCell(Graphics& g,
 
   switch (columnId) {
     case 1: {
+      g.setFont(14);
       g.drawText(item.getAlias(), 0, 0, width, height, Justification::centred);
       break;
     }
     case 2: {
+      g.setFont(10);
       g.drawText(item.getAddress(), 0, 0, width, height, Justification::centredLeft);
       break;
     }

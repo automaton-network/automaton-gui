@@ -100,13 +100,15 @@ class PlaygroundGUIApplication: public JUCEApplication {
                      DocumentWindow::allButtons) {
       LookAndFeel::setDefaultLookAndFeel(&lnf);
 
-      setUsingNativeTitleBar(true);
+      setUsingNativeTitleBar(false);
+      setTitleBarButtonsRequired(DocumentWindow::closeButton, false);
       setContentOwned(new LoginComponent(userSettings), true);
+      setName("Automaton Login");
 
       setFullScreen(true);
-      setResizable(true, true);
-      setResizeLimits(600, 600, 10000, 600);
-      centreWithSize(600, 600);
+      setResizable(false, false);
+      setResizeLimits(350, 500, 10000, 600);
+      centreWithSize(350, 500);
 
       setVisible(true);
     }

@@ -54,7 +54,7 @@ DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
   m_tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040),
                             new NetworkView(m_proposalsManager.get()), true);
   m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(), true);
-  m_tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
+  // m_tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
 
   auto proposalsPage = new ProposalsPage(m_proposalsManager.get());
   m_tabbedComponent->addTab(TRANS("Proposals"), Colour(0xff404040), proposalsPage, true);
@@ -62,10 +62,10 @@ DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
                             new ProposalsActionsPage(m_proposalsManager.get()), true);
   m_tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(), true);
 
-  m_tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
-  m_tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
-  m_tabbedComponent->addTab(TRANS("DApps"), Colour(0xff404040), new DemoBlank(), true);
-  m_tabbedComponent->addTab(TRANS("Demo Grid"), Colour(0xff404040), new DemoGrid(), true);
+  // m_tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
+  // m_tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
+  // m_tabbedComponent->addTab(TRANS("DApps"), Colour(0xff404040), new DemoBlank(), true);
+  // m_tabbedComponent->addTab(TRANS("Demo Grid"), Colour(0xff404040), new DemoGrid(), true);
   // tabbedComponent->addTab(TRANS("Network Simulation"), Colour(0xff404040), new DemoSimNet(), true);
   m_tabbedComponent->setCurrentTabIndex(0);
 
