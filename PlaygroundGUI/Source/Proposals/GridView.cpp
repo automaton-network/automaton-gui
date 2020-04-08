@@ -22,10 +22,10 @@
 
 //==============================================================================
 GridView::GridView():
+  m_cellRatio(2.0),
   m_verticalSpacing(35),
   m_horizontalSpacing(25),
   m_cellMinWidth(500),
-  m_cellRatio(2.0),
   m_margins(50, 50, 50, 50) {
   m_viewport = std::make_unique<Viewport>();
   m_viewport->setScrollBarsShown(true, false, true);

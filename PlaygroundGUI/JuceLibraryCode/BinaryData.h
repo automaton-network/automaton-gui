@@ -8,6 +8,9 @@
 
 namespace BinaryData
 {
+    extern const char*   logo_white_on_transparent_8x8_svg;
+    const int            logo_white_on_transparent_8x8_svgSize = 7070;
+
     extern const char*   BIG_A_BLACK_CIRCLE_BACK_1000x1000_png;
     const int            BIG_A_BLACK_CIRCLE_BACK_1000x1000_pngSize = 60500;
 
@@ -24,7 +27,7 @@ namespace BinaryData
     const int            PlayRegular_ttfSize = 199020;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 5;
+    const int namedResourceListSize = 6;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

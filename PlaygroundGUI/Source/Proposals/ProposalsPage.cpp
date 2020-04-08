@@ -19,6 +19,7 @@
 
 #include "ProposalsPage.h"
 #include "ProposalsManager.h"
+#include "../Utils.h"
 
 //==============================================================================
 ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
@@ -134,9 +135,11 @@ void ProposalsPage::createProposalViewActionHappened(CreateProposalComponent* co
                                                      CreateProposalComponent::Action action) {
   if (action == CreateProposalComponent::Action::ProposalCreated) {
     componentInWhichActionHappened->setVisible(false);
-    // TODO(Kirill): remove hardcoded contributor
-    m_proposalsManager->createProposal(componentInWhichActionHappened->getProposal(),
-                                                    "a6C8015476f6F4c646C95488c5fc7f5174A4E0ef");
+    auto proposal = componentInWhichActionHappened->getProposal();
+    proposal->setCreatorAlias(m_proposalsManager->getEthAddressAlias());
+    proposal->setCreator(m_proposalsManager->getEthAddress());
+    m_proposalsManager->createProposal(proposal,
+                                       proposal->getCreator());
   } else if (action == CreateProposalComponent::Action::Cancelled) {
     componentInWhichActionHappened->setVisible(false);
   }
@@ -151,7 +154,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_proposalsManager->castVote(proposal, 1);
   } else if (buttonThatWasClicked == m_voteNoBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    m_proposalsManager->castVote(proposal, 0);
+    m_proposalsManager->castVote(proposal, 2);
   } else if (buttonThatWasClicked == m_payForGasBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
     AlertWindow w("Pay for gas of " + proposal->getTitle(),
@@ -230,14 +233,14 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     case Spent: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<uint64>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
+                * DefaultElementComparator<String>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
       };
       break;
     }
     case Budget: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<uint64>::compareElements(p1->getBudget(), p2->getBudget());
+                * DefaultElementComparator<String>::compareElements(p1->getBudget(), p2->getBudget());
       };
       break;
     }
@@ -250,14 +253,14 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     case Length: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<uint64>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
+                * DefaultElementComparator<String>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
       };
       break;
     }
     case Bonus: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<uint64>::compareElements(p1->getTargetBonus(), p2->getTargetBonus());
+                * DefaultElementComparator<String>::compareElements(p1->getTargetBonus(), p2->getTargetBonus());
       };
       break;
     }
@@ -291,7 +294,11 @@ void ProposalsPage::paintCell(Graphics& g,
     case CreatorAndTitle: {
       g.drawText(String(item->getTitle()), 0, height / 2, width, height / 2, Justification::centredLeft);
       g.setFont(g.getCurrentFont().boldened());
-      g.drawText(String(item->getCreator()), 0, 0, width, height / 2, Justification::centredLeft);
+      const auto creatorAlias = item->getCreatorAlias();
+      const auto creatorText = creatorAlias.isEmpty()
+          ? item->getCreator()
+          : creatorAlias + String(" (") + item->getCreator() + String(")");
+      g.drawText(creatorText, 0, 0, width, height / 2, Justification::centredLeft);
       break;
     }
     case ApprovalRating: {
@@ -308,13 +315,13 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Spent: {
-      const auto percent = item->getBudget() ? item->getAmountSpent() / item->getBudget() : 0.f;
-      const String text = String(item->getAmountSpent()) + "(" + getPercentStr(percent) + ")";
+      const String text = item->getAmountSpent() + "(" + getPercentStr(item->getSpentPrecent()) + ")";
       g.drawText(text, 0, 0, width, height, Justification::centred);
       break;
     }
     case Budget: {
-      g.drawText(String(item->getBudget()), 0, 0, width, height, Justification::centred);
+      g.drawText(Utils::fromWei(EthUnit::ether, item->getBudget()) + String(" ETH"),
+                 0, 0, width, height, Justification::centred);
       break;
     }
     case Periods: {
@@ -331,8 +338,8 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Bonus: {
-      const auto percent = item->getBudget() ? item->getTargetBonus() / item->getBudget() : 0.f;
-      const String text = String(item->getTargetBonus()) + "(" + getPercentStr(percent) + ")";
+      const String text = Utils::fromWei(EthUnit::ether, item->getTargetBonus()) + String(" ETH ")
+          + "(" + getPercentStr(item->getBounusPrecent()) + ")";
       g.drawText(text, 0, 0, width, height, Justification::centred);
       break;
     }

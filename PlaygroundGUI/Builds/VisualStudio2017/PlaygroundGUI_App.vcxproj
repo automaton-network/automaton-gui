@@ -142,6 +142,8 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Login\AccountsModel.cpp"/>
+    <ClCompile Include="..\..\Source\Login\LoginComponent.cpp"/>
     <ClCompile Include="..\..\Source\DEX\DEXPage.cpp"/>
     <ClCompile Include="..\..\Source\DEX\Order.cpp"/>
     <ClCompile Include="..\..\Source\DEX\OrdersManager.cpp"/>
@@ -163,7 +165,6 @@
     <ClCompile Include="..\..\Source\Miner\Miner.cpp"/>
     <ClCompile Include="..\..\Source\Network\NetworkView.cpp"/>
     <ClCompile Include="..\..\Source\Utils.cpp"/>
-    <ClCompile Include="..\..\Source\LoginComponent.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
     <ClCompile Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_AbstractFifo.cpp">
@@ -1351,6 +1352,8 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Login\AccountsModel.h"/>
+    <ClInclude Include="..\..\Source\Login\LoginComponent.h"/>
     <ClInclude Include="..\..\Source\Models\AbstractListModel.h"/>
     <ClInclude Include="..\..\Source\Models\AbstractProxyModel.h"/>
     <ClInclude Include="..\..\Source\DEX\DEXPage.h"/>
@@ -1374,7 +1377,6 @@
     <ClInclude Include="..\..\Source\Miner\Miner.h"/>
     <ClInclude Include="..\..\Source\Network\NetworkView.h"/>
     <ClInclude Include="..\..\Source\Utils.h"/>
-    <ClInclude Include="..\..\Source\LoginComponent.h"/>
     <ClInclude Include="..\..\Source\MainComponent.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_AbstractFifo.h"/>
     <ClInclude Include="..\..\..\..\automaton\src\local_third_party\JUCE\modules\juce_core\containers\juce_Array.h"/>
@@ -1779,6 +1781,7 @@
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h"/>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Resources\logo_white_on_transparent_8x8.svg"/>
     <None Include="..\..\Resources\default_config.json"/>
     <None Include="..\..\Resources\king_automaton_abi.json"/>
     <None Include="..\..\..\..\automaton\media\fonts\play\Play-Bold.ttf"/>

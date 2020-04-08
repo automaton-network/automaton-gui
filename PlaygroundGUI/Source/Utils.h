@@ -18,9 +18,15 @@
  */
 
 #pragma once
-#include <string>
+
+#include "JuceHeader.h"
+
+enum class EthUnit {Gwei = 9, ether = 18};
 
 class Utils {
  public:
   static std::string gen_ethereum_address(const std::string& privkey_hex);
+  static std::unique_ptr<Drawable> loadSVG(const String& xmlData);
+  static String fromWei(EthUnit unitTo, const String& value);
+  static String toWei(EthUnit unitTo, const String& value);
 };

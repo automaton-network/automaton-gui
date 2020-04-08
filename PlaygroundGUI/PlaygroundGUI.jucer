@@ -4,6 +4,8 @@
               version="0.0.1" companyName="Liberatix" companyWebsite="https://liberatix.com">
   <MAINGROUP id="r0wjCp" name="PlaygroundGUI">
     <GROUP id="{874C0493-36CA-5084-DAA0-C4287D2E83CF}" name="Resources">
+      <FILE id="mRg0Yf" name="logo_white_on_transparent_8x8.svg" compile="0"
+            resource="1" file="Resources/logo_white_on_transparent_8x8.svg"/>
       <FILE id="MDnkQK" name="BIG_A_BLACK_CIRCLE_BACK_1000x1000.png" compile="0"
             resource="1" file="Resources/BIG_A_BLACK_CIRCLE_BACK_1000x1000.png"
             xcodeResource="1"/>
@@ -16,6 +18,15 @@
             file="../../automaton/media/fonts/play/Play-Regular.ttf"/>
     </GROUP>
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
+      <GROUP id="{867F9B81-C019-9D46-209F-BBE27FD4A220}" name="Login">
+        <FILE id="SkQyNk" name="AccountsModel.cpp" compile="1" resource="0"
+              file="Source/Login/AccountsModel.cpp"/>
+        <FILE id="yEDkJr" name="AccountsModel.h" compile="0" resource="0" file="Source/Login/AccountsModel.h"/>
+        <FILE id="ezW9B4" name="LoginComponent.cpp" compile="1" resource="0"
+              file="Source/Login/LoginComponent.cpp"/>
+        <FILE id="OVfzEj" name="LoginComponent.h" compile="0" resource="0"
+              file="Source/Login/LoginComponent.h"/>
+      </GROUP>
       <GROUP id="{E61E1C27-4498-A9CF-2C71-5DD345898E6A}" name="Models">
         <FILE id="vBj6l1" name="AbstractListModel.h" compile="0" resource="0"
               file="Source/Models/AbstractListModel.h"/>
@@ -93,10 +104,6 @@
       </GROUP>
       <FILE id="upiiZw" name="Utils.cpp" compile="1" resource="0" file="Source/Utils.cpp"/>
       <FILE id="AUY9pH" name="Utils.h" compile="0" resource="0" file="Source/Utils.h"/>
-      <FILE id="LbEEYC" name="LoginComponent.cpp" compile="1" resource="0"
-            file="Source/LoginComponent.cpp"/>
-      <FILE id="fdFH2x" name="LoginComponent.h" compile="0" resource="0"
-            file="Source/LoginComponent.h"/>
       <FILE id="f60Dju" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="dBsD3K" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>

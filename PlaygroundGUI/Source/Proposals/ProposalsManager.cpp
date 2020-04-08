@@ -74,10 +74,11 @@ class AsyncTask : public ThreadWithProgressWindow {
 };
 
 
-ProposalsManager::ProposalsManager(PropertySet* config)
+ProposalsManager::ProposalsManager(Config* config)
   : m_model(std::make_shared<ProposalsModel>()) {
-  m_privateKey = config->getValue("private_key").toStdString();
-  m_ethAddress = config->getValue("eth_address").toStdString();
+  m_privateKey = config->get_string("private_key");
+  m_ethAddress = config->get_string("eth_address");
+  m_ethAddressAlias = config->get_string("account_alias");
 }
 
 ProposalsManager::~ProposalsManager() {
@@ -123,6 +124,10 @@ bool ProposalsManager::fetchProposals() {
 
       proposal.setApprovalRating(approvalRating);
 
+      // TODO(Kirill): set all aliases for all accounts we have
+      if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal.getCreator()))
+        proposal.setCreatorAlias(getEthAddressAlias());
+
       addProposal(proposal, false);
     }
 
@@ -154,7 +159,7 @@ void ProposalsManager::addProposal(const Proposal& proposal, bool sendNotificati
   m_model->addItem(std::make_shared<Proposal>(proposal), sendNotification);
 }
 
-bool ProposalsManager::createProposal(Proposal::Ptr proposal, const std::string& contributor) {
+bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& contributor) {
   AsyncTask task([=](AsyncTask* task) {
     auto& s = task->m_status;
 
@@ -174,14 +179,17 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const std::string&
     if (!s.is_ok())
       return false;
 
+    const auto contributor_address = contributor.startsWith("0x")
+                                        ? contributor.substring(2).toStdString()
+                                        : contributor.toStdString();
     json jProposal;
-    jProposal.push_back(contributor);
+    jProposal.push_back(contributor_address);
     jProposal.push_back(proposal->getTitle().toStdString());
     jProposal.push_back("google.com");
     jProposal.push_back("BA5EC0DE");
     jProposal.push_back(proposal->getLengthDays());
     jProposal.push_back(proposal->getNumPeriods());
-    jProposal.push_back(proposal->getBudget());
+    jProposal.push_back(proposal->getBudget().toStdString());
 
     json jSignature;
     jSignature.push_back("address");

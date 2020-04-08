@@ -90,7 +90,7 @@ class ProposalComponent : public Component
     if (buttonThatWasClicked == m_approveBtn.get()) {
       m_listeners.call(&Listener::castVote, m_proposal, 1);
     } else if (buttonThatWasClicked == m_rejectBtn.get()) {
-      m_listeners.call(&Listener::castVote, m_proposal, 0);
+      m_listeners.call(&Listener::castVote, m_proposal, 2);
     }
   }
 

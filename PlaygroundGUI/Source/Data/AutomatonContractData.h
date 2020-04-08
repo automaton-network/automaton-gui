@@ -32,7 +32,7 @@ class AutomatonContractData : DeletedAtShutdown {
  public:
   AutomatonContractData();
   ~AutomatonContractData();
-  void init(PropertySet* _config);
+  void init(Config* _config);
   void setData(const std::string& _eth_url,
                const std::string& _contractAddress,
                const std::string& _mask,
@@ -58,5 +58,5 @@ class AutomatonContractData : DeletedAtShutdown {
   CriticalSection criticalSection;
 
  private:
-  PropertySet* config;
+  Config* config;
 };

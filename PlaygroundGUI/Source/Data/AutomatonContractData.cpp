@@ -28,17 +28,16 @@ AutomatonContractData::~AutomatonContractData() {
   clearSingletonInstance();
 }
 
-void AutomatonContractData::init(PropertySet* _config) {
+void AutomatonContractData::init(Config* _config) {
   config  = _config;
   load_abi();
 
-  eth_url = config->getValue("eth_url", "http://127.0.0.1:7545").toStdString();
-  contract_address = config->getValue("contract_address", "0xc6A2d391fe7471EEF1D17bba1035351439bEcbBE").toStdString();
-  mask = config->getValue("mask", "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF").toStdString();
-  min_difficulty = config->getValue("min_difficulty",
-                                    "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF").toStdString();
-  slots_number = static_cast<uint32_t>(config->getIntValue("slots_number", 16));
-  slots_claimed = static_cast<uint32_t>(config->getIntValue("slots_claimed", 0));
+  eth_url = config->get_string("eth_url");
+  contract_address = config->get_string("contract_address");
+  mask = config->get_string("mask");
+  min_difficulty = config->get_string("min_difficulty");
+  slots_number = static_cast<uint32_t>(config->get_number("slots_number"));
+  slots_claimed = static_cast<uint32_t>(config->get_number("slots_claimed"));
 }
 
 void AutomatonContractData::setData(const std::string& _eth_url,
@@ -57,12 +56,12 @@ void AutomatonContractData::setData(const std::string& _eth_url,
   slots_claimed = _slots_claimed;
   slots = _slots;
 
-  config->setValue("eth_url", String(eth_url));
-  config->setValue("contract_address", String(contract_address));
-  config->setValue("mask", String(mask));
-  config->setValue("min_difficulty", String(min_difficulty));
-  config->setValue("slots_number", static_cast<int>(slots_number));
-  config->setValue("slots_claimed", static_cast<int>(slots_claimed));
+  config->set_string("eth_url", eth_url);
+  config->set_string("contract_address", contract_address);
+  config->set_string("mask", mask);
+  config->set_string("min_difficulty", min_difficulty);
+  config->set_number("slots_number", slots_number);
+  config->set_number("slots_claimed", slots_claimed);
 }
 
 const std::string &AutomatonContractData::get_abi() {

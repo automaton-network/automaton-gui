@@ -58,7 +58,7 @@ Proposal::Proposal(uint32_t id, const String& jsonString)
     setDocumentHash(json_proposal.at(3).get<std::string>());
     setLengthDays(std::stoul(json_proposal.at(4).get<std::string>()));
     setNumPeriods(std::stoul(json_proposal.at(5).get<std::string>()));
-    setBudget(std::stoul(json_proposal.at(6).get<std::string>()));
+    setBudget(json_proposal.at(6).get<std::string>());
     // TODO(Kirill)
     // setNextPaymentDate(json_proposal.at(7.get<uint64_t>()));
 
@@ -78,4 +78,23 @@ String Proposal::getStatusStr(Proposal::Status status) {
     case Proposal::Status::Completed: return "Completed";
     default: return "Unknown";
   }
+}
+
+static float getPercentage(const String& dividend, const String& divisor) {
+  BigInteger reminder;
+  BigInteger dividendInt;
+  dividendInt.parseString(dividend, 10);
+  BigInteger divisorInt;
+  divisorInt.parseString(divisor, 10);
+
+  dividendInt.divideBy(divisorInt, reminder);
+  return dividendInt.toInteger() / 100.f;
+}
+
+float Proposal::getSpentPrecent() const {
+  return getPercentage(m_amountSpent, m_budget);
+}
+
+float Proposal::getBounusPrecent() const {
+  return getPercentage(m_targetBonus, m_budget);
 }

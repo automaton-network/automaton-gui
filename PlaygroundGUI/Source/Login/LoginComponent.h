@@ -19,35 +19,54 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include "../Models/AbstractProxyModel.h"
+#include "AccountsModel.h"
 
 class DemosMainComponent;
 class AccountWindow;
-
+class ConfigFile;
 
 class LoginComponent  : public Component
                       , public ComponentListener
                       , public Button::Listener
-                      , public ComboBox::Listener {
+                      , public TableListBoxModel
+                      , public AbstractListModelBase::Listener {
  public:
-  LoginComponent(PropertiesFile* configFile);
+  LoginComponent(ConfigFile* configFile);
   ~LoginComponent();
 
   void paint(Graphics&) override;
   void resized() override;
   void buttonClicked(Button* btn) override;
-  void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
   void componentVisibilityChanged(Component& component) override;
+  void modelChanged(AbstractListModelBase* base) override;
+  void openAccount(Account* account);
+  void removeAccount(const Account& account);
+
+  // TableListBoxModel
+  // ==============================================================================
+
+  int getNumRows();
+  void paintCell(Graphics& g,
+                 int rowNumber, int columnId,
+                 int width, int height,
+                 bool rowIsSelected) override;
+  void paintRowBackground(Graphics& g,
+                          int rowNumber,
+                          int width, int height,
+                          bool rowIsSelected) override;
+  void cellClicked(int rowNumber, int columnId, const MouseEvent&) override;
+  void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent&) override;
+
 
  private:
   AccountWindow* getWindowByAddress(const String& address);
-
-  std::unique_ptr<ComboBox> m_accountsComboBox;
+  std::shared_ptr<AccountsModel> m_model;
+  std::unique_ptr<DrawableButton> m_logoButton;
+  std::unique_ptr<TableListBox> m_accountsTable;
   std::unique_ptr<TextButton> m_importPrivateKeyBtn;
-  std::unique_ptr<TextButton> m_openAccountBtn;
   OwnedArray<AccountWindow> m_accountWindows;
-  std::map<String, PropertySet> m_accountsConfigs;
-  PropertiesFile* m_configFile;
+  ConfigFile* m_configFile;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoginComponent)
 };
