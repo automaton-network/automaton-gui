@@ -86,7 +86,8 @@ void AutomatonContractData::setData(const std::string& _eth_url,
   config->set_number("slots_claimed", m_slotsClaimed);
 }
 
-bool AutomatonContractData::readContract(const std::string& url, const std::string& contractAddress) {
+bool AutomatonContractData::readContract(const std::string& url,
+                                         const std::string& contractAddress) {
   uint32_t slotsNumber;
   uint32_t slotsClaimed;
   std::vector<ValidatorSlot> validatorSlots;
@@ -223,6 +224,10 @@ bool AutomatonContractData::readContract(const std::string& url, const std::stri
         "Canceled!",
         "Operation aborted.");
   }
+}
+
+std::shared_ptr<eth_contract> AutomatonContractData::getContract() {
+  return eth_contract::get_contract(getAddress());
 }
 
 std::string AutomatonContractData::getAbi() {

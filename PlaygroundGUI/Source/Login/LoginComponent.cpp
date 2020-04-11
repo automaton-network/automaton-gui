@@ -221,6 +221,14 @@ void LoginComponent::modelChanged(AbstractListModelBase* base) {
 }
 
 void LoginComponent::openAccount(Account* account) {
+  if (auto contract = AutomatonContractData::getInstance()->getContract()) {
+    AlertWindow::showMessageBoxAsync(
+        AlertWindow::WarningIcon,
+        "ERROR",
+        "Contract is NULL. Read appropriate contract data first.");
+    return;
+  }
+
   if (auto accountWindow = getWindowByAddress(account->getAddress())) {
     accountWindow->toFront(true);
   } else {

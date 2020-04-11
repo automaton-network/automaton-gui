@@ -24,11 +24,12 @@
 #include "OrdersModel.h"
 
 class OrdersUIModel;
+class DEXManager;
 
 class DEXPage : public Component
               , public AbstractListModelBase::Listener {
  public:
-  DEXPage();
+  DEXPage(DEXManager* dexManager);
   ~DEXPage();
 
   void paint(Graphics&) override;
@@ -46,6 +47,7 @@ class DEXPage : public Component
   std::unique_ptr<TableListBox> m_buyingTable;
   std::shared_ptr<OrdersProxyModel> m_sellingProxyModel;
   std::shared_ptr<OrdersProxyModel> m_buyingProxyModel;
+  DEXManager* m_dexManager;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DEXPage)
 };

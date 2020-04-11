@@ -17,7 +17,7 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OrdersManager.h"
+#include "DEXManager.h"
 #include "OrdersModel.h"
 #include "../Utils/AsyncTask.h"
 #include "../Data/AutomatonContractData.h"
@@ -46,16 +46,30 @@ static std::shared_ptr<eth_contract> getContract(status* resStatus) {
   return contract;
 }
 
-OrdersManager::OrdersManager() {
+DEXManager::DEXManager(Config* config) {
+  m_ethBalance = "Undefined";
+  m_autoBalance = "Undefined";
+
   m_model = std::make_shared<OrdersModel>();
+
+  m_privateKey = config->get_string("private_key");
+  m_ethAddress = config->get_string("eth_address");
+  m_ethAddressAlias = config->get_string("account_alias");
 }
 
-OrdersManager::~OrdersManager() {
-  clearSingletonInstance();
+DEXManager::~DEXManager() {
 }
 
-std::shared_ptr<OrdersModel> OrdersManager::getModel() {
+std::shared_ptr<OrdersModel> DEXManager::getModel() {
   return m_model;
+}
+
+std::string DEXManager::getEthBalance() {
+  return m_ethBalance;
+}
+
+std::string DEXManager::getAutoBalance() {
+  return m_autoBalance;
 }
 
 static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resStatus) {
@@ -68,7 +82,7 @@ static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resSt
   return ordersLength;
 }
 
-bool OrdersManager::fetchOrders() {
+bool DEXManager::fetchOrders() {
   Array<Order::Ptr> orders;
   AsyncTask task([&](AsyncTask* task) {
     auto& s = task->m_status;
@@ -118,5 +132,3 @@ bool OrdersManager::fetchOrders() {
 
   return false;
 }
-
-JUCE_IMPLEMENT_SINGLETON(OrdersManager);

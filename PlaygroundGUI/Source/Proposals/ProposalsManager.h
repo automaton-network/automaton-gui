@@ -22,7 +22,7 @@
 #include "ProposalsModel.h"
 class Config;
 
-class ProposalsManager : public DeletedAtShutdown {
+class ProposalsManager {
  public:
   std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
 

@@ -32,7 +32,7 @@
 #include "automaton/core/crypto/cryptopp/Keccak_256_cryptopp.h"
 
 #include "../Proposals/ProposalsManager.h"
-#include "../DEX/OrdersManager.h"
+#include "../DEX/DEXManager.h"
 
 using json = nlohmann::json;
 
@@ -244,7 +244,6 @@ void NetworkView::buttonClicked(Button* btn) {
                                        "Current settings were not affected.");
     }
     m_proposalsManager->fetchProposals();
-    OrdersManager::getInstance()->fetchOrders();
   }
 }
 

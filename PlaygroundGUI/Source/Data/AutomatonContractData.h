@@ -21,6 +21,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Config/Config.h"
+#include "automaton/core/interop/ethereum/eth_contract_curl.h"
 
 struct ValidatorSlot {
   std::string difficulty;
@@ -42,6 +43,8 @@ class AutomatonContractData : DeletedAtShutdown {
                const std::vector<ValidatorSlot>& _slots);
 
   bool readContract(const std::string& url, const std::string& contractAddress);
+  std::shared_ptr<automaton::core::interop::ethereum::eth_contract> getContract();
+
   bool loadAbi();
   std::string getAbi();
   std::string getUrl() const noexcept;

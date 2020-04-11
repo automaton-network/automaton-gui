@@ -19,7 +19,7 @@
 
 #include <JuceHeader.h>
 #include "DEXPage.h"
-#include "OrdersManager.h"
+#include "DEXManager.h"
 
 
 class OrdersUIModel : public TableListBoxModel {
@@ -79,14 +79,14 @@ class OrdersUIModel : public TableListBoxModel {
   std::shared_ptr<AbstractListModel<Order::Ptr>> m_model;
 };
 
-DEXPage::DEXPage() {
+DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   m_sellingProxyModel = std::make_shared<OrdersProxyModel>();
   m_sellingProxyModel->setFilter(OrderFilter::Sell);
-  m_sellingProxyModel->setModel(OrdersManager::getInstance()->getModel());
+  m_sellingProxyModel->setModel(m_dexManager->getModel());
   m_sellingProxyModel->addListener(this);
   m_buyingProxyModel = std::make_shared<OrdersProxyModel>();
   m_buyingProxyModel->setFilter(OrderFilter::Buy);
-  m_buyingProxyModel->setModel(OrdersManager::getInstance()->getModel());
+  m_buyingProxyModel->setModel(m_dexManager->getModel());
   m_buyingProxyModel->addListener(this);
 
   m_sellingUIModel = std::make_unique<OrdersUIModel>();
