@@ -262,13 +262,13 @@
     <ClCompile Include="..\..\Source\Login\LoginComponent.cpp">
       <Filter>PlaygroundGUI\Source\Login</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\DEX\DEXManager.cpp">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\DEX\DEXPage.cpp">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\DEX\Order.cpp">
-      <Filter>PlaygroundGUI\Source\DEX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\DEX\OrdersManager.cpp">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp">
@@ -1626,13 +1626,13 @@
     <ClInclude Include="..\..\Source\Models\AbstractProxyModel.h">
       <Filter>PlaygroundGUI\Source\Models</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\DEX\DEXManager.h">
+      <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\DEX\DEXPage.h">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\DEX\Order.h">
-      <Filter>PlaygroundGUI\Source\DEX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\DEX\OrdersManager.h">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\DEX\OrdersModel.h">

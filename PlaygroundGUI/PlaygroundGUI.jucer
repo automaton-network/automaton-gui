@@ -39,13 +39,12 @@
               file="Source/Models/AbstractProxyModel.h"/>
       </GROUP>
       <GROUP id="{3ED33CF7-55A1-F830-A062-EA46E2239109}" name="DEX">
+        <FILE id="v9TFCT" name="DEXManager.cpp" compile="1" resource="0" file="Source/DEX/DEXManager.cpp"/>
+        <FILE id="OUOeGc" name="DEXManager.h" compile="0" resource="0" file="Source/DEX/DEXManager.h"/>
         <FILE id="YWDtF2" name="DEXPage.cpp" compile="1" resource="0" file="Source/DEX/DEXPage.cpp"/>
         <FILE id="PRHtGa" name="DEXPage.h" compile="0" resource="0" file="Source/DEX/DEXPage.h"/>
         <FILE id="DNFrmv" name="Order.cpp" compile="1" resource="0" file="Source/DEX/Order.cpp"/>
         <FILE id="cECUWM" name="Order.h" compile="0" resource="0" file="Source/DEX/Order.h"/>
-        <FILE id="XqzrgY" name="OrdersManager.cpp" compile="1" resource="0"
-              file="Source/DEX/OrdersManager.cpp"/>
-        <FILE id="w5ibPP" name="OrdersManager.h" compile="0" resource="0" file="Source/DEX/OrdersManager.h"/>
         <FILE id="SavH1N" name="OrdersModel.cpp" compile="1" resource="0" file="Source/DEX/OrdersModel.cpp"/>
         <FILE id="GaasMi" name="OrdersModel.h" compile="0" resource="0" file="Source/DEX/OrdersModel.h"/>
       </GROUP>

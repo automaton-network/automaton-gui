@@ -26,7 +26,7 @@
 #include "Proposals/ProposalsPage.h"
 #include "Proposals/ProposalsActionsPage.h"
 #include "DEX/DEXPage.h"
-#include "Dex/DEXManager.h"
+#include "DEX/DEXManager.h"
 #include "MainComponent.h"
 
 class DemoBlank: public Component {

@@ -53,6 +53,10 @@
 			isa = PBXBuildFile;
 			fileRef = 983C39C12CA4D0F8F53A86E9;
 		};
+		C793573B812E92F2E1F9A3F1 = {
+			isa = PBXBuildFile;
+			fileRef = AF4F14249133E44BDED8C6B4;
+		};
 		5A3DA206190F057B44FDA6A4 = {
 			isa = PBXBuildFile;
 			fileRef = 146CF7EBB22338825418D3E9;
@@ -60,10 +64,6 @@
 		3FAABEF679539A4A35C12933 = {
 			isa = PBXBuildFile;
 			fileRef = 64AA565C9FB6F488ABFC0858;
-		};
-		658A3370960D604062B98387 = {
-			isa = PBXBuildFile;
-			fileRef = 59CE134BB5F2F1D87D20AB34;
 		};
 		81315ABE1B5196E62FEAF085 = {
 			isa = PBXBuildFile;
@@ -278,6 +278,13 @@
 			path = ../../Source/DEX/DEXPage.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		1A80FDC4B88D61C0AAB5D81D = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = DEXManager.h;
+			path = ../../Source/DEX/DEXManager.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		1E8DE8B40D50E5DB882D0D40 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.objcpp;
@@ -355,13 +362,6 @@
 			path = System/Library/Frameworks/WebKit.framework;
 			sourceTree = SDKROOT;
 		};
-		432622C848430E1D225D94C2 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = OrdersManager.h;
-			path = ../../Source/DEX/OrdersManager.h;
-			sourceTree = "SOURCE_ROOT";
-		};
 		510F04B2A4332278F5F209C3 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -395,13 +395,6 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = DemoMiner.h;
 			path = ../../Source/Demos/DemoMiner.h;
-			sourceTree = "SOURCE_ROOT";
-		};
-		59CE134BB5F2F1D87D20AB34 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = OrdersManager.cpp;
-			path = ../../Source/DEX/OrdersManager.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		5DA8E9EC8390C21FB637ABF0 = {
@@ -577,6 +570,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = Proposal.h;
 			path = ../../Source/Proposals/Proposal.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		AF4F14249133E44BDED8C6B4 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = DEXManager.cpp;
+			path = ../../Source/DEX/DEXManager.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		B0900C36AF07AFF88A422DF2 = {
@@ -799,12 +799,12 @@
 		4576C75266FC9F8B83F83140 = {
 			isa = PBXGroup;
 			children = (
+				AF4F14249133E44BDED8C6B4,
+				1A80FDC4B88D61C0AAB5D81D,
 				146CF7EBB22338825418D3E9,
 				160F1B25E830A88EB81D11F5,
 				64AA565C9FB6F488ABFC0858,
 				3D9D6A70A43B37B489172BDD,
-				59CE134BB5F2F1D87D20AB34,
-				432622C848430E1D225D94C2,
 				EDA72D64D0C8122D56A91779,
 				BA288CD361E5BFCC337628EB,
 			);
@@ -1226,9 +1226,9 @@
 				512118B6F16E9FE6A26E5333,
 				2BF750FDBC8DCF0149147F2E,
 				6A954FA3C51846B51AA555E4,
+				C793573B812E92F2E1F9A3F1,
 				5A3DA206190F057B44FDA6A4,
 				3FAABEF679539A4A35C12933,
-				658A3370960D604062B98387,
 				81315ABE1B5196E62FEAF085,
 				94F672D3BDA08865353B9C45,
 				B16A028E08A88B3CC4C157B1,

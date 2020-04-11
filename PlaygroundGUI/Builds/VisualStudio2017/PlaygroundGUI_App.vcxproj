@@ -145,9 +145,9 @@
     <ClCompile Include="..\..\Source\Utils\Utils.cpp"/>
     <ClCompile Include="..\..\Source\Login\AccountsModel.cpp"/>
     <ClCompile Include="..\..\Source\Login\LoginComponent.cpp"/>
+    <ClCompile Include="..\..\Source\DEX\DEXManager.cpp"/>
     <ClCompile Include="..\..\Source\DEX\DEXPage.cpp"/>
     <ClCompile Include="..\..\Source\DEX\Order.cpp"/>
-    <ClCompile Include="..\..\Source\DEX\OrdersManager.cpp"/>
     <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\Proposal.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\ProposalsModel.cpp"/>
@@ -1358,9 +1358,9 @@
     <ClInclude Include="..\..\Source\Login\LoginComponent.h"/>
     <ClInclude Include="..\..\Source\Models\AbstractListModel.h"/>
     <ClInclude Include="..\..\Source\Models\AbstractProxyModel.h"/>
+    <ClInclude Include="..\..\Source\DEX\DEXManager.h"/>
     <ClInclude Include="..\..\Source\DEX\DEXPage.h"/>
     <ClInclude Include="..\..\Source\DEX\Order.h"/>
-    <ClInclude Include="..\..\Source\DEX\OrdersManager.h"/>
     <ClInclude Include="..\..\Source\DEX\OrdersModel.h"/>
     <ClInclude Include="..\..\Source\Proposals\Proposal.h"/>
     <ClInclude Include="..\..\Source\Proposals\ProposalsModel.h"/>
