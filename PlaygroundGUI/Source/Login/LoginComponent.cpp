@@ -221,7 +221,8 @@ void LoginComponent::modelChanged(AbstractListModelBase* base) {
 }
 
 void LoginComponent::openAccount(Account* account) {
-  if (auto contract = AutomatonContractData::getInstance()->getContract()) {
+  auto contract = AutomatonContractData::getInstance()->getContract();
+  if (contract == nullptr) {
     AlertWindow::showMessageBoxAsync(
         AlertWindow::WarningIcon,
         "ERROR",

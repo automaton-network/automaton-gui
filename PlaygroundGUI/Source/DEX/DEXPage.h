@@ -39,6 +39,8 @@ class DEXPage : public Component
   void modelChanged(AbstractListModelBase* model) override;
 
  private:
+  std::unique_ptr<Label> m_ethBalanceLabel;
+  std::unique_ptr<Label> m_autoBalanceLabel;
   std::unique_ptr<OrdersUIModel> m_sellingUIModel;
   std::unique_ptr<OrdersUIModel> m_buyingUIModel;
   std::unique_ptr<Label> m_sellingLabel;

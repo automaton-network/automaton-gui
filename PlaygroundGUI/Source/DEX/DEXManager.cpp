@@ -38,8 +38,7 @@ using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
 static std::shared_ptr<eth_contract> getContract(status* resStatus) {
-  const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract(cd->m_contractAddress);
+  const auto contract = AutomatonContractData::getInstance()->getContract();
   if (contract == nullptr)
     *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
 
@@ -82,12 +81,40 @@ static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resSt
   return ordersLength;
 }
 
+static std::string ethBalance(std::shared_ptr<eth_contract> contract
+    , const std::string& m_ethAddress
+    , status* resStatus) {
+  json jInput;
+  jInput.push_back(m_ethAddress.substr(2));
+  *resStatus = contract->call("getBalanceETH", jInput.dump());
+  json j_output = json::parse(resStatus->msg);
+  return  (*j_output.begin()).get<std::string>();
+}
+
+static std::string autoBalance(std::shared_ptr<eth_contract> contract
+    , const std::string& m_ethAddress
+    , status* resStatus) {
+  json jInput;
+  jInput.push_back(m_ethAddress.substr(2));
+  *resStatus = contract->call("balanceOf", jInput.dump());
+  json j_output = json::parse(resStatus->msg);
+  return  (*j_output.begin()).get<std::string>();
+}
+
 bool DEXManager::fetchOrders() {
   Array<Order::Ptr> orders;
   AsyncTask task([&](AsyncTask* task) {
     auto& s = task->m_status;
 
     auto contract = getContract(&s);
+    if (!s.is_ok())
+      return false;
+
+    m_ethBalance = ethBalance(contract, m_ethAddress, &s);
+    if (!s.is_ok())
+      return false;
+
+    m_autoBalance = autoBalance(contract, m_ethAddress, &s);
     if (!s.is_ok())
       return false;
 

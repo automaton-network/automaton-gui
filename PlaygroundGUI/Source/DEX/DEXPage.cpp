@@ -21,6 +21,8 @@
 #include "DEXPage.h"
 #include "DEXManager.h"
 
+static const String ETH_BALANCE_PREFIX_LABEL = "Eth Balance: ";
+static const String AUTO_BALANCE_PREFIX_LABEL = "AUTO Balance: ";
 
 class OrdersUIModel : public TableListBoxModel {
  public:
@@ -94,6 +96,14 @@ DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   m_buyingUIModel = std::make_unique<OrdersUIModel>();
   m_buyingUIModel->setModel(m_buyingProxyModel);
 
+  m_ethBalanceLabel = std::make_unique<Label>("m_balanceLabel");
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + m_dexManager->getEthBalance()
+      , NotificationType::dontSendNotification);
+  m_autoBalanceLabel = std::make_unique<Label>("m_autoBalanceLabel");
+  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
+      , NotificationType::dontSendNotification);
+
+
   m_sellingLabel = std::make_unique<Label>("m_sellingLabel", "Selling:");
   m_sellingLabel->setColour(Label::textColourId, Colours::red);
   m_sellingLabel->setFont(m_sellingLabel->getFont().withHeight(35));
@@ -117,6 +127,8 @@ DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   buyingHeader.addColumn(translate("Eth"), OrdersUIModel::Eth, 50);
   buyingHeader.addColumn(translate("Owner"), OrdersUIModel::Owner, 200);
 
+  addAndMakeVisible(m_ethBalanceLabel.get());
+  addAndMakeVisible(m_autoBalanceLabel.get());
   addAndMakeVisible(m_sellingLabel.get());
   addAndMakeVisible(m_buyingLabel.get());
   addAndMakeVisible(m_sellingTable.get());
@@ -130,7 +142,12 @@ void DEXPage::paint(Graphics& g) {
 }
 
 void DEXPage::resized() {
-  auto tablesBounds = getLocalBounds();
+  auto bounds = getLocalBounds();
+  auto labelsBounds = bounds.removeFromTop(30);
+  m_ethBalanceLabel->setBounds(labelsBounds.removeFromLeft(getWidth() / 2));
+  m_autoBalanceLabel->setBounds(labelsBounds);
+
+  auto tablesBounds = bounds;
   const int tablesMargin = 10;
   const int titlesHeight = 50;
   auto sellingBounds = tablesBounds.removeFromLeft(getWidth() / 2).reduced(tablesMargin);
@@ -142,6 +159,11 @@ void DEXPage::resized() {
 }
 
 void DEXPage::modelChanged(AbstractListModelBase* model) {
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + m_dexManager->getEthBalance()
+      , NotificationType::dontSendNotification);
+  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
+      , NotificationType::dontSendNotification);
+
   if (model == m_sellingProxyModel.get()) {
     m_sellingTable->updateContent();
     m_sellingTable->repaint();
