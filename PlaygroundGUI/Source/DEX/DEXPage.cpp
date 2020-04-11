@@ -20,6 +20,7 @@
 #include <JuceHeader.h>
 #include "DEXPage.h"
 #include "DEXManager.h"
+#include "../Utils/Utils.h"
 
 static const String ETH_BALANCE_PREFIX_LABEL = "Eth Balance: ";
 static const String AUTO_BALANCE_PREFIX_LABEL = "AUTO Balance: ";
@@ -97,7 +98,8 @@ DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   m_buyingUIModel->setModel(m_buyingProxyModel);
 
   m_ethBalanceLabel = std::make_unique<Label>("m_balanceLabel");
-  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + m_dexManager->getEthBalance()
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + Utils::fromWei(EthUnit::ether, m_dexManager->getEthBalance())
+      + String(" ETH")
       , NotificationType::dontSendNotification);
   m_autoBalanceLabel = std::make_unique<Label>("m_autoBalanceLabel");
   m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
@@ -159,7 +161,7 @@ void DEXPage::resized() {
 }
 
 void DEXPage::modelChanged(AbstractListModelBase* model) {
-  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + m_dexManager->getEthBalance()
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + Utils::fromWei(EthUnit::ether, m_dexManager->getEthBalance())
       , NotificationType::dontSendNotification);
   m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
       , NotificationType::dontSendNotification);

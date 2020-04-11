@@ -33,6 +33,7 @@ using automaton::core::interop::ethereum::eth_getTransactionCount;
 using automaton::core::interop::ethereum::eth_getTransactionReceipt;
 using automaton::core::interop::ethereum::encode;
 using automaton::core::interop::ethereum::eth_contract;
+using automaton::core::interop::ethereum::eth_getBalance;
 using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
@@ -81,14 +82,12 @@ static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resSt
   return ordersLength;
 }
 
-static std::string ethBalance(std::shared_ptr<eth_contract> contract
-    , const std::string& m_ethAddress
-    , status* resStatus) {
-  json jInput;
-  jInput.push_back(m_ethAddress.substr(2));
-  *resStatus = contract->call("getBalanceETH", jInput.dump());
-  json j_output = json::parse(resStatus->msg);
-  return  (*j_output.begin()).get<std::string>();
+static std::string ethBalance(const std::string& m_ethAddress
+                              , status* resStatus) {
+  *resStatus = eth_getBalance(AutomatonContractData::getInstance()->getUrl(), m_ethAddress);
+  BigInteger balance;
+  balance.parseString(resStatus->msg, 16);
+  return balance.toString(10).toStdString();
 }
 
 static std::string autoBalance(std::shared_ptr<eth_contract> contract
@@ -110,7 +109,7 @@ bool DEXManager::fetchOrders() {
     if (!s.is_ok())
       return false;
 
-    m_ethBalance = ethBalance(contract, m_ethAddress, &s);
+    m_ethBalance = ethBalance(m_ethAddress, &s);
     if (!s.is_ok())
       return false;
 
