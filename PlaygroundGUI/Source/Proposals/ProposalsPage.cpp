@@ -19,7 +19,7 @@
 
 #include "ProposalsPage.h"
 #include "ProposalsManager.h"
-#include "../Utils.h"
+#include "../Utils/Utils.h"
 
 //==============================================================================
 ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {

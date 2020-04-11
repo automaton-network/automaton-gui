@@ -133,7 +133,7 @@ void Miner::stopMining() {
 
 void Miner::processMinedKey(std::string _pk, int keys_generated) {
   auto cd = AutomatonContractData::getInstance();
-  ScopedLock lock(cd->criticalSection);
+  ScopedLock lock(cd->m_criticalSection);
 
   total_keys_generated += abs(keys_generated);
   if (keys_generated <= 0) {
@@ -150,7 +150,7 @@ void Miner::processMinedKey(std::string _pk, int keys_generated) {
   if (x <= std::string(reinterpret_cast<char*>(difficulty), 32)) {
     return;
   }
-  if (x <= cd->slots[ms.slot_index].difficulty) {
+  if (x <= cd->m_slots[ms.slot_index].difficulty) {
     return;
   }
   ms.difficulty = x;
@@ -208,8 +208,8 @@ class TableSlots: public TableListBox, TableListBoxModel {
   // This is overloaded from TableListBoxModel, and must return the total number of rows in our table
   int getNumRows() override {
     auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->criticalSection);
-    return static_cast<int>(cd->slots.size());
+    ScopedLock lock(cd->m_criticalSection);
+    return static_cast<int>(cd->m_slots.size());
   }
 
   void selectedRowsChanged(int) override {
@@ -231,7 +231,7 @@ class TableSlots: public TableListBox, TableListBoxModel {
   void paintCell(Graphics& g, int rowNumber, int columnId,
                 int width, int height, bool /*rowIsSelected*/) override {
     auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->criticalSection);
+    ScopedLock lock(cd->m_criticalSection);
 
     g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
     g.setFont(font);
@@ -247,11 +247,11 @@ class TableSlots: public TableListBox, TableListBoxModel {
         break;
       }
       case 2: {
-        text = bin2hex(cd->slots[rowNumber].difficulty);
+        text = bin2hex(cd->m_slots[rowNumber].difficulty);
         break;
       }
       case 3: {
-        text = "0x" + cd->slots[rowNumber].owner;
+        text = "0x" + cd->m_slots[rowNumber].owner;
         break;
       }
       case 4: {
@@ -408,10 +408,10 @@ Miner::Miner() {
 
 void Miner::updateContractData() {
   auto cd = AutomatonContractData::getInstance();
-  ScopedLock lock(cd->criticalSection);
-  setSlotsNumber(cd->slots_number);
-  setMaskHex(cd->mask);
-  setMinDifficultyHex(cd->min_difficulty);
+  ScopedLock lock(cd->m_criticalSection);
+  setSlotsNumber(cd->m_slotsNumber);
+  setMaskHex(cd->m_mask);
+  setMinDifficultyHex(cd->m_minDifficulty);
 }
 
 Miner::~Miner() {
@@ -608,11 +608,11 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
 
   void run() override {
     auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->criticalSection);
+    ScopedLock lock(cd->m_criticalSection);
 
     setStatusMessage("Getting nonce for account 0x" + address);
     uint32_t nonce = 0;
-    s = eth_getTransactionCount(cd->eth_url, "0x" + address);
+    s = eth_getTransactionCount(cd->m_ethUrl, "0x" + address);
     if (s.code == automaton::core::common::status::OK) {
       nonce = hex2dec(s.msg);
       std::cout << "0x" << address << " Nonce is: " << nonce << std::endl;
@@ -650,15 +650,15 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
     t.nonce = nonce ? dec2hex(nonce) : "";
     t.gas_price = "1388";  // 5 000
     t.gas_limit = "5B8D80";  // 6M
-    t.to = cd->contract_address.substr(2);
+    t.to = cd->m_contractAddress.substr(2);
     t.value = "";
     t.data = claim_slot_data.str();
     t.chain_id = "01";
 
     std::string transaction_receipt = "";
 
-    eth_contract::register_contract(cd->eth_url, cd->contract_address, cd->get_abi());
-    auto contract = eth_contract::get_contract(cd->contract_address);
+    eth_contract::register_contract(cd->m_ethUrl, cd->m_contractAddress, cd->getAbi());
+    auto contract = eth_contract::get_contract(cd->m_contractAddress);
     if (contract == nullptr) {
       s = status::internal("Contract is NULL!");
       return;

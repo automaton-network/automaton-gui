@@ -19,6 +19,7 @@
 
 #include "OrdersManager.h"
 #include "OrdersModel.h"
+#include "../Utils/AsyncTask.h"
 #include "../Data/AutomatonContractData.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
@@ -36,27 +37,9 @@ using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
-class AsyncTask : public ThreadWithProgressWindow {
- public:
-  AsyncTask(std::function<bool(AsyncTask*)> fun, const String& title)
-    : ThreadWithProgressWindow(title, true, true)
-    , m_status(status::ok()) {
-    m_fun = fun;
-  }
-
-  void run() {
-    m_fun(this);
-  }
-
-  status m_status;
-
- private:
-  std::function<bool(AsyncTask*)> m_fun;
-};
-
 static std::shared_ptr<eth_contract> getContract(status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract(cd->contract_address);
+  const auto contract = eth_contract::get_contract(cd->m_contractAddress);
   if (contract == nullptr)
     *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
 

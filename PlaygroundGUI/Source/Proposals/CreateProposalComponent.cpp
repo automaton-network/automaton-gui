@@ -18,7 +18,7 @@
  */
 
 #include "CreateProposalComponent.h"
-#include "../Utils.h"
+#include "../Utils/Utils.h"
 
 CreateProposalComponent::CreateProposalComponent() {
   m_titleEditor = std::make_unique<TextEditor>(translate("Title"));

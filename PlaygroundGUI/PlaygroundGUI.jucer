@@ -18,6 +18,11 @@
             file="../../automaton/media/fonts/play/Play-Regular.ttf"/>
     </GROUP>
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
+      <GROUP id="{3E428D4F-158D-E689-F504-DD0848DE4278}" name="Utils">
+        <FILE id="tHTUtX" name="AsyncTask.h" compile="0" resource="0" file="Source/Utils/AsyncTask.h"/>
+        <FILE id="RtEFzK" name="Utils.cpp" compile="1" resource="0" file="Source/Utils/Utils.cpp"/>
+        <FILE id="zMGIcA" name="Utils.h" compile="0" resource="0" file="Source/Utils/Utils.h"/>
+      </GROUP>
       <GROUP id="{867F9B81-C019-9D46-209F-BBE27FD4A220}" name="Login">
         <FILE id="SkQyNk" name="AccountsModel.cpp" compile="1" resource="0"
               file="Source/Login/AccountsModel.cpp"/>
@@ -102,8 +107,6 @@
         <FILE id="zxKSKI" name="NetworkView.cpp" compile="1" resource="0" file="Source/Network/NetworkView.cpp"/>
         <FILE id="zDEJP7" name="NetworkView.h" compile="0" resource="0" file="Source/Network/NetworkView.h"/>
       </GROUP>
-      <FILE id="upiiZw" name="Utils.cpp" compile="1" resource="0" file="Source/Utils.cpp"/>
-      <FILE id="AUY9pH" name="Utils.h" compile="0" resource="0" file="Source/Utils.h"/>
       <FILE id="f60Dju" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="dBsD3K" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>

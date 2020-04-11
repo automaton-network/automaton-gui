@@ -21,6 +21,7 @@
 #include <functional>
 
 #include "ProposalsManager.h"
+#include "../Utils/AsyncTask.h"
 #include "../Data/AutomatonContractData.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
@@ -47,32 +48,12 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
 
 static std::shared_ptr<eth_contract> getContract(status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract(cd->contract_address);
+  const auto contract = eth_contract::get_contract(cd->getAddress());
   if (contract == nullptr)
     *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
 
   return contract;
 }
-
-
-class AsyncTask : public ThreadWithProgressWindow {
- public:
-  AsyncTask(std::function<bool(AsyncTask*)> fun, const String& title)
-      : ThreadWithProgressWindow(title, true, true)
-      , m_status(status::ok()) {
-    m_fun = fun;
-  }
-
-  void run() {
-    m_fun(this);
-  }
-
-  status m_status;
-
- private:
-  std::function<bool(AsyncTask*)> m_fun;
-};
-
 
 ProposalsManager::ProposalsManager(Config* config)
   : m_model(std::make_shared<ProposalsModel>()) {
@@ -174,7 +155,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     proposal->setId(lastProposalId + 1);
     task->setProgress(0.25);
 
-    s = eth_getTransactionCount(cd->eth_url, m_ethAddress);
+    s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -208,7 +189,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     transaction.nonce = nonce;
     transaction.gas_price = "1388";  // 5 000
     transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = cd->contract_address.substr(2);
+    transaction.to = cd->getAddress().substr(2);
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
@@ -264,7 +245,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
 
     task->setProgress(0.1);
 
-    s = eth_getTransactionCount(cd->eth_url, m_ethAddress);
+    s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -285,7 +266,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     transaction.nonce = nonce;
     transaction.gas_price = "1388";  // 5 000
     transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = cd->contract_address.substr(2);
+    transaction.to = cd->getAddress().substr(2);
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
@@ -330,7 +311,7 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
                          const std::string& privateKey,
                          status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  const auto s = eth_getTransactionCount(cd->eth_url, ethAddress);
+  const auto s = eth_getTransactionCount(cd->getUrl(), ethAddress);
   *resStatus = s;
   const auto nonce = s.is_ok() ? s.msg : "0";
   if (!s.is_ok())
@@ -353,7 +334,7 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
   transaction.nonce = nonce;
   transaction.gas_price = "1388";  // 5 000
   transaction.gas_limit = "5B8D80";  // 6M
-  transaction.to = cd->contract_address.substr(2);
+  transaction.to = cd->getAddress().substr(2);
   transaction.value = "";
   transaction.data = txData.str();
   transaction.chain_id = "01";

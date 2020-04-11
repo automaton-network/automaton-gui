@@ -51,8 +51,8 @@ DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
   m_tabbedComponent.reset(new TabbedComponent(TabbedButtonBar::TabsAtTop));
   addAndMakeVisible(m_tabbedComponent.get());
   m_tabbedComponent->setTabBarDepth(37);
-  m_tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040),
-                            new NetworkView(m_proposalsManager.get()), true);
+//  m_tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040),
+//                            new NetworkView(m_proposalsManager.get()), true);
   m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(), true);
   // m_tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
 

@@ -41,6 +41,10 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
+		512118B6F16E9FE6A26E5333 = {
+			isa = PBXBuildFile;
+			fileRef = B0900C36AF07AFF88A422DF2;
+		};
 		2BF750FDBC8DCF0149147F2E = {
 			isa = PBXBuildFile;
 			fileRef = 417321119444057352E75D2E;
@@ -132,10 +136,6 @@
 		474A5E736DC9996D96CBC820 = {
 			isa = PBXBuildFile;
 			fileRef = 08D1D043B252AE5AA9E7A223;
-		};
-		DC28DB98D6CD9590DC30C89D = {
-			isa = PBXBuildFile;
-			fileRef = 3A56070EF92B1A08D0E377C5;
 		};
 		9A3C098021D839B8BA421107 = {
 			isa = PBXBuildFile;
@@ -292,13 +292,6 @@
 			path = ../../Source/Proposals/CreateProposalComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
-		2442CDA25E1722A28DB0106F = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = Utils.h;
-			path = ../../Source/Utils.h;
-			sourceTree = "SOURCE_ROOT";
-		};
 		24A90FD816B6497603F90864 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -339,13 +332,6 @@
 			lastKnownFileType = file;
 			name = "juce_gui_basics";
 			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_gui_basics";
-			sourceTree = "SOURCE_ROOT";
-		};
-		3A56070EF92B1A08D0E377C5 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = Utils.cpp;
-			path = ../../Source/Utils.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		3D9D6A70A43B37B489172BDD = {
@@ -416,6 +402,20 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = OrdersManager.cpp;
 			path = ../../Source/DEX/OrdersManager.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		5DA8E9EC8390C21FB637ABF0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = AsyncTask.h;
+			path = ../../Source/Utils/AsyncTask.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		63E9BAEFD1CC58069F2AB51D = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Utils.h;
+			path = ../../Source/Utils/Utils.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		64AA565C9FB6F488ABFC0858 = {
@@ -577,6 +577,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = Proposal.h;
 			path = ../../Source/Proposals/Proposal.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		B0900C36AF07AFF88A422DF2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Utils.cpp;
+			path = ../../Source/Utils/Utils.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		B4352990FE118BBD5B965E8F = {
@@ -759,6 +766,16 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		94893703525D205935444A39 = {
+			isa = PBXGroup;
+			children = (
+				5DA8E9EC8390C21FB637ABF0,
+				B0900C36AF07AFF88A422DF2,
+				63E9BAEFD1CC58069F2AB51D,
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
 		A5F3935FE58429F9F2E04941 = {
 			isa = PBXGroup;
 			children = (
@@ -878,6 +895,7 @@
 		883895BF3FD94AEF68720830 = {
 			isa = PBXGroup;
 			children = (
+				94893703525D205935444A39,
 				A5F3935FE58429F9F2E04941,
 				687803636958C453C18D7987,
 				4576C75266FC9F8B83F83140,
@@ -888,8 +906,6 @@
 				D42076CCB651D5CCB42A7F0D,
 				32CC0634FEFEA14E371BC412,
 				6BBA852623D8A64A3A5A7043,
-				3A56070EF92B1A08D0E377C5,
-				2442CDA25E1722A28DB0106F,
 				F37DC7F8EC888D82E793ED31,
 				D2896F2FBEFBC7DB297DCD12,
 				960F41F1CCAE949D7CDBFC7B,
@@ -1207,6 +1223,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				512118B6F16E9FE6A26E5333,
 				2BF750FDBC8DCF0149147F2E,
 				6A954FA3C51846B51AA555E4,
 				5A3DA206190F057B44FDA6A4,
@@ -1230,7 +1247,6 @@
 				EED2358D21B09846AA8B17BD,
 				6C764B7D3E1A849226C54B02,
 				474A5E736DC9996D96CBC820,
-				DC28DB98D6CD9590DC30C89D,
 				9A3C098021D839B8BA421107,
 				0721950C61ADA44331EC5DB3,
 				EF0B0FEE0E3E3DF8F720110A,

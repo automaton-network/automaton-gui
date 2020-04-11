@@ -5,6 +5,9 @@
     <Filter Include="PlaygroundGUI\Resources">
       <UniqueIdentifier>{AE2B0A6C-5E8C-CDF5-BBA7-0BA1DA8C1FBD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PlaygroundGUI\Source\Utils">
+      <UniqueIdentifier>{5BA90E0C-E3EA-613A-C80F-3E02627758D5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="PlaygroundGUI\Source\Login">
       <UniqueIdentifier>{3C003833-5ED0-B953-6FF0-A7F7DEDF4EC6}</UniqueIdentifier>
     </Filter>
@@ -250,6 +253,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Utils\Utils.cpp">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Login\AccountsModel.cpp">
       <Filter>PlaygroundGUI\Source\Login</Filter>
     </ClCompile>
@@ -315,9 +321,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Network\NetworkView.cpp">
       <Filter>PlaygroundGUI\Source\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Utils.cpp">
-      <Filter>PlaygroundGUI\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\MainComponent.cpp">
       <Filter>PlaygroundGUI\Source</Filter>
@@ -1605,6 +1608,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Utils\AsyncTask.h">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Utils\Utils.h">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Login\AccountsModel.h">
       <Filter>PlaygroundGUI\Source\Login</Filter>
     </ClInclude>
@@ -1676,9 +1685,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Network\NetworkView.h">
       <Filter>PlaygroundGUI\Source\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Utils.h">
-      <Filter>PlaygroundGUI\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\MainComponent.h">
       <Filter>PlaygroundGUI\Source</Filter>

@@ -46,7 +46,7 @@ class LoginComponent  : public Component
   // TableListBoxModel
   // ==============================================================================
 
-  int getNumRows();
+  int getNumRows() override;
   void paintCell(Graphics& g,
                  int rowNumber, int columnId,
                  int width, int height,
@@ -65,6 +65,12 @@ class LoginComponent  : public Component
   std::unique_ptr<Drawable> m_logo;
   std::unique_ptr<TableListBox> m_accountsTable;
   std::unique_ptr<TextButton> m_importPrivateKeyBtn;
+  std::unique_ptr<Label> m_rpcLabel;
+  std::unique_ptr<TextEditor> m_rpcEditor;
+  std::unique_ptr<Label> m_contractAddrLabel;
+  std::unique_ptr<TextEditor> m_contractAddrEditor;
+  std::unique_ptr<TextButton> m_readContractBtn;
+
   OwnedArray<AccountWindow> m_accountWindows;
   ConfigFile* m_configFile;
 

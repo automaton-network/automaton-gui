@@ -20,8 +20,9 @@
 #include <JuceHeader.h>
 #include "LoginComponent.h"
 #include "../MainComponent.h"
-#include "../Utils.h"
+#include "../Utils/Utils.h"
 #include "../Config/Config.h"
+#include "../Data/AutomatonContractData.h"
 
 class AccountWindow : public DocumentWindow {
  public:
@@ -100,6 +101,25 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
       BinaryData::logo_white_on_transparent_8x8_svgSize);
   addAndMakeVisible(m_logo.get());
 
+  m_rpcLabel = std::make_unique<Label>("m_rpcLabel", "Ethereum RPC:");
+  addAndMakeVisible(m_rpcLabel.get());
+  m_rpcEditor = std::make_unique<TextEditor>("m_rpcEditor");
+  addAndMakeVisible(m_rpcEditor.get());
+
+  m_contractAddrLabel = std::make_unique<Label>("m_contractAddrLabel", "Contract Address: ");
+  addAndMakeVisible(m_contractAddrLabel.get());
+  m_contractAddrEditor = std::make_unique<TextEditor>("m_contractAddrEditor");
+  m_contractAddrEditor->setInputRestrictions(42, "0123456789abcdefABCDEFx");
+  addAndMakeVisible(m_contractAddrEditor.get());
+
+  m_readContractBtn = std::make_unique<TextButton>("Read");
+  m_readContractBtn->addListener(this);
+  addAndMakeVisible(m_readContractBtn.get());
+
+  auto cd = AutomatonContractData::getInstance();
+  m_rpcEditor->setText(cd->getUrl());
+  m_contractAddrEditor->setText(cd->getAddress());
+
   setSize(350, 600);
 }
 
@@ -123,7 +143,17 @@ void LoginComponent::resized() {
   auto logoBounds = bounds.removeFromTop(39);
   m_logo->setBounds(logoBounds.withSizeKeepingCentre(231, 39));
 
-  bounds.removeFromTop(40);
+  bounds.removeFromTop(20);
+  auto rpcBounds = bounds.removeFromTop(20);
+  m_rpcLabel->setBounds(rpcBounds.removeFromLeft(100));
+  m_rpcEditor->setBounds(rpcBounds);
+
+  bounds.removeFromTop(20);
+  auto addrBounds = bounds.removeFromTop(20);
+  m_contractAddrLabel->setBounds(addrBounds.removeFromLeft(100));
+  m_contractAddrEditor->setBounds(addrBounds);
+  m_readContractBtn->setBounds(bounds.removeFromTop(40).withSizeKeepingCentre(120, 20));
+
   m_accountsTable->setBounds(bounds.removeFromTop(250));
   bounds.removeFromTop(40);
   auto btnBounds = bounds.removeFromTop(40);
@@ -163,6 +193,9 @@ void LoginComponent::buttonClicked(Button* btn) {
       account.getConfig().set_string("account_alias", accountAlias.toStdString());
       m_model->addItem(account, true);
     }
+  } else if (btn == m_readContractBtn.get()) {
+    AutomatonContractData::getInstance()->readContract(m_rpcEditor->getText().toStdString(),
+                                                       m_contractAddrEditor->getText().toStdString());
   }
 }
 
