@@ -107,8 +107,8 @@ class PlaygroundGUIApplication: public JUCEApplication {
 
       setFullScreen(true);
       setResizable(false, false);
-      setResizeLimits(350, 600, 10000, 600);
-      centreWithSize(350, 600);
+      setResizeLimits(350, 500, 10000, 600);
+      centreWithSize(350, 500);
 
       setVisible(true);
     }

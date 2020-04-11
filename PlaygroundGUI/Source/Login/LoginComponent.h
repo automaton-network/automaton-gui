@@ -58,6 +58,8 @@ class LoginComponent  : public Component
   void cellClicked(int rowNumber, int columnId, const MouseEvent&) override;
   void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent&) override;
 
+ private:
+  void switchLoginState(bool isNetworkConfig);
 
  private:
   AccountWindow* getWindowByAddress(const String& address);

@@ -112,13 +112,14 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   m_contractAddrEditor->setInputRestrictions(42, "0123456789abcdefABCDEFx");
   addAndMakeVisible(m_contractAddrEditor.get());
 
-  m_readContractBtn = std::make_unique<TextButton>("Read");
+  m_readContractBtn = std::make_unique<TextButton>("Login");
   m_readContractBtn->addListener(this);
   addAndMakeVisible(m_readContractBtn.get());
 
   auto cd = AutomatonContractData::getInstance();
   m_rpcEditor->setText(cd->getUrl());
   m_contractAddrEditor->setText(cd->getAddress());
+  switchLoginState(true);
 
   setSize(350, 600);
 }
@@ -143,17 +144,19 @@ void LoginComponent::resized() {
   auto logoBounds = bounds.removeFromTop(39);
   m_logo->setBounds(logoBounds.withSizeKeepingCentre(231, 39));
 
-  bounds.removeFromTop(20);
-  auto rpcBounds = bounds.removeFromTop(20);
+  auto configBounds = bounds;
+  configBounds.removeFromTop(20);
+  auto rpcBounds = configBounds.removeFromTop(20);
   m_rpcLabel->setBounds(rpcBounds.removeFromLeft(100));
   m_rpcEditor->setBounds(rpcBounds);
-
-  bounds.removeFromTop(20);
-  auto addrBounds = bounds.removeFromTop(20);
+  configBounds.removeFromTop(20);
+  auto addrBounds = configBounds.removeFromTop(20);
   m_contractAddrLabel->setBounds(addrBounds.removeFromLeft(100));
   m_contractAddrEditor->setBounds(addrBounds);
-  m_readContractBtn->setBounds(bounds.removeFromTop(40).withSizeKeepingCentre(120, 20));
+  configBounds.removeFromTop(40);
+  m_readContractBtn->setBounds(configBounds.removeFromTop(40).withSizeKeepingCentre(120, 40));
 
+  bounds.removeFromTop(40);
   m_accountsTable->setBounds(bounds.removeFromTop(250));
   bounds.removeFromTop(40);
   auto btnBounds = bounds.removeFromTop(40);
@@ -194,8 +197,10 @@ void LoginComponent::buttonClicked(Button* btn) {
       m_model->addItem(account, true);
     }
   } else if (btn == m_readContractBtn.get()) {
-    AutomatonContractData::getInstance()->readContract(m_rpcEditor->getText().toStdString(),
-                                                       m_contractAddrEditor->getText().toStdString());
+    bool res = AutomatonContractData::getInstance()->readContract(m_rpcEditor->getText().toStdString(),
+                                                                  m_contractAddrEditor->getText().toStdString());
+    if (res)
+      switchLoginState(false);
   }
 }
 
@@ -221,15 +226,6 @@ void LoginComponent::modelChanged(AbstractListModelBase* base) {
 }
 
 void LoginComponent::openAccount(Account* account) {
-  auto contract = AutomatonContractData::getInstance()->getContract();
-  if (contract == nullptr) {
-    AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        "Contract is NULL. Read appropriate contract data first.");
-    return;
-  }
-
   if (auto accountWindow = getWindowByAddress(account->getAddress())) {
     accountWindow->toFront(true);
   } else {
@@ -302,4 +298,14 @@ void LoginComponent::cellDoubleClicked(int rowNumber, int columnId, const MouseE
   if (e.mods.isLeftButtonDown()) {
     openAccount(&m_model->getReferenceAt(rowNumber));
   }
+}
+
+void LoginComponent::switchLoginState (bool isNetworkConfig) {
+  m_accountsTable->setVisible(!isNetworkConfig);
+  m_importPrivateKeyBtn->setVisible(!isNetworkConfig);
+  m_rpcLabel->setVisible(isNetworkConfig);
+  m_rpcEditor->setVisible(isNetworkConfig);
+  m_contractAddrLabel->setVisible(isNetworkConfig);
+  m_contractAddrEditor->setVisible(isNetworkConfig);
+ m_readContractBtn->setVisible(isNetworkConfig);
 }
