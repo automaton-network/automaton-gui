@@ -56,7 +56,7 @@ DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
   m_tabbedComponent->setTabBarDepth(37);
 //  m_tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040),
 //                            new NetworkView(m_proposalsManager.get()), true);
-  m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(), true);
+  m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(m_config), true);
   // m_tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
 
   auto proposalsPage = new ProposalsPage(m_proposalsManager.get());

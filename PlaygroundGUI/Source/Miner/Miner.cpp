@@ -310,8 +310,9 @@ static String sepitoa(uint64 n, bool lz = false) {
 }
 
 //==============================================================================
-Miner::Miner() {
-  startTimer(1000);
+Miner::Miner(Config* config) {
+  private_key = config->get_string("private_key");
+  eth_address = config->get_string("eth_address");
 
   int y = 0;
 
@@ -336,6 +337,7 @@ Miner::Miner() {
   LBL("Slots: ", 20, y, 100, 24);
   txtSlotsNum = TXT("SLOTS", 120, y, 100, 24);
   txtSlotsNum->setInputRestrictions(5, "0123456789");
+  txtSlotsNum->setReadOnly(true);
 
   // y += 30;
   // LBL("Mask: ", 20, y, 100, 24);
@@ -354,12 +356,6 @@ Miner::Miner() {
   // txtMinDifficulty->setInputRestrictions(2, "0123456789");
   txtMinDifficultyHex = TXT("MINDIFFHEX", 120, y, 600, 24);
   txtMinDifficultyHex->setReadOnly(true);
-
-  y += 30;
-  LBL("Miner Address: ", 20, y, 100, 24);
-  txtMinerAddress = TXT("ADDR", 120, y, 430, 24);
-  txtMinerAddress->setInputRestrictions(42, "0123456789abcdefABCDEFx");
-  TB("Import Private Key", 570, y, 150, 24);
 
   y += 50;
   TB("Add Miner", 120, y, 80, 24);
@@ -404,6 +400,8 @@ Miner::Miner() {
   TB("Claim", 100, y, 80, 30);
   TB("Start Miner", 200, y, 80, 30);
   */
+
+  startTimer(1000);
 }
 
 void Miner::updateContractData() {
@@ -450,7 +448,7 @@ void Miner::setMinerAddress(std::string _address) {
 
   a.Encode(minerAddress, 32);
   const unsigned int UPPER = (1 << 31);
-  txtMinerAddress->setText("0x" + IntToString(a, UPPER | 16), false);
+  //txtMinerAddress->setText("0x" + IntToString(a, UPPER | 16), false);
 }
 
 void Miner::setSlotsNumber(int _slotsNum) {
@@ -481,9 +479,6 @@ void Miner::textEditorTextChanged(TextEditor & txt) {
   if (txtSlotsNum == &txt) {
     setSlotsNumber(txtSlotsNum->getText().getIntValue());
   }
-  if (txtMinerAddress == & txt) {
-    setMinerAddress(txtMinerAddress->getText().toStdString());
-  }
 }
 
 void Miner::buttonClicked(Button* btn) {
@@ -494,8 +489,6 @@ void Miner::buttonClicked(Button* btn) {
     stopMining();
   } else if (txt == "Claim") {
     createSignature();
-  } else if (txt == "Import Private Key") {
-    importPrivateKey();
   }
   repaint();
 }
@@ -522,33 +515,6 @@ void Miner::update() {
   }
   last_time = cur_time;
   last_keys_generated = total_keys_generated;
-}
-
-void Miner::importPrivateKey() {
-  AlertWindow w("Import Private Key",
-                "Enter your private key and it will be imported.",
-                AlertWindow::QuestionIcon);
-
-  w.addTextEditor("privkey", "", "Private Key:", true);
-  w.addButton("OK",     1, KeyPress(KeyPress::returnKey, 0, 0));
-  w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-
-  if (w.runModalLoop() == 1) {
-    // this is the text they entered..
-    auto privkey_hex = w.getTextEditorContents("privkey");
-    if (privkey_hex.startsWith("0x")) {
-      privkey_hex = privkey_hex.substring(2);
-    }
-    if (privkey_hex.length() != 64) {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Invalid Private Key!",
-                                       "Private key should be exactly 32 bytes!");
-      return;
-    }
-    private_key = hex2bin(privkey_hex.toStdString());
-    eth_address = gen_ethereum_address((unsigned char *)private_key.c_str());
-    txtMinerAddress->setText(bin2hex(eth_address));
-  }
 }
 
 void Miner::createSignature() {
