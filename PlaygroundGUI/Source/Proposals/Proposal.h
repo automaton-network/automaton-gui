@@ -35,7 +35,7 @@ class Proposal {
     // INACTIVE statuses
     , Rejected   // not enough "yes" votes during the initial period or during a contest period
     , Completed  // the proposal was successfully implemented
-    , PrepayingGas // the proposal is inactive until all slots are paid
+    , PrepayingGas  // the proposal is inactive until all slots are paid
   };
 
   using Ptr = std::shared_ptr<Proposal>;

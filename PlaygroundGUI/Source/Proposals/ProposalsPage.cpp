@@ -324,8 +324,7 @@ void ProposalsPage::paintCell(Graphics& g,
       const auto status = item->getStatus();
       const auto areAllSlotsPaid = item->areAllSlotsPaid();
       const auto numSlots = AutomatonContractData::getInstance()->getSlotsNumber();
-      if (!areAllSlotsPaid)
-      {
+      if (!areAllSlotsPaid) {
         g.drawText(Proposal::getStatusStr(Proposal::Status::PrepayingGas),
                    0, 0, width, height / 2, Justification::centred);
         g.drawText(String(item->getNumSlotsPaid()) + String("/") + String(numSlots) + String(" paid"),

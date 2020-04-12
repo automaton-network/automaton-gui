@@ -448,7 +448,7 @@ void Miner::setMinerAddress(std::string _address) {
 
   a.Encode(minerAddress, 32);
   const unsigned int UPPER = (1 << 31);
-  //txtMinerAddress->setText("0x" + IntToString(a, UPPER | 16), false);
+  // txtMinerAddress->setText("0x" + IntToString(a, UPPER | 16), false);
 }
 
 void Miner::setSlotsNumber(int _slotsNum) {

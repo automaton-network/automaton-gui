@@ -300,12 +300,12 @@ void LoginComponent::cellDoubleClicked(int rowNumber, int columnId, const MouseE
   }
 }
 
-void LoginComponent::switchLoginState (bool isNetworkConfig) {
+void LoginComponent::switchLoginState(bool isNetworkConfig) {
   m_accountsTable->setVisible(!isNetworkConfig);
   m_importPrivateKeyBtn->setVisible(!isNetworkConfig);
   m_rpcLabel->setVisible(isNetworkConfig);
   m_rpcEditor->setVisible(isNetworkConfig);
   m_contractAddrLabel->setVisible(isNetworkConfig);
   m_contractAddrEditor->setVisible(isNetworkConfig);
- m_readContractBtn->setVisible(isNetworkConfig);
+  m_readContractBtn->setVisible(isNetworkConfig);
 }
