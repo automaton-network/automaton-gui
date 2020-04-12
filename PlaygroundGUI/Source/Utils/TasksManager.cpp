@@ -40,7 +40,8 @@ bool TasksManager::launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
   TaskWithProgressWindow task(fun, title);
 
   if (task.runThread()) {
-    postAction(&task);
+    if (postAction != nullptr)
+      postAction(&task);
 
     auto& s = task.m_status;
     if (!s.is_ok()) {

@@ -88,12 +88,6 @@ void AutomatonContractData::setData(const std::string& _eth_url,
 
 bool AutomatonContractData::readContract(const std::string& url,
                                          const std::string& contractAddress) {
-  uint32_t slotsNumber;
-  uint32_t slotsClaimed;
-  std::vector<ValidatorSlot> validatorSlots;
-  std::string mask;
-  std::string minDifficulty;
-
   auto result = TasksManager::launchTask([&](TaskWithProgressWindow* task){
     auto& s = task->m_status;
     eth_contract::register_contract(url, contractAddress, getAbi());
@@ -116,7 +110,8 @@ bool AutomatonContractData::readContract(const std::string& url,
       return false;
     }
     json j_output = json::parse(s.msg);
-    slotsNumber = std::stoul((*j_output.begin()).get<std::string>());
+    auto slotsNumber = std::stoul((*j_output.begin()).get<std::string>());
+    std::vector<ValidatorSlot> validatorSlots;
     validatorSlots.resize(slotsNumber);
 
     uint32_t step = 1024;
@@ -184,29 +179,26 @@ bool AutomatonContractData::readContract(const std::string& url,
 
     s = contract->call("mask", "");
     j_output = json::parse(s.msg);
-    mask = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
+    auto mask = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     task->setStatusMessage("Mask: " + mask);
 
     s = contract->call("minDifficulty", "");
     j_output = json::parse(s.msg);
-    minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
+    auto minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     task->setStatusMessage("MinDifficulty: " + minDifficulty);
 
     s = contract->call("numTakeOvers", "");
     j_output = json::parse(s.msg);
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
-    slotsClaimed = std::stoul(slots_claimed_string);
+    auto slotsClaimed = std::stoul(slots_claimed_string);
     task->setStatusMessage("Number of slot claims: " + slots_claimed_string);
     task->setProgress(1.0);
 
     s = status::ok();
+    setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, validatorSlots);
+
     return true;
-  }, [=](TaskWithProgressWindow* task) {
-    auto& s = task->m_status;
-    if (s.is_ok()) {
-      setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, validatorSlots);
-    }
-  }, "Reading Contract...");
+  }, nullptr, "Reading Contract...");
 
   return result;
 }
