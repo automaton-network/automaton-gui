@@ -208,13 +208,6 @@
 			path = ../../Source/Network/NetworkView.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
-		0A5C667446871EEB5E066CD5 = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = "juce_data_structures";
-			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_data_structures";
-			sourceTree = "SOURCE_ROOT";
-		};
 		0C84C6C4FC66FF94F12AABA5 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -264,13 +257,6 @@
 			path = ../../JuceLibraryCode/BinaryData.h;
 			sourceTree = "SOURCE_ROOT";
 		};
-		14E041721C1B23214867CB2B = {
-			isa = PBXFileReference;
-			lastKnownFileType = file.ttf;
-			name = "Play-Bold.ttf";
-			path = "../../../../automaton/media/fonts/play/Play-Bold.ttf";
-			sourceTree = "SOURCE_ROOT";
-		};
 		160F1B25E830A88EB81D11F5 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -292,6 +278,13 @@
 			path = "../../JuceLibraryCode/include_juce_graphics.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
+		1EF1C86BA3545A63CF6F51AF = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = "juce_gui_extra";
+			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_gui_extra";
+			sourceTree = "SOURCE_ROOT";
+		};
 		1F7A71E440D0AA4EFE54D78D = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -306,18 +299,18 @@
 			path = ../../Source/Proposals/ProposalsPage.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		276EEAFF3718A06A6783E563 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = "juce_data_structures";
+			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_data_structures";
+			sourceTree = "SOURCE_ROOT";
+		};
 		285D5BE86C9CA0389815AD35 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = AbstractListModel.h;
 			path = ../../Source/Models/AbstractListModel.h;
-			sourceTree = "SOURCE_ROOT";
-		};
-		2886D3F006ED597D331F6F51 = {
-			isa = PBXFileReference;
-			lastKnownFileType = file.ttf;
-			name = "Play-Regular.ttf";
-			path = "../../../../automaton/media/fonts/play/Play-Regular.ttf";
 			sourceTree = "SOURCE_ROOT";
 		};
 		30384822F40D4037F57C2DCE = {
@@ -327,6 +320,13 @@
 			path = ../../Source/Proposals/ProposalsActionsPage.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		332D498B308F6BF18254769A = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = "juce_core";
+			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_core";
+			sourceTree = "SOURCE_ROOT";
+		};
 		3604DF6B545750B665E78AE0 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -334,11 +334,11 @@
 			path = ../../Source/Miner/Miner.h;
 			sourceTree = "SOURCE_ROOT";
 		};
-		3A454FE92094389A80F490F4 = {
+		390B88E39D6507CEEE2D59E5 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
-			name = "juce_gui_basics";
-			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_gui_basics";
+			name = "juce_graphics";
+			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_graphics";
 			sourceTree = "SOURCE_ROOT";
 		};
 		3D9D6A70A43B37B489172BDD = {
@@ -361,6 +361,20 @@
 			name = WebKit.framework;
 			path = System/Library/Frameworks/WebKit.framework;
 			sourceTree = SDKROOT;
+		};
+		432622C848430E1D225D94C2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = OrdersManager.h;
+			path = ../../Source/DEX/OrdersManager.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		45F2FC04A84B5B8CF5E1AE67 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = "juce_events";
+			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_events";
+			sourceTree = "SOURCE_ROOT";
 		};
 		510F04B2A4332278F5F209C3 = {
 			isa = PBXFileReference;
@@ -425,13 +439,6 @@
 			path = ../../Source/Components/ValidatorGrid.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
-		674DB7AB7B8ED07B0A8F11AF = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = "juce_core";
-			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_core";
-			sourceTree = "SOURCE_ROOT";
-		};
 		6987C350E8D76C73DEEE0CF6 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.json;
@@ -458,6 +465,13 @@
 			lastKnownFileType = sourcecode.cpp.objcpp;
 			name = "include_juce_gui_basics.mm";
 			path = "../../JuceLibraryCode/include_juce_gui_basics.mm";
+			sourceTree = "SOURCE_ROOT";
+		};
+		83B5F556B5963390AC64E6DA = {
+			isa = PBXFileReference;
+			lastKnownFileType = file.ttf;
+			name = "Play-Regular.ttf";
+			path = "../../Resources/fonts/play/Play-Regular.ttf";
 			sourceTree = "SOURCE_ROOT";
 		};
 		85E526C236EF38B98DCC3185 = {
@@ -628,13 +642,6 @@
 			path = RecentFilesMenuTemplate.nib;
 			sourceTree = "SOURCE_ROOT";
 		};
-		C53096D02736737FABD8BAED = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = "juce_gui_extra";
-			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_gui_extra";
-			sourceTree = "SOURCE_ROOT";
-		};
 		C96D53B60D798069E2D6DDAA = {
 			isa = PBXFileReference;
 			lastKnownFileType = text.plist.xml;
@@ -663,13 +670,6 @@
 			path = ../../Source/MainComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
-		D41947784222840DA22BB2DD = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = "juce_graphics";
-			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_graphics";
-			sourceTree = "SOURCE_ROOT";
-		};
 		D60BF1DB6AB1382EC05AFF91 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -684,11 +684,11 @@
 			path = ../../Source/Demos/DemoSimNet.h;
 			sourceTree = "SOURCE_ROOT";
 		};
-		E5687D650B344CDB3FAD2B11 = {
+		D7AE5F18A879171692E6A8B8 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
-			name = "juce_events";
-			path = "../../../../automaton/src/local_third_party/JUCE/modules/juce_events";
+			name = "juce_gui_basics";
+			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_gui_basics";
 			sourceTree = "SOURCE_ROOT";
 		};
 		E5B0838487DE7547C1C1E1A4 = {
@@ -733,6 +733,13 @@
 			path = ../../Source/DEX/OrdersModel.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		EE3085C26CC13B9B707C1B9C = {
+			isa = PBXFileReference;
+			lastKnownFileType = file.ttf;
+			name = "Play-Bold.ttf";
+			path = "../../Resources/fonts/play/Play-Bold.ttf";
+			sourceTree = "SOURCE_ROOT";
+		};
 		F193D440E5BAB158E4C4C217 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -754,14 +761,30 @@
 			path = ../../Source/Demos/DemoMiner.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		E7A9E511932A1F543B148804 = {
+			isa = PBXGroup;
+			children = (
+				EE3085C26CC13B9B707C1B9C,
+				83B5F556B5963390AC64E6DA,
+			);
+			name = play;
+			sourceTree = "<group>";
+		};
+		736A8B33A38548EFC6D7940A = {
+			isa = PBXGroup;
+			children = (
+				E7A9E511932A1F543B148804,
+			);
+			name = fonts;
+			sourceTree = "<group>";
+		};
 		B2BE99BC504D58542BEE5CEB = {
 			isa = PBXGroup;
 			children = (
+				736A8B33A38548EFC6D7940A,
 				BB8CA00A0AC6F0E148EACDA7,
 				6987C350E8D76C73DEEE0CF6,
 				8B0AAA0091A485A31E7E7FB9,
-				14E041721C1B23214867CB2B,
-				2886D3F006ED597D331F6F51,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -925,12 +948,12 @@
 		417E1A51580CBC6557E61458 = {
 			isa = PBXGroup;
 			children = (
-				674DB7AB7B8ED07B0A8F11AF,
-				0A5C667446871EEB5E066CD5,
-				E5687D650B344CDB3FAD2B11,
-				D41947784222840DA22BB2DD,
-				3A454FE92094389A80F490F4,
-				C53096D02736737FABD8BAED,
+				332D498B308F6BF18254769A,
+				276EEAFF3718A06A6783E563,
+				45F2FC04A84B5B8CF5E1AE67,
+				390B88E39D6507CEEE2D59E5,
+				D7AE5F18A879171692E6A8B8,
+				1EF1C86BA3545A63CF6F51AF,
 			);
 			name = "JUCE Modules";
 			sourceTree = "<group>";
@@ -1026,15 +1049,15 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					"../../JuceLibraryCode",
-					"../../../../automaton/src/local_third_party/JUCE/modules",
+					"../../../../automaton-core/src/local_third_party/JUCE/modules",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Info-App.plist;
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(HOME)/Applications";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				OTHER_CPLUSPLUSFLAGS = "-I$(SRCROOT)../../Source -I$(SRCROOT)/../../../../automaton/src/local_third_party/include";
-				OTHER_LDFLAGS = "-lLDAP $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libautomaton-core.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libsecp256k1.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libboost_system.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libssl.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libcrypto.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libcryptopp.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libcurl.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libg3logger.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libgmp.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/liblua.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libprotobuf.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libreplxx.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libz.a";
+				OTHER_CPLUSPLUSFLAGS = "-I $(SRCROOT)/../../../../automaton-core/src/local_third_party/include";
+				OTHER_LDFLAGS = "-lLDAP $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_system.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libssl.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcrypto.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcryptopp.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcurl.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libg3logger.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libgmp.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/liblua.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libprotobuf.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libreplxx.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libz.a";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Liberatix.PlaygroundGUI;
 				PRODUCT_NAME = "PlaygroundGUI";
 				USE_HEADERMAP = NO;
@@ -1068,11 +1091,10 @@
 					"JucePlugin_Build_Standalone=0",
 					"JucePlugin_Build_Unity=0",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					"../../JuceLibraryCode",
-					"../../../../automaton/src/local_third_party/JUCE/modules",
+					"../../../../automaton-core/src/local_third_party/JUCE/modules",
 					"../automaton/src/local_third_party/include",
 					"$(inherited)",
 				);
@@ -1085,8 +1107,8 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				OTHER_CPLUSPLUSFLAGS = "-I$(SRCROOT)../../Source -I$(SRCROOT)/../../../../automaton/src/local_third_party/include";
-				OTHER_LDFLAGS = "-lLDAP $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libautomaton-core.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libsecp256k1.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libboost_system.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libssl.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libcrypto.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libcryptopp.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libcurl.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libg3logger.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libgmp.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/liblua.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libprotobuf-lite.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libprotobuf.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libreplxx.a $(SRCROOT)/../../../../automaton/src/local_third_party/lib/libz.a";
+				OTHER_CPLUSPLUSFLAGS = "-I $(SRCROOT)/../../../../automaton-core/src/local_third_party/include";
+				OTHER_LDFLAGS = "-lLDAP $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_system.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libssl.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcrypto.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcryptopp.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcurl.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libg3logger.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libgmp.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/liblua.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libprotobuf.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libreplxx.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libz.a";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Liberatix.PlaygroundGUI;
 				PRODUCT_NAME = "PlaygroundGUI";
 				USE_HEADERMAP = NO;
@@ -1118,11 +1140,12 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
+				ENABLE_TESTABILITY = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1166,10 +1189,12 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;

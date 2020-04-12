@@ -8,6 +8,12 @@
 
 namespace BinaryData
 {
+    extern const char*   PlayBold_ttf;
+    const int            PlayBold_ttfSize = 210704;
+
+    extern const char*   PlayRegular_ttf;
+    const int            PlayRegular_ttfSize = 199020;
+
     extern const char*   logo_white_on_transparent_8x8_svg;
     const int            logo_white_on_transparent_8x8_svgSize = 7070;
 
@@ -19,12 +25,6 @@ namespace BinaryData
 
     extern const char*   king_automaton_abi_json;
     const int            king_automaton_abi_jsonSize = 27433;
-
-    extern const char*   PlayBold_ttf;
-    const int            PlayBold_ttfSize = 210704;
-
-    extern const char*   PlayRegular_ttf;
-    const int            PlayRegular_ttfSize = 199020;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
     const int namedResourceListSize = 6;
