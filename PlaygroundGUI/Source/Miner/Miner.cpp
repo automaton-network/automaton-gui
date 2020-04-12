@@ -19,6 +19,7 @@
 
 #include "Miner.h"
 #include "../Data/AutomatonContractData.h"
+#include "Utils/Utils.h"
 
 #include "automaton/core/crypto/cryptopp/Keccak_256_cryptopp.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
@@ -45,27 +46,6 @@ using automaton::tools::miner::gen_pub_key;
 using automaton::tools::miner::mine_key;
 using automaton::tools::miner::sign;
 
-static std::string gen_ethereum_address(const unsigned char* priv_key) {
-  Keccak_256_cryptopp hash;
-  secp256k1_context* context = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
-  secp256k1_pubkey* pubkey = new secp256k1_pubkey();
-
-  if (!secp256k1_ec_pubkey_create(context, pubkey, priv_key)) {
-    LOG(WARNING) << "Invalid priv_key " << bin2hex(std::string(reinterpret_cast<const char*>(priv_key), 32));
-    delete pubkey;
-    secp256k1_context_destroy(context);
-    return "";
-  }
-
-  uint8_t pub_key_serialized[65];
-  uint8_t eth_address[32];
-  size_t outLen = 65;
-  secp256k1_ec_pubkey_serialize(context, pub_key_serialized, &outLen, pubkey, SECP256K1_EC_UNCOMPRESSED);
-  hash.calculate_digest(pub_key_serialized + 1, 64, eth_address);
-  delete pubkey;
-  secp256k1_context_destroy(context);
-  return std::string(reinterpret_cast<char*>(eth_address + 12), 20);
-}
 
 static std::string get_pub_key_x(const unsigned char* priv_key) {
   secp256k1_context* context = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
@@ -568,20 +548,20 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
       private_key(_private_key),
       mined_key(_mined_key),
       s(status::ok()) {
-    address = bin2hex(gen_ethereum_address((unsigned char *)private_key.c_str()));
-    bin_address = hex2bin(std::string(24, '0') + address);
+    address = Utils::gen_ethereum_address(private_key);
+    bin_address = hex2bin(std::string(24, '0') + address.substr(2));
   }
 
   void run() override {
     auto cd = AutomatonContractData::getInstance();
     ScopedLock lock(cd->m_criticalSection);
 
-    setStatusMessage("Getting nonce for account 0x" + address);
+    setStatusMessage("Getting nonce for account " + address);
     uint32_t nonce = 0;
-    s = eth_getTransactionCount(cd->m_ethUrl, "0x" + address);
+    s = eth_getTransactionCount(cd->m_ethUrl, address);
     if (s.code == automaton::core::common::status::OK) {
       nonce = hex2dec(s.msg);
-      std::cout << "0x" << address << " Nonce is: " << nonce << std::endl;
+      std::cout << address << " Nonce is: " << nonce << std::endl;
     } else {
       return;
     }
