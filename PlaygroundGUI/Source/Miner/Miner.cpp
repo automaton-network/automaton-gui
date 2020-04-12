@@ -611,7 +611,7 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
     }
 
     setStatusMessage("Claiming slot...");
-    s = contract->call("claimSlot", t.sign_tx(bin2hex(private_key)));
+    s = contract->call("claimSlot", t.sign_tx(private_key));
     if (s.code == automaton::core::common::status::OK) {
       std::cout << "Claim slot result: " << s.msg << std::endl;
       transaction_receipt = s.msg;
