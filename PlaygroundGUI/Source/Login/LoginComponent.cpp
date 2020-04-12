@@ -89,7 +89,7 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   for (const auto& el : accountsJson.items()) {
     Account account(el.key());
     account.getConfig().restoreFrom_json(el.value());
-    m_model->addItem(account, false);
+    m_model->addItem(account, NotificationType::dontSendNotification);
   }
 
   m_importPrivateKeyBtn = std::make_unique<TextButton>("Import");
@@ -201,7 +201,7 @@ void LoginComponent::buttonClicked(Button* btn) {
       account.getConfig().set_string("private_key", privkeyHex.toStdString());
       account.getConfig().set_string("eth_address", eth_address_hex);
       account.getConfig().set_string("account_alias", accountAlias.toStdString());
-      m_model->addItem(account, true);
+      m_model->addItem(account, NotificationType::sendNotification);
     }
   } else if (btn == m_readContractBtn.get()) {
     bool res = AutomatonContractData::getInstance()->readContract(m_rpcEditor->getText().toStdString(),
@@ -244,7 +244,7 @@ void LoginComponent::openAccount(Account* account) {
 
 void LoginComponent::removeAccount(const Account& account) {
   m_accountWindows.removeObject(getWindowByAddress(account.getAddress()), true);
-  m_model->removeItem(account);
+  m_model->removeItem(account, NotificationType::sendNotification);
 }
 
 // TableListBoxModel

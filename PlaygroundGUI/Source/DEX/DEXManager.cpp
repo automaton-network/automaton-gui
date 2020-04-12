@@ -19,7 +19,7 @@
 
 #include "DEXManager.h"
 #include "OrdersModel.h"
-#include "../Utils/AsyncTask.h"
+#include "../Utils/TasksManager.h"
 #include "../Data/AutomatonContractData.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
@@ -101,8 +101,7 @@ static std::string autoBalance(std::shared_ptr<eth_contract> contract
 }
 
 bool DEXManager::fetchOrders() {
-  Array<Order::Ptr> orders;
-  AsyncTask task([&](AsyncTask* task) {
+  TasksManager::launchTask([&](AsyncTask* task) {
     auto& s = task->m_status;
 
     auto contract = getContract(&s);
@@ -117,12 +116,13 @@ bool DEXManager::fetchOrders() {
     if (!s.is_ok())
       return false;
 
-    m_model->clear(false);
+    m_model->clear(NotificationType::dontSendNotification);
 
     const auto numOfOrders = getNumOrders(contract, &s);
     if (!s.is_ok())
       return false;
 
+    Array<Order::Ptr> orders;
     for (int i = 1; i <= numOfOrders; ++i) {
       json jInput;
       jInput.push_back(i);
@@ -135,26 +135,12 @@ bool DEXManager::fetchOrders() {
       auto order = std::make_shared<Order>(String(s.msg));
       orders.add(order);
     }
+    m_model->clear(NotificationType::dontSendNotification);
+    m_model->addItems(orders, NotificationType::sendNotificationAsync);
 
     return true;
+  }, [=](AsyncTask* task) {
   }, "Fetching orders...");
 
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      m_model->clear(false);
-      m_model->addItems(orders, true);
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "ERROR",
-                                       String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                     "Fetching orders canceled!",
-                                     "Current orders data may be broken.");
-  }
-
-  return false;
+  return true;
 }

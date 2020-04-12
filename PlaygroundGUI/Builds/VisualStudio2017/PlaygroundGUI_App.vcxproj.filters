@@ -259,6 +259,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Utils\TasksManager.cpp">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Utils\Utils.cpp">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClCompile>
@@ -1615,6 +1618,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Utils\AsyncTask.h">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Utils\TasksManager.h">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Utils\Utils.h">

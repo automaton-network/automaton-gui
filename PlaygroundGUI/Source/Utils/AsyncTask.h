@@ -19,13 +19,74 @@
 
 #pragma once
 
+#include "JuceHeader.h"
 #include "automaton/core/common/status.h"
 
 using automaton::core::common::status;
 
-class AsyncTask : public ThreadWithProgressWindow {
+class AsyncTask : public Thread
+                , public AsyncUpdater {
  public:
-  AsyncTask(std::function<bool(AsyncTask*)> fun, const String& title)
+  AsyncTask(std::function<bool(AsyncTask*)> fun,
+            std::function<void(AsyncTask*)> postAsyncAction,
+            const String& title)
+      : m_status(status::ok())
+      , m_title(title)
+      , m_fun(fun)
+      , m_postAsyncAction(postAsyncAction)
+      , Thread(title) {
+  }
+
+  void runThread(std::function<void(AsyncTask*)> onComplete) {
+    m_onComplete = onComplete;
+    startThread();
+  }
+
+  void setProgress(const double newProgress) {
+    m_progress = newProgress;
+  }
+
+  void setStatusMessage(const String& newStatusMessage) {
+    const ScopedLock sl(m_messageLock);
+    m_message = newStatusMessage;
+  }
+
+  void handleAsyncUpdate() override {
+    if (m_postAsyncAction != nullptr)
+      m_postAsyncAction(this);
+
+    writeStatusToLog();
+
+    if (m_onComplete != nullptr)
+      m_onComplete(this);
+  }
+
+  void writeStatusToLog() {
+    Logger::writeToLog(String("(") + String(m_status.code) + String(") :") + m_status.msg);
+  }
+
+  status m_status;
+
+ private:
+  void run() override {
+    m_fun(this);
+    triggerAsyncUpdate();
+  }
+
+ private:
+  String m_title;
+  double m_progress;
+  String m_message;
+  CriticalSection m_messageLock;
+  std::function<bool(AsyncTask*)> m_fun;
+  std::function<void(AsyncTask*)> m_postAsyncAction;
+  std::function<void(AsyncTask*)> m_onComplete;
+};
+
+
+class TaskWithProgressWindow : public ThreadWithProgressWindow {
+ public:
+  TaskWithProgressWindow(std::function<bool(TaskWithProgressWindow*)> fun, const String& title)
       : ThreadWithProgressWindow(title, true, true)
       , m_status(status::ok()) {
     m_fun = fun;
@@ -38,5 +99,5 @@ class AsyncTask : public ThreadWithProgressWindow {
   status m_status;
 
  private:
-  std::function<bool(AsyncTask*)> m_fun;
+  std::function<bool(TaskWithProgressWindow*)> m_fun;
 };

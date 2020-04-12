@@ -56,6 +56,10 @@ class PlaygroundGUIApplication: public JUCEApplication {
   void initialise(const String& commandLine) override {
     curl_global_init(CURL_GLOBAL_ALL);
 
+    m_fileLogger.reset(FileLogger::createDefaultAppLogger("automaton",
+                                                          "automaton_log.txt",
+                                                          "Automaton App Log"));
+    FileLogger::setCurrentLogger(m_fileLogger.get());
     AutomatonContractData::getInstance()->init(ConfigFile::getInstance());
     mainWindow.reset(new MainWindow(getApplicationName(), ConfigFile::getInstance()));
 
@@ -66,7 +70,7 @@ class PlaygroundGUIApplication: public JUCEApplication {
 
   void shutdown() override {
     mainWindow = nullptr;
-
+    FileLogger::setCurrentLogger(nullptr);
     curl_global_cleanup();
   }
 
@@ -135,6 +139,7 @@ class PlaygroundGUIApplication: public JUCEApplication {
   std::unique_ptr<MainWindow> mainWindow;
   EmbeddedFonts fonts;
   Typeface::Ptr typefacePlay;
+  std::unique_ptr<FileLogger> m_fileLogger;
 };
 
 //==============================================================================

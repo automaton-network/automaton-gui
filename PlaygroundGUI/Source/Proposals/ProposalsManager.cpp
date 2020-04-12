@@ -22,6 +22,7 @@
 
 #include "ProposalsManager.h"
 #include "../Utils/AsyncTask.h"
+#include "../Utils/TasksManager.h"
 #include "../Data/AutomatonContractData.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
@@ -67,15 +68,14 @@ ProposalsManager::~ProposalsManager() {
 }
 
 bool ProposalsManager::fetchProposals() {
-  Array<Proposal> proposals;
-  AsyncTask task([&](AsyncTask* task) {
+  TasksManager::launchTask([&](AsyncTask* task) {
     auto& s = task->m_status;
 
     auto contract = getContract(&s);
     if (!s.is_ok())
       return false;
 
-    m_model->clear(false);
+    m_model->clear(NotificationType::dontSendNotification);
 
     const auto lastProposalId = getLastProposalId(contract, &s);
     if (!s.is_ok())
@@ -118,39 +118,23 @@ bool ProposalsManager::fetchProposals() {
       if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal.getCreator()))
         proposal.setCreatorAlias(getEthAddressAlias());
 
-      addProposal(proposal, false);
+      addProposal(proposal, NotificationType::dontSendNotification);
     }
 
+    notifyProposalsUpdated();
     return true;
+  }, [=](AsyncTask* task) {
   }, "Fetching proposals...");
 
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      notifyProposalsUpdated();
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-      AlertWindow::WarningIcon,
-      "Fetching proposals canceled!",
-      "Current proposals data may be broken.");
-  }
-
-  return false;
+  return true;
 }
 
-void ProposalsManager::addProposal(const Proposal& proposal, bool sendNotification) {
-  m_model->addItem(std::make_shared<Proposal>(proposal), sendNotification);
+void ProposalsManager::addProposal(const Proposal& proposal, NotificationType notification) {
+  m_model->addItem(std::make_shared<Proposal>(proposal), notification);
 }
 
 bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& contributor) {
-  AsyncTask task([=](AsyncTask* task) {
+  TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     const auto cd = AutomatonContractData::getInstance();
@@ -211,29 +195,13 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     proposal->setStatus(Proposal::Status::Started);
     task->setProgress(1.0);
 
+    m_model->addItem(proposal, NotificationType::sendNotificationAsync);
+
     return true;
+  }, [=](AsyncTask* task) {
   }, "Creating proposal...");
 
-
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      m_model->addItem(proposal);
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-      AlertWindow::WarningIcon,
-      "Canceled!",
-      "Operation aborted.");
-  }
-
-  return false;
+  return true;
 }
 
 bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
@@ -244,7 +212,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
       "The proposal is not valid");
   }
 
-  AsyncTask task([=](AsyncTask* task) {
+  TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     const auto cd = AutomatonContractData::getInstance();
@@ -287,31 +255,14 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     task->setProgress(1.0);
 
     return true;
+  }, [=](AsyncTask* task) {
   }, "Paying for gas....");
 
-
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-     AlertWindow::WarningIcon,
-     "Canceled!",
-     "Operation aborted.");
-  }
-
-  return false;
+  return true;
 }
 
 void ProposalsManager::notifyProposalsUpdated() {
-  m_model->notifyModelChanged();
+  m_model->notifyModelChanged(NotificationType::sendNotificationAsync);
 }
 
 static void voteWithSlot(std::shared_ptr<eth_contract> contract,
@@ -426,7 +377,7 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
       "The proposal is not valid");
   }
 
-  AsyncTask task([=](AsyncTask* task) {
+  TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     auto contract = getContract(&s);
@@ -468,25 +419,8 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
     }
 
     return true;
+  }, [=](AsyncTask* task) {
   }, "Voting....");
 
-
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-      AlertWindow::WarningIcon,
-      "Canceled!",
-      "Operation aborted.");
-  }
-
-  return false;
+  return true;
 }

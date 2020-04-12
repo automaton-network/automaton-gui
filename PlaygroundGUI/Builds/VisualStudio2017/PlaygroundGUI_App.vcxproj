@@ -142,6 +142,7 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Utils\TasksManager.cpp"/>
     <ClCompile Include="..\..\Source\Utils\Utils.cpp"/>
     <ClCompile Include="..\..\Source\Login\AccountsModel.cpp"/>
     <ClCompile Include="..\..\Source\Login\LoginComponent.cpp"/>
@@ -1353,6 +1354,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Utils\AsyncTask.h"/>
+    <ClInclude Include="..\..\Source\Utils\TasksManager.h"/>
     <ClInclude Include="..\..\Source\Utils\Utils.h"/>
     <ClInclude Include="..\..\Source\Login\AccountsModel.h"/>
     <ClInclude Include="..\..\Source\Login\LoginComponent.h"/>

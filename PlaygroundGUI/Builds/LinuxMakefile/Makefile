@@ -41,7 +41,7 @@ ifeq ($(CONFIG),Debug)
 
   JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 -I ../../../../automaton-core/src/local_third_party/include -I ../../Source $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS)
-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2 libcurl) -fvisibility=hidden ../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a ../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a ../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a ../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a ../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a ../../../../automaton-core/src/local_third_party/lib/libboost_system.a ../../../../automaton-core/src/local_third_party/lib/libssl.a ../../../../automaton-core/src/local_third_party/lib/libcrypto.a ../../../../automaton-core/src/local_third_party/lib/libcryptopp.a ../../../../automaton-core/src/local_third_party/lib/libcurl.a ../../../../automaton-core/src/local_third_party/lib/libg3logger.a ../../../../automaton-core/src/local_third_party/lib/libgmp.a ../../../../automaton-core/src/local_third_party/lib/liblua.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf.a ../../../../automaton-core/src/local_third_party/lib/libreplxx.a ../../../../automaton-core/src/local_third_party/lib/libz.a -lrt -ldl -lpthread -lgmp $(LDFLAGS)
+  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2 libcurl) ../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a ../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a ../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a ../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a ../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a ../../../../automaton-core/src/local_third_party/lib/libboost_system.a ../../../../automaton-core/src/local_third_party/lib/libssl.a ../../../../automaton-core/src/local_third_party/lib/libcrypto.a ../../../../automaton-core/src/local_third_party/lib/libcryptopp.a ../../../../automaton-core/src/local_third_party/lib/libcurl.a ../../../../automaton-core/src/local_third_party/lib/libg3logger.a ../../../../automaton-core/src/local_third_party/lib/libgmp.a ../../../../automaton-core/src/local_third_party/lib/liblua.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf.a ../../../../automaton-core/src/local_third_party/lib/libreplxx.a ../../../../automaton-core/src/local_third_party/lib/libz.a -lrt -ldl -lpthread -lgmp $(LDFLAGS)
 
   CLEANCMD = rm -rf $(JUCE_OUTDIR)/$(TARGET) $(JUCE_OBJDIR)
 endif
@@ -68,6 +68,7 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS_APP := \
+  $(JUCE_OBJDIR)/TasksManager_3dcc4806.o \
   $(JUCE_OBJDIR)/Utils_13f97694.o \
   $(JUCE_OBJDIR)/AccountsModel_2a80de7e.o \
   $(JUCE_OBJDIR)/LoginComponent_661412a3.o \
@@ -113,6 +114,11 @@ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
 	-$(V_AT)mkdir -p $(JUCE_LIBDIR)
 	-$(V_AT)mkdir -p $(JUCE_OUTDIR)
 	$(V_AT)$(CXX) -o $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) $(OBJECTS_APP) $(JUCE_LDFLAGS) $(JUCE_LDFLAGS_APP) $(RESOURCES) $(TARGET_ARCH)
+
+$(JUCE_OBJDIR)/TasksManager_3dcc4806.o: ../../Source/Utils/TasksManager.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling TasksManager.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/Utils_13f97694.o: ../../Source/Utils/Utils.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)

@@ -17,39 +17,30 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ACCOUNTSMODEL_H_INCLUDED
-#define ACCOUNTSMODEL_H_INCLUDED
+#pragma once
 
-#include "../Models/AbstractProxyModel.h"
-#include "../Config/Config.h"
+#include "JuceHeader.h"
+#include "AsyncTask.h"
 
-class Account {
+class TasksManager : public DeletedAtShutdown {
  public:
-  Account();
-  Account(const String& address);
+  TasksManager();
+  ~TasksManager();
 
-  const String& getAddress() const noexcept;
-  String getAlias() const noexcept;
-  Config& getConfig() noexcept;
+  static void launchTask(std::function<bool(AsyncTask*)> fun,
+                         std::function<void(AsyncTask*)> postAsyncAction,
+                         const String& title);
 
-  bool operator==(const Account& other) const noexcept;
+  static bool launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
+                         std::function<void(TaskWithProgressWindow*)> postAction,
+                         const String& title);
+
+  void addTask(AsyncTask* task);
+  void runQueuedTask();
+
+  JUCE_DECLARE_SINGLETON(TasksManager, true)
 
  private:
-  String m_address;
-  Config m_config;
+  OwnedArray<AsyncTask> m_tasks;
+  CriticalSection m_lock;
 };
-
-class AccountsModel : public AbstractListModel<Account> {
- public:
-  int size() const override;
-  Account getAt(int index) override;
-  Account& getReferenceAt(int index) override;
-
-  void addItem(const Account& account, NotificationType notification);
-  void removeItem(const Account& account, NotificationType notification);
-
- private:
-  Array<Account> m_accounts;
-};
-
-#endif  // ACCOUNTSMODEL_H_INCLUDED

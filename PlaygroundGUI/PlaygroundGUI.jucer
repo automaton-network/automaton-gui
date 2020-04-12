@@ -24,6 +24,9 @@
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
       <GROUP id="{3E428D4F-158D-E689-F504-DD0848DE4278}" name="Utils">
         <FILE id="tHTUtX" name="AsyncTask.h" compile="0" resource="0" file="Source/Utils/AsyncTask.h"/>
+        <FILE id="MkUMG0" name="TasksManager.cpp" compile="1" resource="0"
+              file="Source/Utils/TasksManager.cpp"/>
+        <FILE id="wFnTmn" name="TasksManager.h" compile="0" resource="0" file="Source/Utils/TasksManager.h"/>
         <FILE id="RtEFzK" name="Utils.cpp" compile="1" resource="0" file="Source/Utils/Utils.cpp"/>
         <FILE id="zMGIcA" name="Utils.h" compile="0" resource="0" file="Source/Utils/Utils.h"/>
       </GROUP>

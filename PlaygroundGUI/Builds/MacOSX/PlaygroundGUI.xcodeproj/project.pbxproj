@@ -41,6 +41,10 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
+		0B490FE0296395CA08CE442B = {
+			isa = PBXBuildFile;
+			fileRef = 340CD4D56FDFE7CD6BBEBD50;
+		};
 		512118B6F16E9FE6A26E5333 = {
 			isa = PBXBuildFile;
 			fileRef = B0900C36AF07AFF88A422DF2;
@@ -327,6 +331,13 @@
 			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_core";
 			sourceTree = "SOURCE_ROOT";
 		};
+		340CD4D56FDFE7CD6BBEBD50 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = TasksManager.cpp;
+			path = ../../Source/Utils/TasksManager.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		3604DF6B545750B665E78AE0 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -593,6 +604,13 @@
 			path = ../../Source/Utils/Utils.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		B0C9B78D5FA95CB19E6291D7 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = TasksManager.h;
+			path = ../../Source/Utils/TasksManager.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		B4352990FE118BBD5B965E8F = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -786,6 +804,8 @@
 			isa = PBXGroup;
 			children = (
 				5DA8E9EC8390C21FB637ABF0,
+				340CD4D56FDFE7CD6BBEBD50,
+				B0C9B78D5FA95CB19E6291D7,
 				B0900C36AF07AFF88A422DF2,
 				63E9BAEFD1CC58069F2AB51D,
 			);
@@ -1084,6 +1104,7 @@
 					"JucePlugin_Build_Standalone=0",
 					"JucePlugin_Build_Unity=0",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					"../../JuceLibraryCode",
@@ -1133,12 +1154,11 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1182,12 +1202,10 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1241,6 +1259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B490FE0296395CA08CE442B,
 				512118B6F16E9FE6A26E5333,
 				2BF750FDBC8DCF0149147F2E,
 				6A954FA3C51846B51AA555E4,

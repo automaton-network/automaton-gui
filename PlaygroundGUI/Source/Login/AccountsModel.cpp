@@ -55,16 +55,12 @@ Account& AccountsModel::getReferenceAt(int index) {
   return m_accounts.getReference(index);
 }
 
-void AccountsModel::addItem(const Account& account, bool sendNotification) {
+void AccountsModel::addItem(const Account& account, NotificationType notification) {
   m_accounts.addIfNotAlreadyThere(account);
-
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }
 
-void AccountsModel::removeItem(const Account& account, bool sendNotification) {
+void AccountsModel::removeItem(const Account& account, NotificationType notification) {
   m_accounts.removeFirstMatchingValue(account);
-
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }

@@ -18,7 +18,7 @@
  */
 
 #include  "AutomatonContractData.h"
-#include "../Utils/AsyncTask.h"
+#include "../Utils/TasksManager.h"
 
 #include <secp256k1_recovery.h>
 #include <secp256k1.h>
@@ -94,7 +94,7 @@ bool AutomatonContractData::readContract(const std::string& url,
   std::string mask;
   std::string minDifficulty;
 
-  AsyncTask task([&](AsyncTask* task){
+  auto result = TasksManager::launchTask([&](TaskWithProgressWindow* task){
     auto& s = task->m_status;
     eth_contract::register_contract(url, contractAddress, getAbi());
     auto contract = eth_contract::get_contract(contractAddress);
@@ -201,29 +201,14 @@ bool AutomatonContractData::readContract(const std::string& url,
 
     s = status::ok();
     return true;
-  }, "Reading Contract...");
-
-  if (task.runThread()) {
-    auto& s = task.m_status;
+  }, [=](TaskWithProgressWindow* task) {
+    auto& s = task->m_status;
     if (s.is_ok()) {
       setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, validatorSlots);
-
-      AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,
-                                       "Operation successful!",
-                                       "Contract data loaded successfully and settings updated");
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-          AlertWindow::WarningIcon,
-          "ERROR",
-          String("(") + String(s.code) + String(") :") + s.msg);
     }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "Canceled!",
-        "Operation aborted.");
-  }
+  }, "Reading Contract...");
+
+  return result;
 }
 
 std::shared_ptr<eth_contract> AutomatonContractData::getContract() {
