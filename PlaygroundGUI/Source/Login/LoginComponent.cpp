@@ -160,7 +160,14 @@ void LoginComponent::resized() {
   m_accountsTable->setBounds(bounds.removeFromTop(250));
   bounds.removeFromTop(40);
   auto btnBounds = bounds.removeFromTop(40);
-  m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(120, 40));
+  // m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(120, 40));
+
+  // Temporarily display refresh button on the same screen after switching view
+  if (m_importPrivateKeyBtn->isVisible()) {
+      const auto btnWidth = 120;
+      m_importPrivateKeyBtn->setBounds(btnBounds.removeFromLeft(btnWidth));
+      m_readContractBtn->setBounds(btnBounds.removeFromRight(btnWidth));
+  }
 }
 
 void LoginComponent::buttonClicked(Button* btn) {
@@ -307,5 +314,11 @@ void LoginComponent::switchLoginState(bool isNetworkConfig) {
   m_rpcEditor->setVisible(isNetworkConfig);
   m_contractAddrLabel->setVisible(isNetworkConfig);
   m_contractAddrEditor->setVisible(isNetworkConfig);
-  m_readContractBtn->setVisible(isNetworkConfig);
+  // m_readContractBtn->setVisible(isNetworkConfig);
+
+  // Temporarily always display read contract button after switching view
+  m_readContractBtn->setVisible(true);
+  if (!isNetworkConfig)
+    m_readContractBtn->setButtonText("Refresh");
+  resized();
 }
