@@ -74,7 +74,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>-I$(SolutionDir)../../Source -I$(SolutionDir)/../../../../automaton/src/local_third_party/include %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-I$(SolutionDir)/../../../../automaton/src/local_third_party/include -I$(SolutionDir)../../Source %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
@@ -117,7 +117,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>-I$(SolutionDir)../../Source -I$(SolutionDir)/../../../../automaton/src/local_third_party/include %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-I$(SolutionDir)/../../../../automaton/src/local_third_party/include -I$(SolutionDir)../../Source %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>

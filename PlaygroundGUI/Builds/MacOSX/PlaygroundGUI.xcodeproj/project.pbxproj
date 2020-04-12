@@ -362,13 +362,6 @@
 			path = System/Library/Frameworks/WebKit.framework;
 			sourceTree = SDKROOT;
 		};
-		432622C848430E1D225D94C2 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = OrdersManager.h;
-			path = ../../Source/DEX/OrdersManager.h;
-			sourceTree = "SOURCE_ROOT";
-		};
 		45F2FC04A84B5B8CF5E1AE67 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
@@ -1056,7 +1049,7 @@
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(HOME)/Applications";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				OTHER_CPLUSPLUSFLAGS = "-I $(SRCROOT)/../../../../automaton-core/src/local_third_party/include";
+				OTHER_CPLUSPLUSFLAGS = "-I $(SRCROOT)/../../../../automaton-core/src/local_third_party/include -I ../../Source";
 				OTHER_LDFLAGS = "-lLDAP $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_system.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libssl.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcrypto.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcryptopp.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcurl.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libg3logger.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libgmp.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/liblua.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libprotobuf.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libreplxx.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libz.a";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Liberatix.PlaygroundGUI;
 				PRODUCT_NAME = "PlaygroundGUI";
@@ -1107,7 +1100,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				OTHER_CPLUSPLUSFLAGS = "-I $(SRCROOT)/../../../../automaton-core/src/local_third_party/include";
+				OTHER_CPLUSPLUSFLAGS = "-I $(SRCROOT)/../../../../automaton-core/src/local_third_party/include -I ../../Source";
 				OTHER_LDFLAGS = "-lLDAP $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libboost_system.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libssl.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcrypto.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcryptopp.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libcurl.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libg3logger.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libgmp.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/liblua.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libprotobuf.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libreplxx.a $(SRCROOT)/../../../../automaton-core/src/local_third_party/lib/libz.a";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Liberatix.PlaygroundGUI;
 				PRODUCT_NAME = "PlaygroundGUI";
