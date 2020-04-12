@@ -340,7 +340,6 @@ Miner::Miner(Config* config) {
   y += 50;
   TB("Add Miner", 120, y, 80, 24);
   TB("Stop Miners", 220, y, 80, 24);
-  TB("Claim", 120, y + 30, 80, 24);
   txtMinerInfo = TXT("MINFO", 320, y, 400, 80);
   txtMinerInfo->setText("Not running.");
   txtMinerInfo->setReadOnly(true);
@@ -467,8 +466,6 @@ void Miner::buttonClicked(Button* btn) {
     addMinerThread();
   } else if (txt == "Stop Miners") {
     stopMining();
-  } else if (txt == "Claim") {
-    createSignature();
   }
   repaint();
 }
