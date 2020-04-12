@@ -292,6 +292,9 @@ void ProposalsPage::paintCell(Graphics& g,
                               int width, int height,
                               bool rowIsSelected) {
   auto item = m_proxyModel->getAt(rowNumber);
+  if (!item)
+      return;
+
   g.setColour(Colours::white);
 
   auto getPercentStr = [](float percent) -> String { return String(percent * 100) + "%"; };
