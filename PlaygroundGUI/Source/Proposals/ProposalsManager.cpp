@@ -40,6 +40,7 @@ using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
 static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus);
+static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 proposalId, status* resStatus);
 static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract, uint64 numOfSlots, status* resStatus);
 static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus);
 static void voteWithSlot(std::shared_ptr<eth_contract> contract,
@@ -100,10 +101,18 @@ bool ProposalsManager::fetchProposals() {
 
       json j_output = json::parse(s.msg);
       const int approvalRating = std::stoi((*j_output.begin()).get<std::string>());
+      proposal.setApprovalRating(approvalRating);
+
+      const auto numSlotsPaid = getNumSlotsPaid(contract, i, &s);
       if (!s.is_ok())
         return false;
 
-      proposal.setApprovalRating(approvalRating);
+      proposal.setNumSlotsPaid(numSlotsPaid);
+      const auto cd = AutomatonContractData::getInstance();
+      const bool areAllSlotsPaid = (numSlotsPaid == cd->getSlotsNumber());
+      proposal.setAllSlotsPaid(areAllSlotsPaid);
+      if (!areAllSlotsPaid)
+        proposal.setStatus(Proposal::Status::PrepayingGas);
 
       // TODO(Kirill): set all aliases for all accounts we have
       if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal.getCreator()))
@@ -354,6 +363,26 @@ static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resSta
   return slots_number;
 }
 
+static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 proposalId, status* resStatus) {
+  json j_input;
+  j_input.push_back(proposalId);
+  const std::string params = j_input.dump();
+
+  // Fetch ballot box info for the given proposal
+  const auto s = contract->call("getBallotBox", params);
+  *resStatus = s;
+  if (!s.is_ok())
+    return 0;
+
+  const json ballotBoxJson = json::parse(s.msg);
+  if (ballotBoxJson.size() != 3) {
+    return 0;
+  }
+
+  const uint64 numSlotsPaid = std::stoul(ballotBoxJson[2].get<std::string>());
+  return numSlotsPaid;
+}
+
 static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract,
                                           uint64 numOfSlots,
                                           status* resStatus) {
@@ -363,7 +392,7 @@ static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract
   const std::string params = j_input.dump();
 
   // Fetch owners.
-  auto s = contract->call("getOwners", params);
+  const auto s = contract->call("getOwners", params);
   *resStatus = s;
   if (!s.is_ok())
     return std::vector<std::string>();
@@ -380,10 +409,9 @@ static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* 
   if (!s.is_ok())
     return 0;
 
-  const json ballotBoxJson = json::parse(s.msg);
-
-  if (ballotBoxJson.size() >= 3) {
-    const uint64 lastProposalId = std::stoul(ballotBoxJson[3].get<std::string>());
+  const json proposalsDataJson = json::parse(s.msg);
+  if (proposalsDataJson.size() >= 3) {
+    const uint64 lastProposalId = std::stoul(proposalsDataJson[3].get<std::string>());
     return lastProposalId;
   }
 

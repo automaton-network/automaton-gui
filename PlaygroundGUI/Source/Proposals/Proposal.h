@@ -35,6 +35,7 @@ class Proposal {
     // INACTIVE statuses
     , Rejected   // not enough "yes" votes during the initial period or during a contest period
     , Completed  // the proposal was successfully implemented
+    , PrepayingGas // the proposal is inactive until all slots are paid
   };
 
   using Ptr = std::shared_ptr<Proposal>;
@@ -52,6 +53,8 @@ class Proposal {
   void setLengthDays(uint64 lengthDays)             { m_lengthDays = lengthDays; }
   void setApprovalRating(int approvalRating)        { m_approvalRating = approvalRating; }
   void setTimeLeftDays(int timeLeftDays)            { m_timeLeft = timeLeftDays; }
+  void setNumSlotsPaid(uint64 numSlotsPaid)         { m_numSlotsPaid = numSlotsPaid; }
+  void setAllSlotsPaid(bool allSlotsPaid)           { m_areAllSlotsPaid = allSlotsPaid; }
   void setTitle(const String& title)                { m_title = title; }
   void setCreator(const String& creator)            { m_creator = creator; }
   void setCreatorAlias(const String& creatorAlias)  { m_creatorAlias = creatorAlias; }
@@ -67,6 +70,8 @@ class Proposal {
   uint64 getLengthDays() const noexcept       { return m_lengthDays; }
   int getApprovalRating() const noexcept      { return m_approvalRating; }
   int getTimeLeftDays() const noexcept        { return m_timeLeft; }
+  uint64 getNumSlotsPaid() const noexcept     { return m_numSlotsPaid; }
+  bool areAllSlotsPaid() const noexcept       { return m_areAllSlotsPaid; }
   String getTitle() const noexcept            { return m_title; }
   String getCreator() const noexcept          { return m_creator; }
   String getCreatorAlias() const noexcept     { return m_creatorAlias; }
@@ -87,6 +92,9 @@ class Proposal {
 
   int32 m_approvalRating;
   int32 m_timeLeft;
+
+  uint32 m_numSlotsPaid;
+  bool m_areAllSlotsPaid;
 
   String m_title = "Test title";
   String m_creator = "Test creator";

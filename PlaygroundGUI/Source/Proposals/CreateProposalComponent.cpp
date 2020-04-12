@@ -26,17 +26,24 @@ CreateProposalComponent::CreateProposalComponent() {
 
   const String numericalIntegersAllowed("0123456789");
   const String numericalFloatAllowed("0123456789.");
-  m_budgetEditor = std::make_unique<TextEditor>(translate("Budget (ETH)"));
+  m_budgetEditor = std::make_unique<TextEditor>(translate("Budget (AUTO)"));
   m_budgetEditor->setInputRestrictions(8, numericalFloatAllowed);
+  m_budgetEditor->addListener(this);
   addAndMakeVisible(m_budgetEditor.get());
 
   m_numPeriodsEditor = std::make_unique<TextEditor>(translate("Num periods"));
   m_numPeriodsEditor->setInputRestrictions(5, numericalIntegersAllowed);
+  m_numPeriodsEditor->addListener(this);
   addAndMakeVisible(m_numPeriodsEditor.get());
 
-  m_targetBonusEditor = std::make_unique<TextEditor>(translate("Target bonus (ETH)"));
+  m_totalBudgetEditor = std::make_unique<TextEditor>(translate("Total Budget (AUTO)"));
+  m_totalBudgetEditor->setInputRestrictions(8, numericalFloatAllowed);
+  m_totalBudgetEditor->setReadOnly(true);
+  addAndMakeVisible(m_totalBudgetEditor.get());
+
+  m_targetBonusEditor = std::make_unique<TextEditor>(translate("Target bonus (AUTO)"));
   m_targetBonusEditor->setInputRestrictions(8, numericalFloatAllowed);
-  addAndMakeVisible(m_targetBonusEditor.get());
+  //addAndMakeVisible(m_targetBonusEditor.get());
 
   m_lengthDaysEditor = std::make_unique<TextEditor>(translate("Length (days)"));
   m_lengthDaysEditor->setInputRestrictions(5, numericalIntegersAllowed);
@@ -58,7 +65,7 @@ void CreateProposalComponent::paint(Graphics& g) {
   g.fillRect(getLocalBounds());
 
   const auto spacing = 20;
-  const auto textWidth = 80;
+  const auto textWidth = 130;
   const auto componentHeight = 30;
   auto bounds = getLocalBounds().reduced(spacing);
   bounds = bounds.removeFromLeft(textWidth);
@@ -73,8 +80,11 @@ void CreateProposalComponent::paint(Graphics& g) {
   g.drawText(m_numPeriodsEditor->getName(), bounds.removeFromTop(componentHeight), Justification::centredLeft);
   bounds.removeFromTop(spacing);
 
-  g.drawText(m_targetBonusEditor->getName(), bounds.removeFromTop(componentHeight), Justification::centredLeft);
+  g.drawText(m_totalBudgetEditor->getName(), bounds.removeFromTop(componentHeight), Justification::centredLeft);
   bounds.removeFromTop(spacing);
+
+  //g.drawText(m_targetBonusEditor->getName(), bounds.removeFromTop(componentHeight), Justification::centredLeft);
+  //bounds.removeFromTop(spacing);
 
   g.drawText(m_lengthDaysEditor->getName(), bounds.removeFromTop(componentHeight), Justification::centredLeft);
   bounds.removeFromTop(spacing);
@@ -82,7 +92,7 @@ void CreateProposalComponent::paint(Graphics& g) {
 
 void CreateProposalComponent::resized() {
   const auto spacing = 20;
-  const auto textWidth = 80;
+  const auto textWidth = 130;
   const auto componentHeight = 30;
   auto bounds = getLocalBounds().reduced(spacing);
   bounds.removeFromLeft(textWidth + spacing);
@@ -96,8 +106,11 @@ void CreateProposalComponent::resized() {
   m_numPeriodsEditor->setBounds(bounds.removeFromTop(componentHeight));
   bounds.removeFromTop(spacing);
 
-  m_targetBonusEditor->setBounds(bounds.removeFromTop(componentHeight));
+  m_totalBudgetEditor->setBounds(bounds.removeFromTop(componentHeight));
   bounds.removeFromTop(spacing);
+
+  //m_targetBonusEditor->setBounds(bounds.removeFromTop(componentHeight));
+  //bounds.removeFromTop(spacing);
 
   m_lengthDaysEditor->setBounds(bounds.removeFromTop(componentHeight));
   bounds.removeFromTop(spacing);
@@ -124,13 +137,13 @@ void CreateProposalComponent::buttonClicked(Button* buttonThatWasClicked) {
     if (!checkEmptiness(m_titleEditor.get(), String("Enter proposal title, please"))) return;
     if (!checkEmptiness(m_budgetEditor.get(), String("Enter proposal budget, please"))) return;
     if (!checkEmptiness(m_numPeriodsEditor.get(), String("Enter number of periods for proposal, please"))) return;
-    if (!checkEmptiness(m_targetBonusEditor.get(), String("Enter target bonus for proposal, please"))) return;
+    //if (!checkEmptiness(m_targetBonusEditor.get(), String("Enter target bonus for proposal, please"))) return;
     // Length days could be empty
 
     m_proposal->setTitle(m_titleEditor->getText());
     m_proposal->setBudget(Utils::toWei(EthUnit::ether, m_budgetEditor->getText()));
     m_proposal->setNumPeriods(static_cast<uint64>(m_numPeriodsEditor->getText().getLargeIntValue()));
-    m_proposal->setTargetBonus(Utils::toWei(EthUnit::ether, m_targetBonusEditor->getText()));
+    //m_proposal->setTargetBonus(Utils::toWei(EthUnit::ether, m_targetBonusEditor->getText()));
     if (!m_lengthDaysEditor->isEmpty())
       m_proposal->setLengthDays(static_cast<uint64>(m_lengthDaysEditor->getText().getLargeIntValue()));
 
@@ -139,5 +152,17 @@ void CreateProposalComponent::buttonClicked(Button* buttonThatWasClicked) {
                      Action::ProposalCreated);
   } else if (buttonThatWasClicked == m_cancelBtn.get()) {
     m_listeners.call(&CreateProposalComponent::Listener::createProposalViewActionHappened, this, Action::Cancelled);
+  }
+}
+
+void CreateProposalComponent::textEditorTextChanged(TextEditor& editor)
+{
+  if (&editor == m_budgetEditor.get() || &editor == m_numPeriodsEditor.get()) {
+    if (m_budgetEditor->getText().isEmpty() || m_numPeriodsEditor->getText().isEmpty())
+      return;
+
+    const auto numPeriods = static_cast<uint64>(m_numPeriodsEditor->getText().getLargeIntValue());
+    const auto budgetPerPeriod = static_cast<uint64>(m_budgetEditor->getText().getLargeIntValue());
+    m_totalBudgetEditor->setText(String(numPeriods * budgetPerPeriod));
   }
 }

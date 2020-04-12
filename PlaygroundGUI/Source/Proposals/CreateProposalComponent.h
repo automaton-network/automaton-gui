@@ -24,6 +24,7 @@
 
 
 class CreateProposalComponent : public Component
+                              , private TextEditor::Listener
                               , private Button::Listener {
  public:
   enum class Action {
@@ -52,9 +53,11 @@ class CreateProposalComponent : public Component
 
  private:
   void buttonClicked(Button* buttonThatWasClicked) override;
+  void textEditorTextChanged(TextEditor& editor) override;
 
   std::unique_ptr<TextEditor> m_titleEditor;
   std::unique_ptr<TextEditor> m_budgetEditor;
+  std::unique_ptr<TextEditor> m_totalBudgetEditor;
   std::unique_ptr<TextEditor> m_numPeriodsEditor;
   std::unique_ptr<TextEditor> m_targetBonusEditor;
   std::unique_ptr<TextEditor> m_lengthDaysEditor;
