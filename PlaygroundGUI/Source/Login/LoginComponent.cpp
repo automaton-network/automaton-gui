@@ -20,8 +20,9 @@
 #include <JuceHeader.h>
 #include "LoginComponent.h"
 #include "../MainComponent.h"
-#include "../Utils.h"
+#include "../Utils/Utils.h"
 #include "../Config/Config.h"
+#include "../Data/AutomatonContractData.h"
 
 class AccountWindow : public DocumentWindow {
  public:
@@ -100,6 +101,26 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
       BinaryData::logo_white_on_transparent_8x8_svgSize);
   addAndMakeVisible(m_logo.get());
 
+  m_rpcLabel = std::make_unique<Label>("m_rpcLabel", "Ethereum RPC:");
+  addAndMakeVisible(m_rpcLabel.get());
+  m_rpcEditor = std::make_unique<TextEditor>("m_rpcEditor");
+  addAndMakeVisible(m_rpcEditor.get());
+
+  m_contractAddrLabel = std::make_unique<Label>("m_contractAddrLabel", "Contract Address: ");
+  addAndMakeVisible(m_contractAddrLabel.get());
+  m_contractAddrEditor = std::make_unique<TextEditor>("m_contractAddrEditor");
+  m_contractAddrEditor->setInputRestrictions(42, "0123456789abcdefABCDEFx");
+  addAndMakeVisible(m_contractAddrEditor.get());
+
+  m_readContractBtn = std::make_unique<TextButton>("Login");
+  m_readContractBtn->addListener(this);
+  addAndMakeVisible(m_readContractBtn.get());
+
+  auto cd = AutomatonContractData::getInstance();
+  m_rpcEditor->setText(cd->getUrl());
+  m_contractAddrEditor->setText(cd->getAddress());
+  switchLoginState(true);
+
   setSize(350, 600);
 }
 
@@ -123,11 +144,30 @@ void LoginComponent::resized() {
   auto logoBounds = bounds.removeFromTop(39);
   m_logo->setBounds(logoBounds.withSizeKeepingCentre(231, 39));
 
+  auto configBounds = bounds;
+  configBounds.removeFromTop(20);
+  auto rpcBounds = configBounds.removeFromTop(20);
+  m_rpcLabel->setBounds(rpcBounds.removeFromLeft(100));
+  m_rpcEditor->setBounds(rpcBounds);
+  configBounds.removeFromTop(20);
+  auto addrBounds = configBounds.removeFromTop(20);
+  m_contractAddrLabel->setBounds(addrBounds.removeFromLeft(100));
+  m_contractAddrEditor->setBounds(addrBounds);
+  configBounds.removeFromTop(40);
+  m_readContractBtn->setBounds(configBounds.removeFromTop(40).withSizeKeepingCentre(120, 40));
+
   bounds.removeFromTop(40);
   m_accountsTable->setBounds(bounds.removeFromTop(250));
   bounds.removeFromTop(40);
   auto btnBounds = bounds.removeFromTop(40);
-  m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(120, 40));
+  // m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(120, 40));
+
+  // Temporarily display refresh button on the same screen after switching view
+  if (m_importPrivateKeyBtn->isVisible()) {
+      const auto btnWidth = 120;
+      m_importPrivateKeyBtn->setBounds(btnBounds.removeFromLeft(btnWidth));
+      m_readContractBtn->setBounds(btnBounds.removeFromRight(btnWidth));
+  }
 }
 
 void LoginComponent::buttonClicked(Button* btn) {
@@ -163,6 +203,11 @@ void LoginComponent::buttonClicked(Button* btn) {
       account.getConfig().set_string("account_alias", accountAlias.toStdString());
       m_model->addItem(account, true);
     }
+  } else if (btn == m_readContractBtn.get()) {
+    bool res = AutomatonContractData::getInstance()->readContract(m_rpcEditor->getText().toStdString(),
+                                                                  m_contractAddrEditor->getText().toStdString());
+    if (res)
+      switchLoginState(false);
   }
 }
 
@@ -260,4 +305,20 @@ void LoginComponent::cellDoubleClicked(int rowNumber, int columnId, const MouseE
   if (e.mods.isLeftButtonDown()) {
     openAccount(&m_model->getReferenceAt(rowNumber));
   }
+}
+
+void LoginComponent::switchLoginState(bool isNetworkConfig) {
+  m_accountsTable->setVisible(!isNetworkConfig);
+  m_importPrivateKeyBtn->setVisible(!isNetworkConfig);
+  m_rpcLabel->setVisible(isNetworkConfig);
+  m_rpcEditor->setVisible(isNetworkConfig);
+  m_contractAddrLabel->setVisible(isNetworkConfig);
+  m_contractAddrEditor->setVisible(isNetworkConfig);
+  // m_readContractBtn->setVisible(isNetworkConfig);
+
+  // Temporarily always display read contract button after switching view
+  m_readContractBtn->setVisible(true);
+  if (!isNetworkConfig)
+    m_readContractBtn->setButtonText("Refresh");
+  resized();
 }

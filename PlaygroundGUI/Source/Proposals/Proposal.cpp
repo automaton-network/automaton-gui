@@ -27,22 +27,23 @@ using json = nlohmann::json;
 
 Proposal::Proposal()
   : m_id(0)
-  , m_amountSpent(0)
-  , m_budget(0)
+  , m_amountSpent(String(0))
+  , m_budget(String(0))
   , m_numPeriods(0)
-  , m_targetBonus(0)
+  , m_targetBonus(String(0))
   , m_approvalRating(0)
   , m_lengthDays(0)
   , m_timeLeft(0)
+  , m_numSlotsPaid(0)
   , m_status(Proposal::Status::Uninitialized) {
 }
 
 Proposal::Proposal(uint32_t id, const String& jsonString)
   : m_id(0)
-  , m_amountSpent(0)
-  , m_budget(0)
+  , m_amountSpent(String(0))
+  , m_budget(String(0))
   , m_numPeriods(0)
-  , m_targetBonus(0)
+  , m_targetBonus(String(0))
   , m_approvalRating(0)
   , m_lengthDays(0)
   , m_timeLeft(0)
@@ -76,6 +77,7 @@ String Proposal::getStatusStr(Proposal::Status status) {
     case Proposal::Status::Contested: return "Contested";
     case Proposal::Status::Rejected: return "Rejected";
     case Proposal::Status::Completed: return "Completed";
+    case Proposal::Status::PrepayingGas: return "Prepaying Gas";
     default: return "Unknown";
   }
 }

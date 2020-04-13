@@ -24,6 +24,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 class ProposalsManager;
+class DEXManager;
 class Config;
 
 class DemosMainComponent:
@@ -71,6 +72,7 @@ class DemosMainComponent:
   std::unique_ptr<MenuBarComponent> m_menuBar;
   std::unique_ptr<TabbedComponent> m_tabbedComponent;
   std::unique_ptr<ProposalsManager> m_proposalsManager;
+  std::unique_ptr<DEXManager> m_dexManager;
   Config* m_config;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemosMainComponent)

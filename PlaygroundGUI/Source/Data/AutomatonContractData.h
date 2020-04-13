@@ -21,6 +21,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Config/Config.h"
+#include "automaton/core/interop/ethereum/eth_contract_curl.h"
 
 struct ValidatorSlot {
   std::string difficulty;
@@ -41,21 +42,30 @@ class AutomatonContractData : DeletedAtShutdown {
                uint32_t _slots_claimed,
                const std::vector<ValidatorSlot>& _slots);
 
-  const std::string& get_abi();
-  bool load_abi();
+  bool readContract(const std::string& url, const std::string& contractAddress);
+  std::shared_ptr<automaton::core::interop::ethereum::eth_contract> getContract();
 
-  std::string contract_abi;
-  std::string eth_url;
-  std::string contract_address;
-  std::string mask;
-  std::string min_difficulty;
-  uint32_t slots_number;
-  uint32_t slots_claimed;
-  std::vector<ValidatorSlot> slots;
+  bool loadAbi();
+  std::string getAbi();
+  std::string getUrl() const noexcept;
+  std::string getAddress() const noexcept;
+  std::string getMask() const noexcept;
+  std::string getMinDifficulty() const noexcept;
+  uint32_t getSlotsNumber() const noexcept;
+  uint32_t getSlotsClaimed() const noexcept;
+
+  std::string m_contractAbi;
+  std::string m_ethUrl;
+  std::string m_contractAddress;
+  std::string m_mask;
+  std::string m_minDifficulty;
+  uint32_t m_slotsNumber;
+  uint32_t m_slotsClaimed;
+  std::vector<ValidatorSlot> m_slots;
 
   JUCE_DECLARE_SINGLETON(AutomatonContractData, true)
 
-  CriticalSection criticalSection;
+  CriticalSection m_criticalSection;
 
  private:
   Config* config;

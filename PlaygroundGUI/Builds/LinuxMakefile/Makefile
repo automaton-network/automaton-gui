@@ -39,7 +39,7 @@ ifeq ($(CONFIG),Debug)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := PlaygroundGUI
 
-  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 -I ../../../../automaton-core/src/local_third_party/include $(CFLAGS)
+  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 -I ../../../../automaton-core/src/local_third_party/include -I ../../Source $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS)
   JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2 libcurl) -fvisibility=hidden ../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a ../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a ../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a ../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a ../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a ../../../../automaton-core/src/local_third_party/lib/libboost_system.a ../../../../automaton-core/src/local_third_party/lib/libssl.a ../../../../automaton-core/src/local_third_party/lib/libcrypto.a ../../../../automaton-core/src/local_third_party/lib/libcryptopp.a ../../../../automaton-core/src/local_third_party/lib/libcurl.a ../../../../automaton-core/src/local_third_party/lib/libg3logger.a ../../../../automaton-core/src/local_third_party/lib/libgmp.a ../../../../automaton-core/src/local_third_party/lib/liblua.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf.a ../../../../automaton-core/src/local_third_party/lib/libreplxx.a ../../../../automaton-core/src/local_third_party/lib/libz.a -lrt -ldl -lpthread -lgmp $(LDFLAGS)
 
@@ -60,7 +60,7 @@ ifeq ($(CONFIG),Release)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := PlaygroundGUI
 
-  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O3 -I ../../../../automaton-core/src/local_third_party/include $(CFLAGS)
+  JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O3 -I ../../../../automaton-core/src/local_third_party/include -I ../../Source $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++14 $(CXXFLAGS)
   JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2 libcurl) -fvisibility=hidden ../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a ../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a ../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a ../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a ../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a ../../../../automaton-core/src/local_third_party/lib/libboost_system.a ../../../../automaton-core/src/local_third_party/lib/libssl.a ../../../../automaton-core/src/local_third_party/lib/libcrypto.a ../../../../automaton-core/src/local_third_party/lib/libcryptopp.a ../../../../automaton-core/src/local_third_party/lib/libcurl.a ../../../../automaton-core/src/local_third_party/lib/libg3logger.a ../../../../automaton-core/src/local_third_party/lib/libgmp.a ../../../../automaton-core/src/local_third_party/lib/liblua.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a ../../../../automaton-core/src/local_third_party/lib/libprotobuf.a ../../../../automaton-core/src/local_third_party/lib/libreplxx.a ../../../../automaton-core/src/local_third_party/lib/libz.a -lrt -ldl -lpthread -lgmp $(LDFLAGS)
 
@@ -68,11 +68,12 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS_APP := \
+  $(JUCE_OBJDIR)/Utils_13f97694.o \
   $(JUCE_OBJDIR)/AccountsModel_2a80de7e.o \
   $(JUCE_OBJDIR)/LoginComponent_661412a3.o \
+  $(JUCE_OBJDIR)/DEXManager_a5533d37.o \
   $(JUCE_OBJDIR)/DEXPage_119e148f.o \
   $(JUCE_OBJDIR)/Order_30383997.o \
-  $(JUCE_OBJDIR)/OrdersManager_4f5a9a51.o \
   $(JUCE_OBJDIR)/OrdersModel_86d6378d.o \
   $(JUCE_OBJDIR)/Proposal_bae9729.o \
   $(JUCE_OBJDIR)/ProposalsModel_40a09f9f.o \
@@ -90,7 +91,6 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/DemoMiner_b95613be.o \
   $(JUCE_OBJDIR)/Miner_521421b0.o \
   $(JUCE_OBJDIR)/NetworkView_2d1f0d3.o \
-  $(JUCE_OBJDIR)/Utils_e4b11b92.o \
   $(JUCE_OBJDIR)/MainComponent_a6ffb4a5.o \
   $(JUCE_OBJDIR)/Main_90ebc5c2.o \
   $(JUCE_OBJDIR)/BinaryData_ce4232d4.o \
@@ -114,6 +114,11 @@ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
 	-$(V_AT)mkdir -p $(JUCE_OUTDIR)
 	$(V_AT)$(CXX) -o $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) $(OBJECTS_APP) $(JUCE_LDFLAGS) $(JUCE_LDFLAGS_APP) $(RESOURCES) $(TARGET_ARCH)
 
+$(JUCE_OBJDIR)/Utils_13f97694.o: ../../Source/Utils/Utils.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling Utils.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
 $(JUCE_OBJDIR)/AccountsModel_2a80de7e.o: ../../Source/Login/AccountsModel.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling AccountsModel.cpp"
@@ -124,6 +129,11 @@ $(JUCE_OBJDIR)/LoginComponent_661412a3.o: ../../Source/Login/LoginComponent.cpp
 	@echo "Compiling LoginComponent.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
+$(JUCE_OBJDIR)/DEXManager_a5533d37.o: ../../Source/DEX/DEXManager.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling DEXManager.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
 $(JUCE_OBJDIR)/DEXPage_119e148f.o: ../../Source/DEX/DEXPage.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling DEXPage.cpp"
@@ -132,11 +142,6 @@ $(JUCE_OBJDIR)/DEXPage_119e148f.o: ../../Source/DEX/DEXPage.cpp
 $(JUCE_OBJDIR)/Order_30383997.o: ../../Source/DEX/Order.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling Order.cpp"
-	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
-
-$(JUCE_OBJDIR)/OrdersManager_4f5a9a51.o: ../../Source/DEX/OrdersManager.cpp
-	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling OrdersManager.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/OrdersModel_86d6378d.o: ../../Source/DEX/OrdersModel.cpp
@@ -222,11 +227,6 @@ $(JUCE_OBJDIR)/Miner_521421b0.o: ../../Source/Miner/Miner.cpp
 $(JUCE_OBJDIR)/NetworkView_2d1f0d3.o: ../../Source/Network/NetworkView.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling NetworkView.cpp"
-	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
-
-$(JUCE_OBJDIR)/Utils_e4b11b92.o: ../../Source/Utils.cpp
-	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling Utils.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/MainComponent_a6ffb4a5.o: ../../Source/MainComponent.cpp

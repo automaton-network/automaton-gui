@@ -21,6 +21,7 @@
 #include <functional>
 
 #include "ProposalsManager.h"
+#include "../Utils/AsyncTask.h"
 #include "../Data/AutomatonContractData.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
@@ -39,6 +40,7 @@ using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
 static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus);
+static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 proposalId, status* resStatus);
 static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract, uint64 numOfSlots, status* resStatus);
 static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus);
 static void voteWithSlot(std::shared_ptr<eth_contract> contract,
@@ -47,32 +49,12 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
 
 static std::shared_ptr<eth_contract> getContract(status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract(cd->contract_address);
+  const auto contract = eth_contract::get_contract(cd->getAddress());
   if (contract == nullptr)
     *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
 
   return contract;
 }
-
-
-class AsyncTask : public ThreadWithProgressWindow {
- public:
-  AsyncTask(std::function<bool(AsyncTask*)> fun, const String& title)
-      : ThreadWithProgressWindow(title, true, true)
-      , m_status(status::ok()) {
-    m_fun = fun;
-  }
-
-  void run() {
-    m_fun(this);
-  }
-
-  status m_status;
-
- private:
-  std::function<bool(AsyncTask*)> m_fun;
-};
-
 
 ProposalsManager::ProposalsManager(Config* config)
   : m_model(std::make_shared<ProposalsModel>()) {
@@ -119,10 +101,18 @@ bool ProposalsManager::fetchProposals() {
 
       json j_output = json::parse(s.msg);
       const int approvalRating = std::stoi((*j_output.begin()).get<std::string>());
+      proposal.setApprovalRating(approvalRating);
+
+      const auto numSlotsPaid = getNumSlotsPaid(contract, i, &s);
       if (!s.is_ok())
         return false;
 
-      proposal.setApprovalRating(approvalRating);
+      proposal.setNumSlotsPaid(numSlotsPaid);
+      const auto cd = AutomatonContractData::getInstance();
+      const bool areAllSlotsPaid = (numSlotsPaid == cd->getSlotsNumber());
+      proposal.setAllSlotsPaid(areAllSlotsPaid);
+      if (!areAllSlotsPaid)
+        proposal.setStatus(Proposal::Status::PrepayingGas);
 
       // TODO(Kirill): set all aliases for all accounts we have
       if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal.getCreator()))
@@ -174,7 +164,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     proposal->setId(lastProposalId + 1);
     task->setProgress(0.25);
 
-    s = eth_getTransactionCount(cd->eth_url, m_ethAddress);
+    s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -208,7 +198,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     transaction.nonce = nonce;
     transaction.gas_price = "1388";  // 5 000
     transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = cd->contract_address.substr(2);
+    transaction.to = cd->getAddress().substr(2);
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
@@ -264,7 +254,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
 
     task->setProgress(0.1);
 
-    s = eth_getTransactionCount(cd->eth_url, m_ethAddress);
+    s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -285,7 +275,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     transaction.nonce = nonce;
     transaction.gas_price = "1388";  // 5 000
     transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = cd->contract_address.substr(2);
+    transaction.to = cd->getAddress().substr(2);
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
@@ -330,7 +320,7 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
                          const std::string& privateKey,
                          status* resStatus) {
   const auto cd = AutomatonContractData::getInstance();
-  const auto s = eth_getTransactionCount(cd->eth_url, ethAddress);
+  const auto s = eth_getTransactionCount(cd->getUrl(), ethAddress);
   *resStatus = s;
   const auto nonce = s.is_ok() ? s.msg : "0";
   if (!s.is_ok())
@@ -353,7 +343,7 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
   transaction.nonce = nonce;
   transaction.gas_price = "1388";  // 5 000
   transaction.gas_limit = "5B8D80";  // 6M
-  transaction.to = cd->contract_address.substr(2);
+  transaction.to = cd->getAddress().substr(2);
   transaction.value = "";
   transaction.data = txData.str();
   transaction.chain_id = "01";
@@ -373,6 +363,26 @@ static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resSta
   return slots_number;
 }
 
+static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 proposalId, status* resStatus) {
+  json j_input;
+  j_input.push_back(proposalId);
+  const std::string params = j_input.dump();
+
+  // Fetch ballot box info for the given proposal
+  const auto s = contract->call("getBallotBox", params);
+  *resStatus = s;
+  if (!s.is_ok())
+    return 0;
+
+  const json ballotBoxJson = json::parse(s.msg);
+  if (ballotBoxJson.size() != 3) {
+    return 0;
+  }
+
+  const uint64 numSlotsPaid = std::stoul(ballotBoxJson[2].get<std::string>());
+  return numSlotsPaid;
+}
+
 static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract,
                                           uint64 numOfSlots,
                                           status* resStatus) {
@@ -382,7 +392,7 @@ static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract
   const std::string params = j_input.dump();
 
   // Fetch owners.
-  auto s = contract->call("getOwners", params);
+  const auto s = contract->call("getOwners", params);
   *resStatus = s;
   if (!s.is_ok())
     return std::vector<std::string>();
@@ -399,10 +409,9 @@ static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* 
   if (!s.is_ok())
     return 0;
 
-  const json ballotBoxJson = json::parse(s.msg);
-
-  if (ballotBoxJson.size() >= 3) {
-    const uint64 lastProposalId = std::stoul(ballotBoxJson[3].get<std::string>());
+  const json proposalsDataJson = json::parse(s.msg);
+  if (proposalsDataJson.size() >= 3) {
+    const uint64 lastProposalId = std::stoul(proposalsDataJson[3].get<std::string>());
     return lastProposalId;
   }
 

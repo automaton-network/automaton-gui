@@ -19,8 +19,11 @@
 
 #include <JuceHeader.h>
 #include "DEXPage.h"
-#include "OrdersManager.h"
+#include "DEXManager.h"
+#include "../Utils/Utils.h"
 
+static const String ETH_BALANCE_PREFIX_LABEL = "Eth Balance: ";
+static const String AUTO_BALANCE_PREFIX_LABEL = "AUTO Balance: ";
 
 class OrdersUIModel : public TableListBoxModel {
  public:
@@ -79,20 +82,29 @@ class OrdersUIModel : public TableListBoxModel {
   std::shared_ptr<AbstractListModel<Order::Ptr>> m_model;
 };
 
-DEXPage::DEXPage() {
+DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   m_sellingProxyModel = std::make_shared<OrdersProxyModel>();
   m_sellingProxyModel->setFilter(OrderFilter::Sell);
-  m_sellingProxyModel->setModel(OrdersManager::getInstance()->getModel());
+  m_sellingProxyModel->setModel(m_dexManager->getModel());
   m_sellingProxyModel->addListener(this);
   m_buyingProxyModel = std::make_shared<OrdersProxyModel>();
   m_buyingProxyModel->setFilter(OrderFilter::Buy);
-  m_buyingProxyModel->setModel(OrdersManager::getInstance()->getModel());
+  m_buyingProxyModel->setModel(m_dexManager->getModel());
   m_buyingProxyModel->addListener(this);
 
   m_sellingUIModel = std::make_unique<OrdersUIModel>();
   m_sellingUIModel->setModel(m_sellingProxyModel);
   m_buyingUIModel = std::make_unique<OrdersUIModel>();
   m_buyingUIModel->setModel(m_buyingProxyModel);
+
+  m_ethBalanceLabel = std::make_unique<Label>("m_balanceLabel");
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + Utils::fromWei(EthUnit::ether, m_dexManager->getEthBalance())
+      + String(" ETH")
+      , NotificationType::dontSendNotification);
+  m_autoBalanceLabel = std::make_unique<Label>("m_autoBalanceLabel");
+  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
+      , NotificationType::dontSendNotification);
+
 
   m_sellingLabel = std::make_unique<Label>("m_sellingLabel", "Selling:");
   m_sellingLabel->setColour(Label::textColourId, Colours::red);
@@ -117,6 +129,8 @@ DEXPage::DEXPage() {
   buyingHeader.addColumn(translate("Eth"), OrdersUIModel::Eth, 50);
   buyingHeader.addColumn(translate("Owner"), OrdersUIModel::Owner, 200);
 
+  addAndMakeVisible(m_ethBalanceLabel.get());
+  addAndMakeVisible(m_autoBalanceLabel.get());
   addAndMakeVisible(m_sellingLabel.get());
   addAndMakeVisible(m_buyingLabel.get());
   addAndMakeVisible(m_sellingTable.get());
@@ -130,7 +144,12 @@ void DEXPage::paint(Graphics& g) {
 }
 
 void DEXPage::resized() {
-  auto tablesBounds = getLocalBounds();
+  auto bounds = getLocalBounds();
+  auto labelsBounds = bounds.removeFromTop(30);
+  m_ethBalanceLabel->setBounds(labelsBounds.removeFromLeft(getWidth() / 2));
+  m_autoBalanceLabel->setBounds(labelsBounds);
+
+  auto tablesBounds = bounds;
   const int tablesMargin = 10;
   const int titlesHeight = 50;
   auto sellingBounds = tablesBounds.removeFromLeft(getWidth() / 2).reduced(tablesMargin);
@@ -142,6 +161,11 @@ void DEXPage::resized() {
 }
 
 void DEXPage::modelChanged(AbstractListModelBase* model) {
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + Utils::fromWei(EthUnit::ether, m_dexManager->getEthBalance())
+      , NotificationType::dontSendNotification);
+  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
+      , NotificationType::dontSendNotification);
+
   if (model == m_sellingProxyModel.get()) {
     m_sellingTable->updateContent();
     m_sellingTable->repaint();

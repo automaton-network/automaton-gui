@@ -19,6 +19,7 @@
 
 #include "Miner.h"
 #include "../Data/AutomatonContractData.h"
+#include "Utils/Utils.h"
 
 #include "automaton/core/crypto/cryptopp/Keccak_256_cryptopp.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
@@ -45,27 +46,6 @@ using automaton::tools::miner::gen_pub_key;
 using automaton::tools::miner::mine_key;
 using automaton::tools::miner::sign;
 
-static std::string gen_ethereum_address(const unsigned char* priv_key) {
-  Keccak_256_cryptopp hash;
-  secp256k1_context* context = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
-  secp256k1_pubkey* pubkey = new secp256k1_pubkey();
-
-  if (!secp256k1_ec_pubkey_create(context, pubkey, priv_key)) {
-    LOG(WARNING) << "Invalid priv_key " << bin2hex(std::string(reinterpret_cast<const char*>(priv_key), 32));
-    delete pubkey;
-    secp256k1_context_destroy(context);
-    return "";
-  }
-
-  uint8_t pub_key_serialized[65];
-  uint8_t eth_address[32];
-  size_t outLen = 65;
-  secp256k1_ec_pubkey_serialize(context, pub_key_serialized, &outLen, pubkey, SECP256K1_EC_UNCOMPRESSED);
-  hash.calculate_digest(pub_key_serialized + 1, 64, eth_address);
-  delete pubkey;
-  secp256k1_context_destroy(context);
-  return std::string(reinterpret_cast<char*>(eth_address + 12), 20);
-}
 
 static std::string get_pub_key_x(const unsigned char* priv_key) {
   secp256k1_context* context = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
@@ -133,7 +113,7 @@ void Miner::stopMining() {
 
 void Miner::processMinedKey(std::string _pk, int keys_generated) {
   auto cd = AutomatonContractData::getInstance();
-  ScopedLock lock(cd->criticalSection);
+  ScopedLock lock(cd->m_criticalSection);
 
   total_keys_generated += abs(keys_generated);
   if (keys_generated <= 0) {
@@ -150,7 +130,7 @@ void Miner::processMinedKey(std::string _pk, int keys_generated) {
   if (x <= std::string(reinterpret_cast<char*>(difficulty), 32)) {
     return;
   }
-  if (x <= cd->slots[ms.slot_index].difficulty) {
+  if (x <= cd->m_slots[ms.slot_index].difficulty) {
     return;
   }
   ms.difficulty = x;
@@ -208,8 +188,8 @@ class TableSlots: public TableListBox, TableListBoxModel {
   // This is overloaded from TableListBoxModel, and must return the total number of rows in our table
   int getNumRows() override {
     auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->criticalSection);
-    return static_cast<int>(cd->slots.size());
+    ScopedLock lock(cd->m_criticalSection);
+    return static_cast<int>(cd->m_slots.size());
   }
 
   void selectedRowsChanged(int) override {
@@ -231,7 +211,7 @@ class TableSlots: public TableListBox, TableListBoxModel {
   void paintCell(Graphics& g, int rowNumber, int columnId,
                 int width, int height, bool /*rowIsSelected*/) override {
     auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->criticalSection);
+    ScopedLock lock(cd->m_criticalSection);
 
     g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
     g.setFont(font);
@@ -247,11 +227,11 @@ class TableSlots: public TableListBox, TableListBoxModel {
         break;
       }
       case 2: {
-        text = bin2hex(cd->slots[rowNumber].difficulty);
+        text = bin2hex(cd->m_slots[rowNumber].difficulty);
         break;
       }
       case 3: {
-        text = "0x" + cd->slots[rowNumber].owner;
+        text = "0x" + cd->m_slots[rowNumber].owner;
         break;
       }
       case 4: {
@@ -310,8 +290,9 @@ static String sepitoa(uint64 n, bool lz = false) {
 }
 
 //==============================================================================
-Miner::Miner() {
-  startTimer(1000);
+Miner::Miner(Config* config) {
+  private_key = config->get_string("private_key");
+  eth_address = config->get_string("eth_address");
 
   int y = 0;
 
@@ -336,6 +317,7 @@ Miner::Miner() {
   LBL("Slots: ", 20, y, 100, 24);
   txtSlotsNum = TXT("SLOTS", 120, y, 100, 24);
   txtSlotsNum->setInputRestrictions(5, "0123456789");
+  txtSlotsNum->setReadOnly(true);
 
   // y += 30;
   // LBL("Mask: ", 20, y, 100, 24);
@@ -354,12 +336,6 @@ Miner::Miner() {
   // txtMinDifficulty->setInputRestrictions(2, "0123456789");
   txtMinDifficultyHex = TXT("MINDIFFHEX", 120, y, 600, 24);
   txtMinDifficultyHex->setReadOnly(true);
-
-  y += 30;
-  LBL("Miner Address: ", 20, y, 100, 24);
-  txtMinerAddress = TXT("ADDR", 120, y, 430, 24);
-  txtMinerAddress->setInputRestrictions(42, "0123456789abcdefABCDEFx");
-  TB("Import Private Key", 570, y, 150, 24);
 
   y += 50;
   TB("Add Miner", 120, y, 80, 24);
@@ -404,14 +380,16 @@ Miner::Miner() {
   TB("Claim", 100, y, 80, 30);
   TB("Start Miner", 200, y, 80, 30);
   */
+
+  startTimer(1000);
 }
 
 void Miner::updateContractData() {
   auto cd = AutomatonContractData::getInstance();
-  ScopedLock lock(cd->criticalSection);
-  setSlotsNumber(cd->slots_number);
-  setMaskHex(cd->mask);
-  setMinDifficultyHex(cd->min_difficulty);
+  ScopedLock lock(cd->m_criticalSection);
+  setSlotsNumber(cd->m_slotsNumber);
+  setMaskHex(cd->m_mask);
+  setMinDifficultyHex(cd->m_minDifficulty);
 }
 
 Miner::~Miner() {
@@ -450,7 +428,7 @@ void Miner::setMinerAddress(std::string _address) {
 
   a.Encode(minerAddress, 32);
   const unsigned int UPPER = (1 << 31);
-  txtMinerAddress->setText("0x" + IntToString(a, UPPER | 16), false);
+  // txtMinerAddress->setText("0x" + IntToString(a, UPPER | 16), false);
 }
 
 void Miner::setSlotsNumber(int _slotsNum) {
@@ -481,9 +459,6 @@ void Miner::textEditorTextChanged(TextEditor & txt) {
   if (txtSlotsNum == &txt) {
     setSlotsNumber(txtSlotsNum->getText().getIntValue());
   }
-  if (txtMinerAddress == & txt) {
-    setMinerAddress(txtMinerAddress->getText().toStdString());
-  }
 }
 
 void Miner::buttonClicked(Button* btn) {
@@ -494,8 +469,6 @@ void Miner::buttonClicked(Button* btn) {
     stopMining();
   } else if (txt == "Claim") {
     createSignature();
-  } else if (txt == "Import Private Key") {
-    importPrivateKey();
   }
   repaint();
 }
@@ -522,33 +495,6 @@ void Miner::update() {
   }
   last_time = cur_time;
   last_keys_generated = total_keys_generated;
-}
-
-void Miner::importPrivateKey() {
-  AlertWindow w("Import Private Key",
-                "Enter your private key and it will be imported.",
-                AlertWindow::QuestionIcon);
-
-  w.addTextEditor("privkey", "", "Private Key:", true);
-  w.addButton("OK",     1, KeyPress(KeyPress::returnKey, 0, 0));
-  w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-
-  if (w.runModalLoop() == 1) {
-    // this is the text they entered..
-    auto privkey_hex = w.getTextEditorContents("privkey");
-    if (privkey_hex.startsWith("0x")) {
-      privkey_hex = privkey_hex.substring(2);
-    }
-    if (privkey_hex.length() != 64) {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Invalid Private Key!",
-                                       "Private key should be exactly 32 bytes!");
-      return;
-    }
-    private_key = hex2bin(privkey_hex.toStdString());
-    eth_address = gen_ethereum_address((unsigned char *)private_key.c_str());
-    txtMinerAddress->setText(bin2hex(eth_address));
-  }
 }
 
 void Miner::createSignature() {
@@ -602,20 +548,20 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
       private_key(_private_key),
       mined_key(_mined_key),
       s(status::ok()) {
-    address = bin2hex(gen_ethereum_address((unsigned char *)private_key.c_str()));
-    bin_address = hex2bin(std::string(24, '0') + address);
+    address = Utils::gen_ethereum_address(private_key);
+    bin_address = hex2bin(std::string(24, '0') + address.substr(2));
   }
 
   void run() override {
     auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->criticalSection);
+    ScopedLock lock(cd->m_criticalSection);
 
-    setStatusMessage("Getting nonce for account 0x" + address);
+    setStatusMessage("Getting nonce for account " + address);
     uint32_t nonce = 0;
-    s = eth_getTransactionCount(cd->eth_url, "0x" + address);
+    s = eth_getTransactionCount(cd->m_ethUrl, address);
     if (s.code == automaton::core::common::status::OK) {
       nonce = hex2dec(s.msg);
-      std::cout << "0x" << address << " Nonce is: " << nonce << std::endl;
+      std::cout << address << " Nonce is: " << nonce << std::endl;
     } else {
       return;
     }
@@ -650,22 +596,22 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
     t.nonce = nonce ? dec2hex(nonce) : "";
     t.gas_price = "1388";  // 5 000
     t.gas_limit = "5B8D80";  // 6M
-    t.to = cd->contract_address.substr(2);
+    t.to = cd->m_contractAddress.substr(2);
     t.value = "";
     t.data = claim_slot_data.str();
     t.chain_id = "01";
 
     std::string transaction_receipt = "";
 
-    eth_contract::register_contract(cd->eth_url, cd->contract_address, cd->get_abi());
-    auto contract = eth_contract::get_contract(cd->contract_address);
+    eth_contract::register_contract(cd->m_ethUrl, cd->m_contractAddress, cd->getAbi());
+    auto contract = eth_contract::get_contract(cd->m_contractAddress);
     if (contract == nullptr) {
       s = status::internal("Contract is NULL!");
       return;
     }
 
     setStatusMessage("Claiming slot...");
-    s = contract->call("claimSlot", t.sign_tx(bin2hex(private_key)));
+    s = contract->call("claimSlot", t.sign_tx(private_key));
     if (s.code == automaton::core::common::status::OK) {
       std::cout << "Claim slot result: " << s.msg << std::endl;
       transaction_receipt = s.msg;

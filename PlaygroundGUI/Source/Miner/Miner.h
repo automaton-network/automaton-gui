@@ -20,18 +20,21 @@
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-#include "../Components/FormMaker.h"
+#include "Components/FormMaker.h"
+#include "Config/Config.h"
 
 #include "automaton/core/crypto/cryptopp/secure_random_cryptopp.h"
 #include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
 #include "automaton/core/io/io.h"
+
+class Config;
 
 class Miner:
   public FormMaker,
   private Timer {
  public:
   //==============================================================================
-  Miner();
+  Miner(Config* config);
   ~Miner();
 
   void paint(Graphics& g) override;
@@ -96,7 +99,6 @@ class Miner:
   TextEditor* txtContract;
   // TextEditor* txtMask;
   TextEditor* txtMaskHex;
-  TextEditor* txtMinerAddress;
   TextEditor* txtMinerInfo;
   // TextEditor* txtMinDifficulty;
   TextEditor* txtMinDifficultyHex;
@@ -104,7 +106,6 @@ class Miner:
   TableListBox* tblSlots;
   TextEditor* txtClaim;
 
-  void importPrivateKey();
   void updateContractData();
   void claimMinedSlots();
 

@@ -19,7 +19,8 @@
 
 #include "ProposalsPage.h"
 #include "ProposalsManager.h"
-#include "../Utils.h"
+#include "../Utils/Utils.h"
+#include "../Data/AutomatonContractData.h"
 
 //==============================================================================
 ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
@@ -35,11 +36,16 @@ ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsMa
   tableHeader.addColumn(translate("Approval Rating"), Columns::ApprovalRating, 125);
   tableHeader.addColumn(translate("Status"), Columns::Status, 75);
   tableHeader.addColumn(translate("Spent"), Columns::Spent, 75);
-  tableHeader.addColumn(translate("Budget"), Columns::Budget, 75);
-  tableHeader.addColumn(translate("Periods"), Columns::Periods, 75);
+  tableHeader.addColumn(translate("Reward p/period"), Columns::Budget, 75);
+  tableHeader.addColumn(translate("Periods left"), Columns::Periods, 75);
   tableHeader.addColumn(translate("Length"), Columns::Length, 75);
   tableHeader.addColumn(translate("Target Bonus"), Columns::Bonus, 75);
   tableHeader.addColumn(translate("Time Left"), Columns::TimeLeft, 75);
+
+  // Temporarily disable unused columns (we can't receive a correct data from the contract at the moment)
+  tableHeader.setColumnVisible(Columns::Spent, false);
+  tableHeader.setColumnVisible(Columns::Bonus, false);
+  tableHeader.setColumnVisible(Columns::TimeLeft, false);
 
   m_fetchProposalsBtn = std::make_unique<TextButton>(translate("Fetch Proposals"));
   m_fetchProposalsBtn->addListener(this);
@@ -157,8 +163,12 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_proposalsManager->castVote(proposal, 2);
   } else if (buttonThatWasClicked == m_payForGasBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    AlertWindow w("Pay for gas of " + proposal->getTitle(),
-                  "Enter num of slots and it will be payed.",
+    const auto numSlots = AutomatonContractData::getInstance()->getSlotsNumber();
+    const auto numSlotsPaid = proposal->getNumSlotsPaid();
+    const String slotsMsg = String(numSlotsPaid) + String("/") + String(numSlots) + String(" are paid. ")
+                              + String("Enter num of slots to pay");
+    AlertWindow w("Pay for gas for " + proposal->getTitle() + " proposal",
+                  slotsMsg,
                   AlertWindow::QuestionIcon);
 
     w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
@@ -282,6 +292,9 @@ void ProposalsPage::paintCell(Graphics& g,
                               int width, int height,
                               bool rowIsSelected) {
   auto item = m_proxyModel->getAt(rowNumber);
+  if (!item)
+      return;
+
   g.setColour(Colours::white);
 
   auto getPercentStr = [](float percent) -> String { return String(percent * 100) + "%"; };
@@ -311,7 +324,17 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Status: {
-      g.drawText(Proposal::getStatusStr(item->getStatus()), 0, 0, width, height, Justification::centred);
+      const auto status = item->getStatus();
+      const auto areAllSlotsPaid = item->areAllSlotsPaid();
+      const auto numSlots = AutomatonContractData::getInstance()->getSlotsNumber();
+      if (!areAllSlotsPaid) {
+        g.drawText(Proposal::getStatusStr(Proposal::Status::PrepayingGas),
+                   0, 0, width, height / 2, Justification::centred);
+        g.drawText(String(item->getNumSlotsPaid()) + String("/") + String(numSlots) + String(" paid"),
+                   0, height / 2, width, height / 2, Justification::centred);
+      } else {
+        g.drawText(Proposal::getStatusStr(item->getStatus()), 0, 0, width, height, Justification::centred);
+      }
       break;
     }
     case Spent: {
@@ -320,7 +343,7 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Budget: {
-      g.drawText(Utils::fromWei(EthUnit::ether, item->getBudget()) + String(" ETH"),
+      g.drawText(Utils::fromWei(EthUnit::ether, item->getBudget()) + String(" AUTO"),
                  0, 0, width, height, Justification::centred);
       break;
     }
@@ -344,7 +367,7 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case TimeLeft: {
-      const String unit(item->getLengthDays() == 1 ? "day" : "days");
+      const String unit(item->getTimeLeftDays() == 1 ? "day" : "days");
       g.drawText(String(item->getTimeLeftDays()) + " " + unit, 0, 0, width, height, Justification::centred);
       break;
     }

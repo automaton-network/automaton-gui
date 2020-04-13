@@ -20,19 +20,26 @@
 #pragma once
 #include <JuceHeader.h>
 #include "Order.h"
+#include "../Config/Config.h"
 
 class OrdersModel;
 
-class OrdersManager : public DeletedAtShutdown {
+class DEXManager {
  public:
-  OrdersManager();
-  ~OrdersManager();
+  DEXManager(Config* config);
+  ~DEXManager();
   std::shared_ptr<OrdersModel> getModel();
+  std::string getEthBalance();
+  std::string getAutoBalance();
 
   bool fetchOrders();
 
-  JUCE_DECLARE_SINGLETON(OrdersManager, true)
-
  private:
   std::shared_ptr<OrdersModel> m_model;
+  std::string m_ethBalance;
+  std::string m_autoBalance;
+
+  std::string m_privateKey;
+  std::string m_ethAddress;
+  std::string m_ethAddressAlias;
 };

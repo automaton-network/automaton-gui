@@ -32,7 +32,7 @@
 #include "automaton/core/crypto/cryptopp/Keccak_256_cryptopp.h"
 
 #include "../Proposals/ProposalsManager.h"
-#include "../DEX/OrdersManager.h"
+#include "../DEX/DEXManager.h"
 
 using json = nlohmann::json;
 
@@ -71,7 +71,7 @@ class ReadContractThread: public ThreadWithProgressWindow {
 
   void run() override {
     auto cd = AutomatonContractData::getInstance();
-    eth_contract::register_contract(url, contract_addr, cd->get_abi());
+    eth_contract::register_contract(url, contract_addr, cd->getAbi());
     auto contract = eth_contract::get_contract(contract_addr);
     if (contract == nullptr) {
       std::cout << "ERROR: Contract is NULL" << std::endl;
@@ -187,19 +187,19 @@ class ReadContractThread: public ThreadWithProgressWindow {
 
 NetworkView::NetworkView(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
   auto cd = AutomatonContractData::getInstance();
-  ScopedLock lock(cd->criticalSection);
+  ScopedLock lock(cd->m_criticalSection);
 
   // startTimer(1000);
   int y = 100;
   LBL("Ethereum RPC: ", 20, y, 100, 24);
   txtURL = TXT("URL", 120, y, 500, 24);
-  txtURL->setText(cd->eth_url);
+  txtURL->setText(cd->m_ethUrl);
 
   y += 30;
   LBL("Contract Address: ", 20, y, 100, 24);
   txtContractAddress = TXT("ADDR", 120, y, 500, 24);
   txtContractAddress->setInputRestrictions(42, "0123456789abcdefABCDEFx");
-  txtContractAddress->setText(cd->contract_address);
+  txtContractAddress->setText(cd->m_contractAddress);
 
   y += 30;
   TB("Read Contract", 120, y, 120, 24);
@@ -244,7 +244,6 @@ void NetworkView::buttonClicked(Button* btn) {
                                        "Current settings were not affected.");
     }
     m_proposalsManager->fetchProposals();
-    OrdersManager::getInstance()->fetchOrders();
   }
 }
 
