@@ -34,6 +34,7 @@ class ProposalsManager {
   bool createProposal(Proposal::Ptr proposal, const String& contributor);
   bool payForGas(Proposal::Ptr proposal, uint64 slotsToPay);
   bool castVote(Proposal::Ptr proposal, uint64 choice);
+  bool claimReward(Proposal::Ptr proposal, const String& rewardAmount);
 
   std::string getEthAddress() const noexcept { return m_ethAddress; }
   std::string getEthAddressAlias() const noexcept { return m_ethAddressAlias; }

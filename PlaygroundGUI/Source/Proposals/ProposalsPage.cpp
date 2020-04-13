@@ -58,6 +58,8 @@ ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsMa
   m_voteYesBtn->addListener(this);
   m_voteNoBtn = std::make_unique<TextButton>(translate("Vote NO"));
   m_voteNoBtn->addListener(this);
+  m_claimRewardBtn = std::make_unique<TextButton>(translate("Claim reward"));
+  m_claimRewardBtn->addListener(this);
   m_abandonProposalBtn = std::make_unique<TextButton>(translate("Abandon Proposal"));
 
   m_filterByStatusComboBox = std::make_unique<ComboBox>();
@@ -79,6 +81,7 @@ ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsMa
   m_abandonProposalBtn->setEnabled(false);
   m_voteYesBtn->setEnabled(false);
   m_voteNoBtn->setEnabled(false);
+  m_claimRewardBtn->setEnabled(false);
 
   m_createProposalView = std::make_unique<CreateProposalComponent>();
   m_createProposalView->addListener(this);
@@ -90,6 +93,7 @@ ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsMa
   addAndMakeVisible(m_FilterBtn.get());
   addAndMakeVisible(m_voteYesBtn.get());
   addAndMakeVisible(m_voteNoBtn.get());
+  addAndMakeVisible(m_claimRewardBtn.get());
   addAndMakeVisible(m_filterByStatusComboBox.get());
   addAndMakeVisible(m_proposalsListBox.get());
 
@@ -122,6 +126,8 @@ void ProposalsPage::resized() {
   m_voteYesBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
   m_voteNoBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
+  buttonsArea.removeFromLeft(buttonsSpacing);
+  m_claimRewardBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
   m_filterByStatusComboBox->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
@@ -187,6 +193,32 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     }
   } else if (buttonThatWasClicked == m_fetchProposalsBtn.get()) {
     m_proposalsManager->fetchProposals();
+  } else if (buttonThatWasClicked == m_claimRewardBtn.get()) {
+    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
+    const String rewardMsg = String(proposal->getBudget()) + String(" AUTO is available. ")
+                              + String("Enter reward of amount to claim");
+    AlertWindow w("Claim reward for " + proposal->getTitle() + " proposal",
+                  rewardMsg,
+                  AlertWindow::QuestionIcon);
+
+    w.addTextEditor("rewardAmount", "", "Reward Amount:", false);
+    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+    w.getTextEditor("rewardAmount")->setInputRestrictions(8, "0123456789.");
+
+    if (w.runModalLoop() == 1) {
+      const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
+      std::cout << "Reward amount: " << rewardAmount << std::endl;
+      if (rewardAmount > 0.0) {
+        const auto rewardAmountWei = Utils::toWei(EthUnit::ether, w.getTextEditorContents("rewardAmount"));
+        m_proposalsManager->claimReward(proposal, rewardAmountWei);
+      } else {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                         "Invalid data",
+                                         "Enter correct amount of reward to claim");
+      }
+    }
   }
 }
 
@@ -200,6 +232,7 @@ void ProposalsPage::updateButtons() {
   m_abandonProposalBtn->setEnabled(isRowSelected);
   m_voteYesBtn->setEnabled(isRowSelected);
   m_voteNoBtn->setEnabled(isRowSelected);
+  m_claimRewardBtn->setEnabled(isRowSelected);
 }
 
 // TableListBoxModel

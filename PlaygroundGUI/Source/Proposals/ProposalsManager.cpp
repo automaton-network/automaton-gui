@@ -424,3 +424,62 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
 
   return true;
 }
+
+bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardAmount) {
+  if (proposal->getId() <= 0) {
+    AlertWindow::showMessageBoxAsync(
+      AlertWindow::WarningIcon,
+      "ERROR",
+      "The proposal is not valid");
+  }
+
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+
+    const auto cd = AutomatonContractData::getInstance();
+    auto contract = getContract(&s);
+    if (!s.is_ok())
+      return false;
+
+    task->setProgress(0.1);
+
+    s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
+    const auto nonce = s.is_ok() ? s.msg : "0";
+    if (!s.is_ok())
+      return false;
+
+    task->setProgress(0.3);
+
+    json jInput;
+    jInput.push_back(proposal->getId());
+    jInput.push_back(rewardAmount.toStdString());
+
+    json jSignature;
+    jSignature.push_back("uint256");
+    jSignature.push_back("uint256");
+
+    std::stringstream txData;
+    txData << "86bb8f37" << bin2hex(encode(jSignature.dump(), jInput.dump()));
+
+    eth_transaction transaction;
+    transaction.nonce = nonce;
+    transaction.gas_price = "1388";  // 5 000
+    transaction.gas_limit = "5B8D80";  // 6M
+    transaction.to = cd->getAddress().substr(2);
+    transaction.value = "";
+    transaction.data = txData.str();
+    transaction.chain_id = "01";
+    s = contract->call("claimReward", transaction.sign_tx(m_privateKey));
+    DBG("Call result: " << s.msg << "\n");
+
+    if (!s.is_ok())
+      return false;
+
+    task->setProgress(1.0);
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, "Claiming reward....");
+
+  return true;
+}

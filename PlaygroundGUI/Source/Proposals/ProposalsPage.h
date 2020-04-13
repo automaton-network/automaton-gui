@@ -86,6 +86,7 @@ class ProposalsPage : public Component
   std::unique_ptr<TextButton> m_FilterBtn;
   std::unique_ptr<TextButton> m_voteYesBtn;
   std::unique_ptr<TextButton> m_voteNoBtn;
+  std::unique_ptr<TextButton> m_claimRewardBtn;
   std::unique_ptr<TextButton> m_fetchProposalsBtn;
   std::unique_ptr<ComboBox> m_filterByStatusComboBox;
 
