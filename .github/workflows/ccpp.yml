@@ -2,6 +2,8 @@ name: C/C++ CI
 
 on:
   push:
+    branches:
+      - build
     paths:
       - 'PlaygroundGUI/**'
       - '.github/workflows/ccpp.yml'
