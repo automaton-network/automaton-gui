@@ -23,7 +23,9 @@
 #include "../Data/AutomatonContractData.h"
 
 //==============================================================================
-ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
+ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager)
+    : m_tooltipWindow(this, 500)
+    , m_proposalsManager(proposalsManager) {
   m_proposalsListBox = std::make_unique<TableListBox>();
   m_proposalsListBox->setRowHeight(50);
   m_proposalsListBox->setRowSelectedOnMouseDown(true);
@@ -195,8 +197,8 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_proposalsManager->fetchProposals();
   } else if (buttonThatWasClicked == m_claimRewardBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    const String rewardMsg = String(proposal->getBudget()) + String(" AUTO is available. ")
-                              + String("Enter reward of amount to claim");
+    const auto budget = Utils::fromWei(CoinUnit::AUTO, proposal->getBudget());
+    const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
     AlertWindow w("Claim reward for " + proposal->getTitle() + " proposal",
                   rewardMsg,
                   AlertWindow::QuestionIcon);
@@ -211,7 +213,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
       const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
       std::cout << "Reward amount: " << rewardAmount << std::endl;
       if (rewardAmount > 0.0) {
-        const auto rewardAmountWei = Utils::toWei(EthUnit::ether, w.getTextEditorContents("rewardAmount"));
+        const auto rewardAmountWei = Utils::toWei(CoinUnit::AUTO, w.getTextEditorContents("rewardAmount"));
         m_proposalsManager->claimReward(proposal, rewardAmountWei);
       } else {
         AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
@@ -226,13 +228,20 @@ void ProposalsPage::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
   m_proxyModel->setFilter((ProposalFilter) m_filterByStatusComboBox->getSelectedId());
 }
 
-void ProposalsPage::updateButtons() {
+void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedProposal) {
   const bool isRowSelected = m_proposalsListBox->getNumSelectedRows() > 0;
   m_payForGasBtn->setEnabled(isRowSelected);
   m_abandonProposalBtn->setEnabled(isRowSelected);
   m_voteYesBtn->setEnabled(isRowSelected);
   m_voteNoBtn->setEnabled(isRowSelected);
-  m_claimRewardBtn->setEnabled(isRowSelected);
+
+  // TODO(Kirill) need to think which statuses are eligible for claiming (perhaps, Accepted, Completed as well)
+  const bool isClaimingActive = selectedProposal->getStatus() == Proposal::Status::Started;
+  if (isClaimingActive)
+    m_claimRewardBtn->setTooltip("Claim your reward now!");
+  else
+    m_claimRewardBtn->setTooltip("Proposal claiming is unavailable. Check proposal status, please");
+  m_claimRewardBtn->setEnabled(isClaimingActive);
 }
 
 // TableListBoxModel
@@ -376,7 +385,7 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Budget: {
-      g.drawText(Utils::fromWei(EthUnit::ether, item->getBudget()) + String(" AUTO"),
+      g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudget()) + String(" AUTO"),
                  0, 0, width, height, Justification::centred);
       break;
     }
@@ -394,7 +403,7 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Bonus: {
-      const String text = Utils::fromWei(EthUnit::ether, item->getTargetBonus()) + String(" ETH ")
+      const String text = Utils::fromWei(CoinUnit::AUTO, item->getTargetBonus()) + String(" ETH ")
           + "(" + getPercentStr(item->getBounusPrecent()) + ")";
       g.drawText(text, 0, 0, width, height, Justification::centred);
       break;
@@ -418,6 +427,9 @@ void ProposalsPage::paintRowBackground(Graphics& g,
   g.fillRect(0, 0, width, height);
 }
 
-void ProposalsPage::selectedRowsChanged(int) {
-  updateButtons();
+void ProposalsPage::selectedRowsChanged(int lastRowSelected) {
+  auto selectedItem = m_proxyModel->getAt(lastRowSelected);
+  if (!selectedItem)
+      return;
+  updateButtonsForSelectedProposal(selectedItem);
 }

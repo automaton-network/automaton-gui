@@ -98,12 +98,13 @@ DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   m_buyingUIModel->setModel(m_buyingProxyModel);
 
   m_ethBalanceLabel = std::make_unique<Label>("m_balanceLabel");
-  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + Utils::fromWei(EthUnit::ether, m_dexManager->getEthBalance())
-      + String(" ETH")
-      , NotificationType::dontSendNotification);
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::ether, m_dexManager->getEthBalance()) + String(" ETH"),
+                             NotificationType::dontSendNotification);
   m_autoBalanceLabel = std::make_unique<Label>("m_autoBalanceLabel");
-  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
-      , NotificationType::dontSendNotification);
+  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::AUTO, m_dexManager->getAutoBalance()) + String(" AUTO"),
+                              NotificationType::dontSendNotification);
 
 
   m_sellingLabel = std::make_unique<Label>("m_sellingLabel", "Selling:");
@@ -161,10 +162,12 @@ void DEXPage::resized() {
 }
 
 void DEXPage::modelChanged(AbstractListModelBase* model) {
-  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + Utils::fromWei(EthUnit::ether, m_dexManager->getEthBalance())
-      , NotificationType::dontSendNotification);
-  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
-      , NotificationType::dontSendNotification);
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::ether, m_dexManager->getEthBalance()) + String(" ETH"),
+                             NotificationType::dontSendNotification);
+  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::AUTO, m_dexManager->getAutoBalance()) + String(" AUTO"),
+                              NotificationType::dontSendNotification);
 
   if (model == m_sellingProxyModel.get()) {
     m_sellingTable->updateContent();

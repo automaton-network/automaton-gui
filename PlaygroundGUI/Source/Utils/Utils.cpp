@@ -64,16 +64,17 @@ std::unique_ptr<Drawable> Utils::loadSVG(const String& xmlData) {
   return std::unique_ptr<Drawable>(Drawable::createFromSVG(*svg));
 }
 
-static std::map<EthUnit, String> ethUnitsFactor{
-    {EthUnit::Gwei,  "1000000000"},
-    {EthUnit::ether, "1000000000000000000"}
+static std::map<CoinUnit, String> coinUnitsFactor{
+    {CoinUnit::Gwei,  "1000000000"},
+    {CoinUnit::ether, "1000000000000000000"},
+    {CoinUnit::AUTO, "1000000000000000000"}
 };
 
-String Utils::fromWei(EthUnit unitTo, const String& value) {
+String Utils::fromWei(CoinUnit unitTo, const String& value) {
   BigInteger whole;
   whole.parseString(value, 10);
   BigInteger factor;
-  factor.parseString(ethUnitsFactor[unitTo], 10);
+  factor.parseString(coinUnitsFactor[unitTo], 10);
   BigInteger remainder;
   whole.divideBy(factor, remainder);
 
@@ -84,7 +85,7 @@ String Utils::fromWei(EthUnit unitTo, const String& value) {
   return whole.toString(10) + "." + decimals;
 }
 
-String Utils::toWei(EthUnit unitTo, const String& value) {
+String Utils::toWei(CoinUnit unitTo, const String& value) {
   StringArray tokens;
   tokens.addTokens(value, ".", "");
   if (tokens.size() > 2) {
@@ -98,7 +99,7 @@ String Utils::toWei(EthUnit unitTo, const String& value) {
   }
 
   BigInteger factor;
-  auto unitFactor = ethUnitsFactor[unitTo].dropLastCharacters(decimals.length());
+  auto unitFactor = coinUnitsFactor[unitTo].dropLastCharacters(decimals.length());
   if (unitFactor.isEmpty())
     return "";  // Exceeds max precision
 

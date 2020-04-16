@@ -49,7 +49,7 @@ class ProposalsPage : public Component
 
   void buttonClicked(Button* buttonThatWasClicked) override;
   void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-  void updateButtons();
+  void updateButtonsForSelectedProposal(Proposal::Ptr selectedProposal);
 
   // TableListBoxModel
   // ==============================================================================
@@ -78,6 +78,7 @@ class ProposalsPage : public Component
                           bool rowIsSelected) override;
   void selectedRowsChanged(int lastRowSelected) override;
   // ==============================================================================
+  TooltipWindow m_tooltipWindow;
 
   std::unique_ptr<TableListBox> m_proposalsListBox;
   std::unique_ptr<TextButton> m_createProposalBtn;
@@ -92,6 +93,7 @@ class ProposalsPage : public Component
 
   std::unique_ptr<CreateProposalComponent> m_createProposalView;
   std::shared_ptr<ProposalsProxyModel> m_proxyModel;
+
   ProposalsManager* m_proposalsManager;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProposalsPage);
