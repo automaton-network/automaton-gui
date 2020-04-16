@@ -37,7 +37,7 @@ using automaton::core::interop::ethereum::eth_transaction;
 using automaton::core::interop::ethereum::eth_getTransactionCount;
 using automaton::core::interop::ethereum::eth_getTransactionReceipt;
 using automaton::core::interop::ethereum::eth_contract;
-using automaton::core::interop::ethereum::recover_address;
+using automaton::core::interop::ethereum::secp256k1_recover_address;
 using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2bin;

@@ -23,7 +23,7 @@ jobs:
       dist_dir: ./build/local_third_party
       inst_dir: ./build/inst
       static_runtime: ON
-      automaton_version: v0.1.12
+      automaton_version: v0.1.14
     steps:
     - uses: actions/checkout@v2
     - name: Install build dependencies
@@ -84,7 +84,7 @@ jobs:
       build_dir: ./build
       dist_dir: ./build/local_third_party
       inst_dir: ./build/inst
-      automaton_version: v0.1.12
+      automaton_version: v0.1.14
     steps:
     - uses: actions/checkout@v2
     - name: prepare
@@ -133,7 +133,7 @@ jobs:
       build_dir: ./build
       dist_dir: ./build/local_third_party
       inst_dir: ./build/inst
-      automaton_version: v0.1.12
+      automaton_version: v0.1.14
     steps:
     - uses: actions/checkout@v2
     - name: prepare
