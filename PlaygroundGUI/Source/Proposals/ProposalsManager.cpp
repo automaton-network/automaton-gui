@@ -165,9 +165,13 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     task->setProgress(0.25);
 
     s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
-    const auto nonce = s.is_ok() ? s.msg : "0";
+    auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
+
+    if (nonce.substr(0,2) == "0x") {
+      nonce = nonce.substr(2);
+    }
 
     const auto contributor_address = contributor.startsWith("0x")
                                         ? contributor.substring(2).toStdString()
