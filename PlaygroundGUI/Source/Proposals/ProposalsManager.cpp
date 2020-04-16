@@ -133,6 +133,10 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     if (!s.is_ok())
       return false;
 
+    if (nonce.substr(0, 2) == "0x") {
+      nonce = nonce.substr(2);
+    }
+
     const auto contributor_address = contributor.startsWith("0x")
                                         ? contributor.substring(2).toStdString()
                                         : contributor.toStdString();
