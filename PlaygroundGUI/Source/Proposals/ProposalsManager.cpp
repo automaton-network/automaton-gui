@@ -169,7 +169,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     if (!s.is_ok())
       return false;
 
-    if (nonce.substr(0,2) == "0x") {
+    if (nonce.substr(0, 2) == "0x") {
       nonce = nonce.substr(2);
     }
 
