@@ -206,6 +206,10 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     if (!s.is_ok())
       return false;
 
+    if (nonce.substr(0, 2) == "0x") {
+      nonce = nonce.substr(2);
+    }
+
     json jInput;
     jInput.push_back(proposal->getId());
     jInput.push_back(slotsToPay);
@@ -251,9 +255,13 @@ static void voteWithSlot(AutomatonContractData::Ptr contract,
                          status* resStatus) {
   const auto s = eth_getTransactionCount(contract->getUrl(), ethAddress);
   *resStatus = s;
-  const auto nonce = s.is_ok() ? s.msg : "0";
+  auto nonce = s.is_ok() ? s.msg : "0";
   if (!s.is_ok())
     return;
+
+  if (nonce.substr(0, 2) == "0x") {
+    nonce = nonce.substr(2);
+  }
 
   json jInput;
   jInput.push_back(id);
