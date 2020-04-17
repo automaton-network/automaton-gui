@@ -17,6 +17,8 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <json.hpp>
+
 #include "Miner.h"
 #include "../Data/AutomatonContractData.h"
 #include "Utils/Utils.h"
@@ -32,12 +34,7 @@
 
 using automaton::core::common::status;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
-using automaton::core::interop::ethereum::dec_to_32hex;
-using automaton::core::interop::ethereum::eth_transaction;
-using automaton::core::interop::ethereum::eth_getTransactionCount;
-using automaton::core::interop::ethereum::eth_getTransactionReceipt;
 using automaton::core::interop::ethereum::eth_contract;
-using automaton::core::interop::ethereum::secp256k1_recover_address;
 using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2bin;
@@ -556,13 +553,9 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
     auto cd = AutomatonContractData::getInstance();
     ScopedLock lock(cd->m_criticalSection);
 
-    setStatusMessage("Getting nonce for account " + address);
-    uint32_t nonce = 0;
-    s = eth_getTransactionCount(cd->m_ethUrl, address);
-    if (s.code == automaton::core::common::status::OK) {
-      nonce = hex2dec(s.msg);
-      std::cout << address << " Nonce is: " << nonce << std::endl;
-    } else {
+    auto contract = eth_contract::get_contract(cd->m_contractAddress);
+    if (contract == nullptr) {
+      s = status::internal("Contract is NULL!");
       return;
     }
 
@@ -574,64 +567,19 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
         reinterpret_cast<const unsigned char *>(mined_key.c_str()),
         reinterpret_cast<const unsigned char *>(bin_address.c_str()));
 
-    std::cout << bin2hex(pub_key) << std::endl;
-
-    // Encode claimSlot data.
-    std::stringstream claim_slot_data;
-    claim_slot_data
-        // claimSlot signature
-        << "6b2c8c48"
-        // pubKeyX
-        << bin2hex(pub_key.substr(0, 32))
-        // pubKeyY
-        << bin2hex(pub_key.substr(32, 32))
-        // v
-        << std::string(62, '0') << bin2hex(sig.substr(64, 1))
-        // r
-        << bin2hex(sig.substr(0, 32))
-        // s
-        << bin2hex(sig.substr(32, 32));
-
-    eth_transaction t;
-    t.nonce = nonce ? dec2hex(nonce) : "";
-    t.gas_price = "1388";  // 5 000
-    t.gas_limit = "5B8D80";  // 6M
-    t.to = cd->m_contractAddress.substr(2);
-    t.value = "";
-    t.data = claim_slot_data.str();
-    t.chain_id = "01";
-
-    std::string transaction_receipt = "";
-
-    eth_contract::register_contract(cd->m_ethUrl, cd->m_contractAddress, cd->getAbi());
-    auto contract = eth_contract::get_contract(cd->m_contractAddress);
-    if (contract == nullptr) {
-      s = status::internal("Contract is NULL!");
-      return;
-    }
+    int32_t v = sig[64];
+    json jInput;
+    jInput.push_back(bin2hex(pub_key.substr(0, 32)));  // public key X
+    jInput.push_back(bin2hex(pub_key.substr(32, 32)));  // public key Y
+    jInput.push_back(std::to_string(v));
+    jInput.push_back(bin2hex(sig.substr(0, 32)));  // R
+    jInput.push_back(bin2hex(sig.substr(32, 32)));  // S
 
     setStatusMessage("Claiming slot...");
-    s = contract->call("claimSlot", t.sign_tx(private_key));
-    if (s.code == automaton::core::common::status::OK) {
-      std::cout << "Claim slot result: " << s.msg << std::endl;
-      transaction_receipt = s.msg;
-    } else {
+    s = contract->call("claimSlot", jInput.dump(), private_key);
+    if (!s.is_ok()) {
       return;
     }
-
-    /*
-    setStatusMessage("Getting transaction receipt...");
-    if (transaction_receipt != "" && transaction_receipt != "null") {
-      s = eth_getTransactionReceipt(cd->eth_url, transaction_receipt);
-      if (s.code == automaton::core::common::status::OK) {
-        std::cout << "Transaction receipt: " << s.msg << std::endl;
-      } else {
-        std::cout << "Error (eth_getTransactionReceipt()) " << s << std::endl;
-      }
-    } else {
-      std::cout << "Transaction receipt is NULL!" << std::endl;
-    }
-    */
   }
 };
 
