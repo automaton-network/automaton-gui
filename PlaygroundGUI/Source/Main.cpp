@@ -21,10 +21,22 @@
 #include "MainComponent.h"
 #include "Data/AutomatonContractData.h"
 #include "Login/LoginComponent.h"
+#include "automaton/core/io/io.h"
 
 #include <curl/curl.h>
 
 #include <sol.hpp>
+
+class LoggerTest {
+  std::unique_ptr<g3::LogWorker> logworker;
+  std::unique_ptr<g3::FileSinkHandle> l_handler;
+ public:
+  LoggerTest() {
+    logworker = g3::LogWorker::createLogWorker();
+    l_handler = logworker->addDefaultLogger("demo", "./");
+    g3::initializeLogging(logworker.get());
+  }
+};
 
 class EmbeddedFonts {
  private:
@@ -54,6 +66,8 @@ class PlaygroundGUIApplication: public JUCEApplication {
 
   //==============================================================================
   void initialise(const String& commandLine) override {
+    new LoggerTest();
+
     curl_global_init(CURL_GLOBAL_ALL);
 
     m_fileLogger.reset(FileLogger::createDefaultAppLogger("automaton",

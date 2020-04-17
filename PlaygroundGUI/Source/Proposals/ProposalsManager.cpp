@@ -30,11 +30,6 @@
 #include "automaton/core/common/status.h"
 
 using automaton::core::common::status;
-using automaton::core::interop::ethereum::dec_to_32hex;
-using automaton::core::interop::ethereum::eth_transaction;
-using automaton::core::interop::ethereum::eth_getTransactionCount;
-using automaton::core::interop::ethereum::eth_getTransactionReceipt;
-using automaton::core::interop::ethereum::encode;
 using automaton::core::interop::ethereum::eth_contract;
 using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
@@ -122,20 +117,15 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
+    const auto contract = getContract(&s);
+    if (!s.is_ok())
+      return false;
+
     task->setProgress(0.1);
 
     const auto lastProposalId = getLastProposalId(m_contractData, &s);
     proposal->setId(lastProposalId + 1);
     task->setProgress(0.25);
-
-    s = eth_getTransactionCount(m_contractData->getUrl(), m_accountData->getAddress());
-    const auto nonce = s.is_ok() ? s.msg : "0";
-    if (!s.is_ok())
-      return false;
-
-    if (nonce.substr(0, 2) == "0x") {
-      nonce = nonce.substr(2);
-    }
 
     const auto contributor_address = contributor.startsWith("0x")
                                         ? contributor.substring(2).toStdString()
@@ -149,29 +139,9 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     jProposal.push_back(proposal->getNumPeriods());
     jProposal.push_back(proposal->getBudget().toStdString());
 
-    json jSignature;
-    jSignature.push_back("address");
-    jSignature.push_back("string");
-    jSignature.push_back("string");
-    jSignature.push_back("bytes");
-    jSignature.push_back("uint256");
-    jSignature.push_back("uint256");
-    jSignature.push_back("uint256");
-
-    std::stringstream txData;
-    txData << "f8a1ff12" << bin2hex(encode(jSignature.dump(), jProposal.dump()));
     task->setProgress(0.5);
 
-    eth_transaction transaction;
-    transaction.nonce = nonce;
-    transaction.gas_price = "1388";  // 5 000
-    transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = m_contractData->getAddress().substr(2);
-    transaction.value = "";
-    transaction.data = txData.str();
-    transaction.chain_id = "01";
-    s = m_contractData->call("createProposal", transaction.sign_tx(m_accountData->getPrivateKey()));
-
+    s = contract->call("createProposal", jProposal.dump(), m_accountData->getPrivateKey());
     if (!s.is_ok())
       return false;
 
@@ -201,36 +171,12 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
 
     task->setProgress(0.1);
 
-    s = eth_getTransactionCount(m_contractData->getUrl(), m_accountData->getAddress());
-    const auto nonce = s.is_ok() ? s.msg : "0";
-    if (!s.is_ok())
-      return false;
-
-    if (nonce.substr(0, 2) == "0x") {
-      nonce = nonce.substr(2);
-    }
-
     json jInput;
     jInput.push_back(proposal->getId());
     jInput.push_back(slotsToPay);
 
-    json jSignature;
-    jSignature.push_back("uint256");
-    jSignature.push_back("uint256");
-
-    std::stringstream txData;
-    txData << "10075c50" << bin2hex(encode(jSignature.dump(), jInput.dump()));
     task->setProgress(0.5);
-
-    eth_transaction transaction;
-    transaction.nonce = nonce;
-    transaction.gas_price = "1388";  // 5 000
-    transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = m_contractData->getAddress().substr(2);
-    transaction.value = "";
-    transaction.data = txData.str();
-    transaction.chain_id = "01";
-    s = m_contractData->call("payForGas", transaction.sign_tx(m_accountData->getPrivateKey()));
+    s = contract->call("payForGas", jInput.dump(), m_accountData->getPrivateKey());
 
     if (!s.is_ok())
       return false;
@@ -253,38 +199,12 @@ static void voteWithSlot(AutomatonContractData::Ptr contract,
                          const std::string& ethAddress,
                          const std::string& privateKey,
                          status* resStatus) {
-  const auto s = eth_getTransactionCount(contract->getUrl(), ethAddress);
-  *resStatus = s;
-  auto nonce = s.is_ok() ? s.msg : "0";
-  if (!s.is_ok())
-    return;
-
-  if (nonce.substr(0, 2) == "0x") {
-    nonce = nonce.substr(2);
-  }
-
   json jInput;
   jInput.push_back(id);
   jInput.push_back(slot);
   jInput.push_back(choice);
 
-  json jSignature;
-  jSignature.push_back("uint256");
-  jSignature.push_back("uint256");
-  jSignature.push_back("uint8");
-
-  std::stringstream txData;
-  txData << "dea112a6" << bin2hex(encode(jSignature.dump(), jInput.dump()));
-
-  eth_transaction transaction;
-  transaction.nonce = nonce;
-  transaction.gas_price = "1388";  // 5 000
-  transaction.gas_limit = "5B8D80";  // 6M
-  transaction.to = contract->getAddress().substr(2);
-  transaction.value = "";
-  transaction.data = txData.str();
-  transaction.chain_id = "01";
-  *resStatus = contract->call("castVote", transaction.sign_tx(privateKey));
+  *resStatus = contract->call("castVote",  jInput.dump(), privateKey);
 }
 
 static uint64 getNumSlots(AutomatonContractData::Ptr contract, status* resStatus) {
@@ -347,7 +267,7 @@ static uint64 getLastProposalId(AutomatonContractData::Ptr contract, status* res
     return 0;
 
   const json proposalsDataJson = json::parse(s.msg);
-  if (proposalsDataJson.size() >= 3) {
+  if (proposalsDataJson.size() > 3) {
     const uint64 lastProposalId = std::stoul(proposalsDataJson[3].get<std::string>());
     return lastProposalId;
   }

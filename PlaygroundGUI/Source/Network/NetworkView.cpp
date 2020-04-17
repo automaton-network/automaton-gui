@@ -70,8 +70,6 @@ class ReadContractThread: public ThreadWithProgressWindow {
   {}
 
   void run() override {
-    std::string abi;
-    eth_contract::register_contract(url, contract_addr, abi);
     auto contract = eth_contract::get_contract(contract_addr);
     if (contract == nullptr) {
       std::cout << "ERROR: Contract is NULL" << std::endl;
