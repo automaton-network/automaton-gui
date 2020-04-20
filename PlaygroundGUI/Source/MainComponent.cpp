@@ -28,6 +28,7 @@
 #include "DEX/DEXPage.h"
 #include "DEX/DEXManager.h"
 #include "MainComponent.h"
+#include "Utils/TasksPanel.h"
 
 class DemoBlank: public Component {
  public:
@@ -46,6 +47,7 @@ class DemoBlank: public Component {
 
 
 DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
+  m_tasksPanel = std::make_unique<TasksPanel>();
   m_proposalsManager = std::make_unique<ProposalsManager>(m_config);
   m_dexManager = std::make_unique<DEXManager>(m_config);
   m_proposalsManager->fetchProposals();
@@ -72,6 +74,8 @@ DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
   // tabbedComponent->addTab(TRANS("Network Simulation"), Colour(0xff404040), new DemoSimNet(), true);
   m_tabbedComponent->setCurrentTabIndex(0);
 
+  addAndMakeVisible(m_tasksPanel->getProgressBar());
+
   setSize(1024, 768);
 }
 
@@ -85,9 +89,9 @@ void DemosMainComponent::paint(Graphics& g) {
 }
 
 void DemosMainComponent::resized() {
-  // auto b = getLocalBounds();
-  // auto height = LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight();
-  // menuBar->setBounds(b.removeFromTop(height));
+  auto bounds = getLocalBounds();
+  auto progressBounds = bounds.removeFromBottom(20);
 
-  m_tabbedComponent->setBounds(8, 8, getWidth() - 16, getHeight() - 16);
+  m_tabbedComponent->setBounds(8, 8, bounds.getWidth() - 16, bounds.getHeight() - 16);
+  m_tasksPanel->getProgressBar()->setBounds(progressBounds);
 }

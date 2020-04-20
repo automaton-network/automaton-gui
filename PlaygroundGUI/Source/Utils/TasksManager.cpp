@@ -19,9 +19,27 @@
 
 #include "TasksManager.h"
 
+int AsyncTaskModel::size() const {
+  return m_items.size();
+}
+AsyncTask::Ptr AsyncTaskModel::getAt(int index) {
+  return m_items[index];
+}
+AsyncTask::Ptr& AsyncTaskModel::getReferenceAt(int index) {
+  return m_items.getReference(index);
+}
+void AsyncTaskModel::addItem(AsyncTask::Ptr item, NotificationType notification) {
+  m_items.add(item);
+  notifyModelChanged(notification);
+}
+void AsyncTaskModel::removeItem(AsyncTask* item, NotificationType notification) {
+  m_items.removeIf([&](AsyncTask::Ptr itemPtr){return itemPtr.get() == item;});
+  notifyModelChanged(notification);
+}
+
 JUCE_IMPLEMENT_SINGLETON(TasksManager)
 
-TasksManager::TasksManager() {
+TasksManager::TasksManager() : m_model(std::make_shared<AsyncTaskModel>()) {
 }
 
 TasksManager::~TasksManager() {
@@ -31,7 +49,7 @@ TasksManager::~TasksManager() {
 void TasksManager::launchTask(std::function<bool(AsyncTask*)> fun,
                               std::function<void(AsyncTask*)> postAsyncAction,
                               const String& title) {
-  TasksManager::getInstance()->addTask(new AsyncTask (fun, postAsyncAction, title));
+  TasksManager::getInstance()->addTask(std::make_shared<AsyncTask> (fun, postAsyncAction, title));
 }
 
 bool TasksManager::launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
@@ -60,19 +78,23 @@ bool TasksManager::launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
   return task.m_status.is_ok();
 }
 
-void TasksManager::addTask(AsyncTask* task) {
+void TasksManager::addTask(AsyncTask::Ptr task) {
   ScopedLock sl(m_lock);
-  m_tasks.add(task);
+  m_model->addItem(task, NotificationType::sendNotification);
 
-  if (m_tasks.size() == 1)
+  if (m_model->size() == 1)
     runQueuedTask();
 }
 
 void TasksManager::runQueuedTask() {
-  if (auto task = m_tasks.getFirst()) {
+  if (auto task = m_model->getAt(0)) {
     task->runThread([=](AsyncTask* task){
-      m_tasks.removeObject(task, true);
+      m_model->removeItem(task, NotificationType::sendNotification);
       runQueuedTask();
     });
   }
+}
+
+std::shared_ptr<AsyncTaskModel> TasksManager::getModel() {
+  return m_model;
 }

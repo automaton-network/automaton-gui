@@ -26,6 +26,7 @@
 class ProposalsManager;
 class DEXManager;
 class Config;
+class TasksPanel;
 
 class DemosMainComponent:
   public Component,
@@ -73,6 +74,7 @@ class DemosMainComponent:
   std::unique_ptr<TabbedComponent> m_tabbedComponent;
   std::unique_ptr<ProposalsManager> m_proposalsManager;
   std::unique_ptr<DEXManager> m_dexManager;
+  std::unique_ptr<TasksPanel> m_tasksPanel;
   Config* m_config;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemosMainComponent)

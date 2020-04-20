@@ -27,6 +27,8 @@
         <FILE id="MkUMG0" name="TasksManager.cpp" compile="1" resource="0"
               file="Source/Utils/TasksManager.cpp"/>
         <FILE id="wFnTmn" name="TasksManager.h" compile="0" resource="0" file="Source/Utils/TasksManager.h"/>
+        <FILE id="Mh1E6Q" name="TasksPanel.cpp" compile="1" resource="0" file="Source/Utils/TasksPanel.cpp"/>
+        <FILE id="No44Vv" name="TasksPanel.h" compile="0" resource="0" file="Source/Utils/TasksPanel.h"/>
         <FILE id="RtEFzK" name="Utils.cpp" compile="1" resource="0" file="Source/Utils/Utils.cpp"/>
         <FILE id="zMGIcA" name="Utils.h" compile="0" resource="0" file="Source/Utils/Utils.h"/>
       </GROUP>

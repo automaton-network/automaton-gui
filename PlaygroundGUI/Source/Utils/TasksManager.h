@@ -19,8 +19,21 @@
 
 #pragma once
 
+#include <Models/AbstractListModel.h>
 #include "JuceHeader.h"
 #include "AsyncTask.h"
+
+class AsyncTaskModel : public AbstractListModel<AsyncTask::Ptr> {
+ public:
+  int size() const override;
+  AsyncTask::Ptr getAt(int index) override;
+  AsyncTask::Ptr& getReferenceAt(int index) override;
+  void addItem(AsyncTask::Ptr item, NotificationType notification);
+  void removeItem(AsyncTask* item, NotificationType notification);
+
+ private:
+  Array<AsyncTask::Ptr> m_items;
+};
 
 class TasksManager : public DeletedAtShutdown {
  public:
@@ -35,12 +48,13 @@ class TasksManager : public DeletedAtShutdown {
                          std::function<void(TaskWithProgressWindow*)> postAction,
                          const String& title);
 
-  void addTask(AsyncTask* task);
+  void addTask(AsyncTask::Ptr task);
   void runQueuedTask();
+  std::shared_ptr<AsyncTaskModel> getModel();
 
   JUCE_DECLARE_SINGLETON(TasksManager, true)
 
  private:
-  OwnedArray<AsyncTask> m_tasks;
+  std::shared_ptr<AsyncTaskModel> m_model;
   CriticalSection m_lock;
 };

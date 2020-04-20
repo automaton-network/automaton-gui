@@ -65,7 +65,17 @@ class AsyncTask : public Thread
     Logger::writeToLog(String("(") + String(m_status.code) + String(") :") + m_status.msg);
   }
 
+  const String& getOwnerId() const noexcept {
+    return m_ownerId;
+  }
+
+  double& getProgress() {
+    return m_progress;
+  }
+
   status m_status;
+
+  using Ptr = std::shared_ptr<AsyncTask>;
 
  private:
   void run() override {
@@ -74,6 +84,7 @@ class AsyncTask : public Thread
   }
 
  private:
+  String m_ownerId;
   String m_title;
   double m_progress;
   String m_message;
