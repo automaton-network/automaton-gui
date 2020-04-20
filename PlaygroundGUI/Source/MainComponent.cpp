@@ -47,7 +47,10 @@ class DemoBlank: public Component {
 
 
 DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
-  m_tasksPanel = std::make_unique<TasksPanel>();
+  m_showTasksPanelBtn = std::make_unique<TextButton>("Panel");
+  m_showTasksPanelBtn->addListener(this);
+  addAndMakeVisible(m_showTasksPanelBtn.get());
+
   m_proposalsManager = std::make_unique<ProposalsManager>(m_config);
   m_dexManager = std::make_unique<DEXManager>(m_config);
   m_proposalsManager->fetchProposals();
@@ -74,7 +77,9 @@ DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
   // tabbedComponent->addTab(TRANS("Network Simulation"), Colour(0xff404040), new DemoSimNet(), true);
   m_tabbedComponent->setCurrentTabIndex(0);
 
-  addAndMakeVisible(m_tasksPanel->getProgressBar());
+  m_tasksPanel = std::make_unique<TasksPanel>();
+  addChildComponent(m_tasksPanel.get());
+  addChildComponent(m_tasksPanel->getProgressBar());
 
   setSize(1024, 768);
 }
@@ -92,6 +97,14 @@ void DemosMainComponent::resized() {
   auto bounds = getLocalBounds();
   auto progressBounds = bounds.removeFromBottom(20);
 
+  m_tasksPanel->setBounds(bounds.withWidth(300));
   m_tabbedComponent->setBounds(8, 8, bounds.getWidth() - 16, bounds.getHeight() - 16);
+  m_showTasksPanelBtn->setBounds(progressBounds.removeFromLeft(30));
   m_tasksPanel->getProgressBar()->setBounds(progressBounds);
+}
+
+void DemosMainComponent::buttonClicked(Button* button) {
+  if (button == m_showTasksPanelBtn.get()) {
+    m_tasksPanel->setVisible(!m_tasksPanel->isVisible());
+  }
 }

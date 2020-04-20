@@ -22,6 +22,7 @@
 #include "../Models/AbstractListModel.h"
 
 class TasksProxyModel;
+class TaskComponent;
 
 class TasksPanel : public Component
                  , public AbstractListModelBase::Listener{
@@ -30,12 +31,15 @@ class TasksPanel : public Component
   ~TasksPanel();
 
   ProgressBar* getProgressBar() const noexcept;
-
+  void setProgress(double progress);
+  void resized() override;
+  void paint(Graphics& g) override;
   // AbstractListModelBase::Listener
   void modelChanged(AbstractListModelBase* base) override;
 
  private:
   std::shared_ptr<TasksProxyModel> m_tasksProxyModel;
   std::unique_ptr<ProgressBar> m_progressBar;
+  OwnedArray<TaskComponent> m_tasksComponents;
   double m_progress;
 };

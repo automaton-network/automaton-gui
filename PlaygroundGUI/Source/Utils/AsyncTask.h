@@ -25,8 +25,20 @@
 using automaton::core::common::status;
 
 class AsyncTask : public Thread
-                , public AsyncUpdater {
+                , public AsyncUpdater
+                , public std::enable_shared_from_this<AsyncTask>{
  public:
+  using Ptr = std::shared_ptr<AsyncTask>;
+
+  class Listener {
+   public:
+    virtual ~Listener() {}
+    virtual void taskStarted(AsyncTask::Ptr task) {}
+    virtual void taskFinished(AsyncTask::Ptr task) {}
+    virtual void taskMessageChanged(AsyncTask::Ptr task) {}
+    virtual void taskProgressChanged(AsyncTask::Ptr task) {}
+  };
+
   AsyncTask(std::function<bool(AsyncTask*)> fun,
             std::function<void(AsyncTask*)> postAsyncAction,
             const String& title)
@@ -37,18 +49,25 @@ class AsyncTask : public Thread
       , Thread(title) {
   }
 
+  virtual ~AsyncTask() {
+    cancelPendingUpdate();
+  }
+
   void runThread(std::function<void(AsyncTask*)> onComplete) {
+    m_listeners.call(&Listener::taskStarted, shared_from_this());
     m_onComplete = onComplete;
     startThread();
   }
 
   void setProgress(const double newProgress) {
     m_progress = newProgress;
+    m_listeners.call(&Listener::taskProgressChanged, shared_from_this());
   }
 
   void setStatusMessage(const String& newStatusMessage) {
     const ScopedLock sl(m_messageLock);
     m_message = newStatusMessage;
+    m_listeners.call(&Listener::taskMessageChanged, shared_from_this());
   }
 
   void handleAsyncUpdate() override {
@@ -56,6 +75,8 @@ class AsyncTask : public Thread
       m_postAsyncAction(this);
 
     writeStatusToLog();
+
+    m_listeners.call(&Listener::taskFinished, shared_from_this());
 
     if (m_onComplete != nullptr)
       m_onComplete(this);
@@ -73,9 +94,24 @@ class AsyncTask : public Thread
     return m_progress;
   }
 
-  status m_status;
+  String getStatusMessage() {
+    const ScopedLock sl(m_messageLock);
+    return m_message;
+  }
 
-  using Ptr = std::shared_ptr<AsyncTask>;
+  const String& getTitle() {
+    return m_title;
+  }
+
+  void addListener(Listener* listener) {
+    m_listeners.add(listener);
+  }
+
+  void removeListener(Listener* listener) {
+    m_listeners.remove(listener);
+  }
+
+  status m_status;
 
  private:
   void run() override {
@@ -88,6 +124,7 @@ class AsyncTask : public Thread
   String m_title;
   double m_progress;
   String m_message;
+  ListenerList<Listener> m_listeners;
   CriticalSection m_messageLock;
   std::function<bool(AsyncTask*)> m_fun;
   std::function<void(AsyncTask*)> m_postAsyncAction;

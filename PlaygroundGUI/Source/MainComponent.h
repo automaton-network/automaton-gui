@@ -31,7 +31,8 @@ class TasksPanel;
 class DemosMainComponent:
   public Component,
   public ApplicationCommandTarget,
-  public MenuBarModel {
+  public MenuBarModel,
+  public Button::Listener {
  public:
   enum CommandIDs {
   };
@@ -41,6 +42,7 @@ class DemosMainComponent:
 
   void paint(Graphics& g) override;
   void resized() override;
+  void buttonClicked(Button* button) override;
 
   StringArray getMenuBarNames() override {
     return { "Menu Position", "Outer Colour", "Inner Colour" };
@@ -75,6 +77,7 @@ class DemosMainComponent:
   std::unique_ptr<ProposalsManager> m_proposalsManager;
   std::unique_ptr<DEXManager> m_dexManager;
   std::unique_ptr<TasksPanel> m_tasksPanel;
+  std::unique_ptr<TextButton> m_showTasksPanelBtn;
   Config* m_config;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemosMainComponent)

@@ -29,7 +29,9 @@ class AbstractListModelBase : public AsyncUpdater {
     virtual void modelChanged(AbstractListModelBase*) = 0;
   };
 
-  virtual ~AbstractListModelBase() {}
+  virtual ~AbstractListModelBase() {
+    cancelPendingUpdate();
+  }
 
   virtual int size() const = 0;
 
