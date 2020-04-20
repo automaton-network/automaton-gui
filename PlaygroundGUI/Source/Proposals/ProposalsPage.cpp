@@ -23,9 +23,11 @@
 #include "../Data/AutomatonContractData.h"
 
 //==============================================================================
-ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager)
+ProposalsPage::ProposalsPage(Account::Ptr accountData)
     : m_tooltipWindow(this, 500)
-    , m_proposalsManager(proposalsManager) {
+    , m_accountData(accountData) {
+  m_proposalsManager = m_accountData->getProposalsManager();
+
   m_proposalsListBox = std::make_unique<TableListBox>();
   m_proposalsListBox->setRowHeight(50);
   m_proposalsListBox->setRowSelectedOnMouseDown(true);
@@ -171,7 +173,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_proposalsManager->castVote(proposal, 2);
   } else if (buttonThatWasClicked == m_payForGasBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    const auto numSlots = AutomatonContractData::getInstance()->getSlotsNumber();
+    const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
     const auto numSlotsPaid = proposal->getNumSlotsPaid();
     const String slotsMsg = String(numSlotsPaid) + String("/") + String(numSlots) + String(" are paid. ")
                               + String("Enter num of slots to pay");
@@ -368,7 +370,7 @@ void ProposalsPage::paintCell(Graphics& g,
     case Status: {
       const auto status = item->getStatus();
       const auto areAllSlotsPaid = item->areAllSlotsPaid();
-      const auto numSlots = AutomatonContractData::getInstance()->getSlotsNumber();
+      const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
       if (!areAllSlotsPaid) {
         g.drawText(Proposal::getStatusStr(Proposal::Status::PrepayingGas),
                    0, 0, width, height / 2, Justification::centred);

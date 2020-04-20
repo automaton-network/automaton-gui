@@ -19,14 +19,14 @@
 
 #pragma once
 
+#include "../Login/Account.h"
 #include "ProposalsModel.h"
-class Config;
 
 class ProposalsManager {
  public:
   std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
 
-  ProposalsManager(Config* config);
+  ProposalsManager(Account::Ptr accountData);
   ~ProposalsManager();
 
   bool fetchProposals();
@@ -36,15 +36,14 @@ class ProposalsManager {
   bool castVote(Proposal::Ptr proposal, uint64 choice);
   bool claimReward(Proposal::Ptr proposal, const String& rewardAmount);
 
-  std::string getEthAddress() const noexcept { return m_ethAddress; }
-  std::string getEthAddressAlias() const noexcept { return m_ethAddressAlias; }
+  std::string getEthAddress() const noexcept { return m_accountData->getAddress(); }
+  std::string getEthAddressAlias() const noexcept { return m_accountData->getAlias(); }
 
   void notifyProposalsUpdated();
 
  private:
   std::shared_ptr<ProposalsModel> m_model;
 
-  std::string m_privateKey;
-  std::string m_ethAddress;
-  std::string m_ethAddressAlias;
+  Account::Ptr m_accountData;
+  std::shared_ptr<AutomatonContractData> m_contractData;
 };

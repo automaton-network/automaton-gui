@@ -262,8 +262,14 @@
     <ClCompile Include="..\..\Source\Utils\TasksManager.cpp">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Utils\TasksPanel.cpp">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Utils\Utils.cpp">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Login\Account.cpp">
+      <Filter>PlaygroundGUI\Source\Login</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Login\AccountsModel.cpp">
       <Filter>PlaygroundGUI\Source\Login</Filter>
@@ -1623,8 +1629,14 @@
     <ClInclude Include="..\..\Source\Utils\TasksManager.h">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Utils\TasksPanel.h">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Utils\Utils.h">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Login\Account.h">
+      <Filter>PlaygroundGUI\Source\Login</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Login\AccountsModel.h">
       <Filter>PlaygroundGUI\Source\Login</Filter>

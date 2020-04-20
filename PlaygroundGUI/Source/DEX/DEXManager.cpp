@@ -38,23 +38,10 @@ using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
-static std::shared_ptr<eth_contract> getContract(status* resStatus) {
-  const auto contract = AutomatonContractData::getInstance()->getContract();
-  if (contract == nullptr)
-    *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
-
-  return contract;
-}
-
-DEXManager::DEXManager(Config* config) {
-  m_ethBalance = "Undefined";
-  m_autoBalance = "Undefined";
-
-  m_model = std::make_shared<OrdersModel>();
-
-  m_privateKey = config->get_string("private_key");
-  m_ethAddress = config->get_string("eth_address");
-  m_ethAddressAlias = config->get_string("account_alias");
+DEXManager::DEXManager(Account::Ptr accountData)
+: m_model(std::make_shared<OrdersModel>()),
+  m_accountData(accountData) {
+  m_contractData = m_accountData->getContractData();
 }
 
 DEXManager::~DEXManager() {
@@ -64,15 +51,7 @@ std::shared_ptr<OrdersModel> DEXManager::getModel() {
   return m_model;
 }
 
-std::string DEXManager::getEthBalance() {
-  return m_ethBalance;
-}
-
-std::string DEXManager::getAutoBalance() {
-  return m_autoBalance;
-}
-
-static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resStatus) {
+static uint64 getNumOrders(AutomatonContractData::Ptr contract, status* resStatus) {
   *resStatus = contract->call("getOrdersLength", "");
   if (!resStatus->is_ok())
     return 0;
@@ -82,15 +61,16 @@ static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resSt
   return ordersLength;
 }
 
-static std::string ethBalance(const std::string& m_ethAddress
-                              , status* resStatus) {
-  *resStatus = eth_getBalance(AutomatonContractData::getInstance()->getUrl(), m_ethAddress);
+static std::string getEthBalance(AutomatonContractData::Ptr contract
+    , const std::string& m_ethAddress
+    , status* resStatus) {
+  *resStatus = eth_getBalance(contract->getUrl(), m_ethAddress);
   BigInteger balance;
   balance.parseString(resStatus->msg, 16);
   return balance.toString(10).toStdString();
 }
 
-static std::string autoBalance(std::shared_ptr<eth_contract> contract
+static std::string getAutoBalance(AutomatonContractData::Ptr contract
     , const std::string& m_ethAddress
     , status* resStatus) {
   json jInput;
@@ -104,21 +84,19 @@ bool DEXManager::fetchOrders() {
   TasksManager::launchTask([&](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract(&s);
+    auto ethBalance = getEthBalance(m_contractData, m_accountData->getAddress(), &s);
     if (!s.is_ok())
       return false;
 
-    m_ethBalance = ethBalance(m_ethAddress, &s);
+    auto autoBalance = getAutoBalance(m_contractData, m_accountData->getAddress(), &s);
     if (!s.is_ok())
       return false;
 
-    m_autoBalance = autoBalance(contract, m_ethAddress, &s);
-    if (!s.is_ok())
-      return false;
+    m_accountData->setBalance(ethBalance, autoBalance);
 
     m_model->clear(NotificationType::dontSendNotification);
 
-    const auto numOfOrders = getNumOrders(contract, &s);
+    const auto numOfOrders = getNumOrders(m_contractData, &s);
     if (!s.is_ok())
       return false;
 
@@ -127,7 +105,7 @@ bool DEXManager::fetchOrders() {
       json jInput;
       jInput.push_back(i);
 
-      s = contract->call("getOrder", jInput.dump());
+      s = m_contractData->call("getOrder", jInput.dump());
 
       if (!s.is_ok())
         return false;

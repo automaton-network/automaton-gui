@@ -82,7 +82,9 @@ class OrdersUIModel : public TableListBoxModel {
   std::shared_ptr<AbstractListModel<Order::Ptr>> m_model;
 };
 
-DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
+DEXPage::DEXPage(Account::Ptr accountData) : m_accountData(accountData) {
+  m_dexManager = m_accountData->getDexManager();
+
   m_sellingProxyModel = std::make_shared<OrdersProxyModel>();
   m_sellingProxyModel->setFilter(OrderFilter::Sell);
   m_sellingProxyModel->setModel(m_dexManager->getModel());
@@ -99,11 +101,11 @@ DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
 
   m_ethBalanceLabel = std::make_unique<Label>("m_balanceLabel");
   m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL
-                                + Utils::fromWei(CoinUnit::ether, m_dexManager->getEthBalance()) + String(" ETH"),
+                                + Utils::fromWei(CoinUnit::ether, m_accountData->getEthBalance()) + String(" ETH"),
                              NotificationType::dontSendNotification);
   m_autoBalanceLabel = std::make_unique<Label>("m_autoBalanceLabel");
   m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL
-                                + Utils::fromWei(CoinUnit::AUTO, m_dexManager->getAutoBalance()) + String(" AUTO"),
+                                + Utils::fromWei(CoinUnit::AUTO, m_accountData->getAutoBalance()) + String(" AUTO"),
                               NotificationType::dontSendNotification);
 
 
@@ -163,10 +165,10 @@ void DEXPage::resized() {
 
 void DEXPage::modelChanged(AbstractListModelBase* model) {
   m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL
-                                + Utils::fromWei(CoinUnit::ether, m_dexManager->getEthBalance()) + String(" ETH"),
+                                + Utils::fromWei(CoinUnit::ether, m_accountData->getEthBalance()) + String(" ETH"),
                              NotificationType::dontSendNotification);
   m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL
-                                + Utils::fromWei(CoinUnit::AUTO, m_dexManager->getAutoBalance()) + String(" AUTO"),
+                                + Utils::fromWei(CoinUnit::AUTO, m_accountData->getAutoBalance()) + String(" AUTO"),
                               NotificationType::dontSendNotification);
 
   if (model == m_sellingProxyModel.get()) {

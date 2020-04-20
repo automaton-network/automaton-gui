@@ -40,8 +40,9 @@ class LoginComponent  : public Component
   void buttonClicked(Button* btn) override;
   void componentVisibilityChanged(Component& component) override;
   void modelChanged(AbstractListModelBase* base) override;
-  void openAccount(Account* account);
-  void removeAccount(const Account& account);
+  void openAccount(Account::Ptr account);
+  void removeAccount(Account::Ptr account);
+  void setAccountsModel(std::shared_ptr<AccountsModel> model);
 
   // TableListBoxModel
   // ==============================================================================
@@ -60,6 +61,7 @@ class LoginComponent  : public Component
 
  private:
   void switchLoginState(bool isNetworkConfig);
+  std::shared_ptr<AutomatonContractData> getCurrentContract();
 
  private:
   AccountWindow* getWindowByAddress(const String& address);
@@ -73,6 +75,7 @@ class LoginComponent  : public Component
   std::unique_ptr<TextEditor> m_contractAddrEditor;
   std::unique_ptr<TextButton> m_readContractBtn;
 
+  Array<std::shared_ptr<AutomatonContractData>> m_contracts;
   OwnedArray<AccountWindow> m_accountWindows;
   ConfigFile* m_configFile;
 

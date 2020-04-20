@@ -46,29 +46,29 @@ class DemoBlank: public Component {
 };
 
 
-DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
+DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData(accountData) {
+  accountData->initManagers();
+
   m_showTasksPanelBtn = std::make_unique<TextButton>("Panel");
   m_showTasksPanelBtn->addListener(this);
   addAndMakeVisible(m_showTasksPanelBtn.get());
 
-  m_proposalsManager = std::make_unique<ProposalsManager>(m_config);
-  m_dexManager = std::make_unique<DEXManager>(m_config);
-  m_proposalsManager->fetchProposals();
-  m_dexManager->fetchOrders();
+  m_accountData->getProposalsManager()->fetchProposals();
+  m_accountData->getDexManager()->fetchOrders();
 
   m_tabbedComponent.reset(new TabbedComponent(TabbedButtonBar::TabsAtTop));
   addAndMakeVisible(m_tabbedComponent.get());
   m_tabbedComponent->setTabBarDepth(37);
 //  m_tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040),
 //                            new NetworkView(m_proposalsManager.get()), true);
-  m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(m_config), true);
+  m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(m_accountData), true);
   // m_tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
 
-  auto proposalsPage = new ProposalsPage(m_proposalsManager.get());
+  auto proposalsPage = new ProposalsPage(m_accountData);
   m_tabbedComponent->addTab(TRANS("Proposals"), Colour(0xff404040), proposalsPage, true);
   m_tabbedComponent->addTab(TRANS("Proposals Actions"), Colour(0xff404040),
-                            new ProposalsActionsPage(m_proposalsManager.get()), true);
-  m_tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(m_dexManager.get()), true);
+                            new ProposalsActionsPage(m_accountData->getProposalsManager()), true);
+  m_tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(m_accountData), true);
 
   // m_tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   // m_tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);

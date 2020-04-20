@@ -33,6 +33,8 @@
         <FILE id="zMGIcA" name="Utils.h" compile="0" resource="0" file="Source/Utils/Utils.h"/>
       </GROUP>
       <GROUP id="{867F9B81-C019-9D46-209F-BBE27FD4A220}" name="Login">
+        <FILE id="SCBkHQ" name="Account.cpp" compile="1" resource="0" file="Source/Login/Account.cpp"/>
+        <FILE id="fBtg6y" name="Account.h" compile="0" resource="0" file="Source/Login/Account.h"/>
         <FILE id="SkQyNk" name="AccountsModel.cpp" compile="1" resource="0"
               file="Source/Login/AccountsModel.cpp"/>
         <FILE id="yEDkJr" name="AccountsModel.h" compile="0" resource="0" file="Source/Login/AccountsModel.h"/>

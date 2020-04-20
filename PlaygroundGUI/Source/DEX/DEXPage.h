@@ -20,6 +20,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <Login/Account.h>
 
 #include "OrdersModel.h"
 
@@ -29,7 +30,7 @@ class DEXManager;
 class DEXPage : public Component
               , public AbstractListModelBase::Listener {
  public:
-  DEXPage(DEXManager* dexManager);
+  DEXPage(Account::Ptr accountData);
   ~DEXPage();
 
   void paint(Graphics&) override;
@@ -49,6 +50,7 @@ class DEXPage : public Component
   std::unique_ptr<TableListBox> m_buyingTable;
   std::shared_ptr<OrdersProxyModel> m_sellingProxyModel;
   std::shared_ptr<OrdersProxyModel> m_buyingProxyModel;
+  Account::Ptr m_accountData;
   DEXManager* m_dexManager;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DEXPage)

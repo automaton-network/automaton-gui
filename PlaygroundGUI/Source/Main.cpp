@@ -60,7 +60,6 @@ class PlaygroundGUIApplication: public JUCEApplication {
                                                           "automaton_log.txt",
                                                           "Automaton App Log"));
     FileLogger::setCurrentLogger(m_fileLogger.get());
-    AutomatonContractData::getInstance()->init(ConfigFile::getInstance());
     mainWindow.reset(new MainWindow(getApplicationName(), ConfigFile::getInstance()));
 
     // const Font& fontPlay = fonts.getPlay();

@@ -143,7 +143,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Utils\TasksManager.cpp"/>
+    <ClCompile Include="..\..\Source\Utils\TasksPanel.cpp"/>
     <ClCompile Include="..\..\Source\Utils\Utils.cpp"/>
+    <ClCompile Include="..\..\Source\Login\Account.cpp"/>
     <ClCompile Include="..\..\Source\Login\AccountsModel.cpp"/>
     <ClCompile Include="..\..\Source\Login\LoginComponent.cpp"/>
     <ClCompile Include="..\..\Source\DEX\DEXManager.cpp"/>
@@ -1355,7 +1357,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\Source\Utils\AsyncTask.h"/>
     <ClInclude Include="..\..\Source\Utils\TasksManager.h"/>
+    <ClInclude Include="..\..\Source\Utils\TasksPanel.h"/>
     <ClInclude Include="..\..\Source\Utils\Utils.h"/>
+    <ClInclude Include="..\..\Source\Login\Account.h"/>
     <ClInclude Include="..\..\Source\Login\AccountsModel.h"/>
     <ClInclude Include="..\..\Source\Login\LoginComponent.h"/>
     <ClInclude Include="..\..\Source\Models\AbstractListModel.h"/>

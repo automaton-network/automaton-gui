@@ -26,18 +26,17 @@
 
 class AccountWindow : public DocumentWindow {
  public:
-  AccountWindow(String title, String accountAddress, Config* accountConfig)
+  AccountWindow(String title, Account::Ptr accountData)
       : DocumentWindow(title,
                     Desktop::getInstance()
                     .getDefaultLookAndFeel()
                     .findColour(ResizableWindow::backgroundColourId),
                     DocumentWindow::allButtons)
-      , m_accountAddress(accountAddress)
-      , m_accountConfig(accountConfig) {
+      , m_accountAddress(accountData->getAddress()) {
     LookAndFeel::setDefaultLookAndFeel(&m_lnf);
 
     setUsingNativeTitleBar(false);
-    setContentOwned(new DemosMainComponent(m_accountConfig), true);
+    setContentOwned(new DemosMainComponent(accountData), true);
     setTitleBarButtonsRequired(closeButton | minimiseButton | maximiseButton, false);
 
     setFullScreen(false);
@@ -62,15 +61,12 @@ class AccountWindow : public DocumentWindow {
  private:
   LookAndFeel_V4 m_lnf;
   String m_accountAddress;
-  Config* m_accountConfig;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AccountWindow)
 };
 
 //==============================================================================
 LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile) {
-  m_model = std::make_shared<AccountsModel>();
-  m_model->addListener(this);
   m_accountsTable = std::make_unique<TableListBox>();
   m_accountsTable->setRowHeight(32);
   m_accountsTable->setRowSelectedOnMouseDown(true);
@@ -84,12 +80,13 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   tableHeader.addColumn(translate("Alias"), 1, 50);
   tableHeader.addColumn(translate("Address"), 2, 300);
 
-
-  auto accountsJson = m_configFile->get_json("accounts");
-  for (const auto& el : accountsJson.items()) {
-    Account account(el.key());
-    account.getConfig().restoreFrom_json(el.value());
-    m_model->addItem(account, NotificationType::dontSendNotification);
+  auto contractsJson = m_configFile->get_json("contracts");
+  for (const auto& el : contractsJson.items()) {
+    Config config;
+    config.restoreFrom_json(el.value());
+    auto contract = std::make_shared<AutomatonContractData>();
+    contract->init(config);
+    m_contracts.add(contract);
   }
 
   m_importPrivateKeyBtn = std::make_unique<TextButton>("Import");
@@ -116,22 +113,21 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   m_readContractBtn->addListener(this);
   addAndMakeVisible(m_readContractBtn.get());
 
-  auto cd = AutomatonContractData::getInstance();
-  m_rpcEditor->setText(cd->getUrl());
-  m_contractAddrEditor->setText(cd->getAddress());
+  m_rpcEditor->setText(configFile->get_string("eth_url"));
+  m_contractAddrEditor->setText(configFile->get_string("contract_address"));
   switchLoginState(true);
 
   setSize(350, 600);
 }
 
 LoginComponent::~LoginComponent() {
-  json accounts;
-  for (int i = 0; i < m_model->size(); ++i) {
-    auto& item = m_model->getReferenceAt(i);
-    accounts[item.getAddress().toStdString()] = item.getConfig().to_json();
+  json contracts;
+  for (int i = 0; i < m_contracts.size(); ++i) {
+    auto item = m_contracts[i];
+    contracts[item->getAddress()] = item->getConfig().to_json();
   }
 
-  m_configFile->set_json("accounts", accounts);
+  m_configFile->set_json("contracts", contracts);
   m_configFile->save_to_local_file();
 }
 
@@ -172,6 +168,14 @@ void LoginComponent::resized() {
 
 void LoginComponent::buttonClicked(Button* btn) {
   if (btn == m_importPrivateKeyBtn.get()) {
+    auto currentContract = getCurrentContract();
+    if (currentContract == nullptr) {
+      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                       "Invalid contract!",
+                                       "Select valid RPC!");
+      return;
+    }
+
     AlertWindow w("Import Private Key",
                   "Enter your private key and it will be imported.",
                   AlertWindow::QuestionIcon);
@@ -197,17 +201,28 @@ void LoginComponent::buttonClicked(Button* btn) {
       const auto accountAlias = w.getTextEditorContents("alias");
 
       auto eth_address_hex = Utils::gen_ethereum_address(privkeyHex.toStdString());
-      Account account(eth_address_hex);
-      account.getConfig().set_string("private_key", privkeyHex.toStdString());
-      account.getConfig().set_string("eth_address", eth_address_hex);
-      account.getConfig().set_string("account_alias", accountAlias.toStdString());
+      Config config;
+      config.set_string("private_key", privkeyHex.toStdString());
+      config.set_string("eth_address", eth_address_hex);
+      config.set_string("account_alias", accountAlias.toStdString());
+      auto account = std::make_shared<Account>(config, eth_address_hex, getCurrentContract());
       m_model->addItem(account, NotificationType::sendNotification);
     }
   } else if (btn == m_readContractBtn.get()) {
-    bool res = AutomatonContractData::getInstance()->readContract(m_rpcEditor->getText().toStdString(),
-                                                                  m_contractAddrEditor->getText().toStdString());
-    if (res)
+    // TODO(Kirill)
+    auto contractData = getCurrentContract();
+    if (contractData == nullptr) {
+      contractData = std::make_shared<AutomatonContractData>();
+      contractData->init(Config());
+      m_contracts.add(contractData);
+    }
+
+    bool res = contractData->readContract(m_rpcEditor->getText().toStdString(),
+                                          m_contractAddrEditor->getText().toStdString());
+    if (res) {
+      setAccountsModel(contractData->getAccountsModel());
       switchLoginState(false);
+    }
   }
 }
 
@@ -232,26 +247,38 @@ void LoginComponent::modelChanged(AbstractListModelBase* base) {
   m_accountsTable->repaint();
 }
 
-void LoginComponent::openAccount(Account* account) {
+void LoginComponent::openAccount(Account::Ptr account) {
   if (auto accountWindow = getWindowByAddress(account->getAddress())) {
     accountWindow->toFront(true);
   } else {
-    accountWindow = new AccountWindow("Account " + account->getAlias(), account->getAddress(), &account->getConfig());
+    accountWindow = new AccountWindow("Account " + account->getAlias(), account);
     accountWindow->addComponentListener(this);
     m_accountWindows.add(accountWindow);
   }
 }
 
-void LoginComponent::removeAccount(const Account& account) {
-  m_accountWindows.removeObject(getWindowByAddress(account.getAddress()), true);
+void LoginComponent::removeAccount(Account::Ptr account) {
+  m_accountWindows.removeObject(getWindowByAddress(account->getAddress()), true);
   m_model->removeItem(account, NotificationType::sendNotification);
+}
+
+void LoginComponent::setAccountsModel(std::shared_ptr<AccountsModel> model) {
+  if (m_model != nullptr)
+    m_model->removeListener(this);
+
+  m_model = model;
+
+  if (m_model != nullptr)
+    m_model->addListener(this);
+
+  m_accountsTable->updateContent();
 }
 
 // TableListBoxModel
 //==============================================================================
 
 int LoginComponent::getNumRows() {
-  return m_model->size();
+  return m_model == nullptr ? 0 : m_model->size();
 }
 
 void LoginComponent::paintCell(Graphics& g,
@@ -264,12 +291,12 @@ void LoginComponent::paintCell(Graphics& g,
   switch (columnId) {
     case 1: {
       g.setFont(14);
-      g.drawText(item.getAlias(), 0, 0, width, height, Justification::centred);
+      g.drawText(item->getAlias(), 0, 0, width, height, Justification::centred);
       break;
     }
     case 2: {
       g.setFont(10);
-      g.drawText(item.getAddress(), 0, 0, width, height, Justification::centredLeft);
+      g.drawText(item->getAddress(), 0, 0, width, height, Justification::centredLeft);
       break;
     }
     default: {
@@ -290,11 +317,11 @@ void LoginComponent::cellClicked(int rowNumber, int columnId, const MouseEvent& 
     if (e.mods.isRightButtonDown()) {
     PopupMenu menu;
     menu.addItem("Open", [=] {
-      openAccount(&m_model->getReferenceAt(rowNumber));
+      openAccount(m_model->getAt(rowNumber));
     });
 
     menu.addItem("Remove", [=] {
-      removeAccount(m_model->getReferenceAt(rowNumber));
+      removeAccount(m_model->getAt(rowNumber));
     });
 
     menu.showAt(m_accountsTable->getCellComponent(columnId, rowNumber));
@@ -303,7 +330,7 @@ void LoginComponent::cellClicked(int rowNumber, int columnId, const MouseEvent& 
 
 void LoginComponent::cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) {
   if (e.mods.isLeftButtonDown()) {
-    openAccount(&m_model->getReferenceAt(rowNumber));
+    openAccount(m_model->getAt(rowNumber));
   }
 }
 
@@ -321,4 +348,8 @@ void LoginComponent::switchLoginState(bool isNetworkConfig) {
   if (!isNetworkConfig)
     m_readContractBtn->setButtonText("Refresh");
   resized();
+}
+
+std::shared_ptr<AutomatonContractData> LoginComponent::getCurrentContract() {
+  return m_contracts.getFirst();
 }

@@ -33,7 +33,7 @@ class NetworkView:
   private Timer {
  public:
   //==============================================================================
-  NetworkView(ProposalsManager* proposalsManager);
+  NetworkView();
   ~NetworkView();
 
   void paint(Graphics& g) override;
@@ -53,8 +53,6 @@ class NetworkView:
   TextEditor* txtURL;
   TextEditor* txtContractAddress;
   TextEditor* txtEthAddress;
-
-  ProposalsManager* m_proposalsManager;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NetworkView)
 };

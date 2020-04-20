@@ -22,34 +22,19 @@
 
 #include "../Models/AbstractProxyModel.h"
 #include "../Config/Config.h"
+#include "Account.h"
 
-class Account {
- public:
-  Account();
-  Account(const String& address);
-
-  const String& getAddress() const noexcept;
-  String getAlias() const noexcept;
-  Config& getConfig() noexcept;
-
-  bool operator==(const Account& other) const noexcept;
-
- private:
-  String m_address;
-  Config m_config;
-};
-
-class AccountsModel : public AbstractListModel<Account> {
+class AccountsModel : public AbstractListModel<Account::Ptr> {
  public:
   int size() const override;
-  Account getAt(int index) override;
-  Account& getReferenceAt(int index) override;
+  Account::Ptr getAt(int index) override;
+  Account::Ptr& getReferenceAt(int index) override;
 
-  void addItem(const Account& account, NotificationType notification);
-  void removeItem(const Account& account, NotificationType notification);
+  void addItem(Account::Ptr account, NotificationType notification);
+  void removeItem(Account::Ptr account, NotificationType notification);
 
  private:
-  Array<Account> m_accounts;
+  Array<Account::Ptr> m_accounts;
 };
 
 #endif  // ACCOUNTSMODEL_H_INCLUDED

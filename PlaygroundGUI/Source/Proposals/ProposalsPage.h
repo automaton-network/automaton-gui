@@ -22,6 +22,7 @@
 #include <JuceHeader.h>
 #include "ProposalsModel.h"
 #include "CreateProposalComponent.h"
+#include "Login/Account.h"
 
 class ProposalsManager;
 
@@ -32,7 +33,7 @@ class ProposalsPage : public Component
                     , private ComboBox::Listener
                     , private TableListBoxModel {
  public:
-  ProposalsPage(ProposalsManager* proposalsManager);
+  ProposalsPage(Account::Ptr accountData);
   ~ProposalsPage();
 
   void setModel(std::shared_ptr<ProposalsModel> model);
@@ -94,6 +95,7 @@ class ProposalsPage : public Component
   std::unique_ptr<CreateProposalComponent> m_createProposalView;
   std::shared_ptr<ProposalsProxyModel> m_proxyModel;
 
+  Account::Ptr m_accountData;
   ProposalsManager* m_proposalsManager;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProposalsPage);

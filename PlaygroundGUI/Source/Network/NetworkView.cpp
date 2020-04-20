@@ -70,8 +70,8 @@ class ReadContractThread: public ThreadWithProgressWindow {
   {}
 
   void run() override {
-    auto cd = AutomatonContractData::getInstance();
-    eth_contract::register_contract(url, contract_addr, cd->getAbi());
+    std::string abi;
+    eth_contract::register_contract(url, contract_addr, abi);
     auto contract = eth_contract::get_contract(contract_addr);
     if (contract == nullptr) {
       std::cout << "ERROR: Contract is NULL" << std::endl;
@@ -185,24 +185,24 @@ class ReadContractThread: public ThreadWithProgressWindow {
 //  NetworkView
 //==============================================================================
 
-NetworkView::NetworkView(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
-  auto cd = AutomatonContractData::getInstance();
-  ScopedLock lock(cd->m_criticalSection);
-
-  // startTimer(1000);
-  int y = 100;
-  LBL("Ethereum RPC: ", 20, y, 100, 24);
-  txtURL = TXT("URL", 120, y, 500, 24);
-  txtURL->setText(cd->m_ethUrl);
-
-  y += 30;
-  LBL("Contract Address: ", 20, y, 100, 24);
-  txtContractAddress = TXT("ADDR", 120, y, 500, 24);
-  txtContractAddress->setInputRestrictions(42, "0123456789abcdefABCDEFx");
-  txtContractAddress->setText(cd->m_contractAddress);
-
-  y += 30;
-  TB("Read Contract", 120, y, 120, 24);
+NetworkView::NetworkView() {
+//  auto cd = AutomatonContractData::getInstance();
+//  ScopedLock lock(cd->m_criticalSection);
+//
+//  // startTimer(1000);
+//  int y = 100;
+//  LBL("Ethereum RPC: ", 20, y, 100, 24);
+//  txtURL = TXT("URL", 120, y, 500, 24);
+//  txtURL->setText(cd->m_ethUrl);
+//
+//  y += 30;
+//  LBL("Contract Address: ", 20, y, 100, 24);
+//  txtContractAddress = TXT("ADDR", 120, y, 500, 24);
+//  txtContractAddress->setInputRestrictions(42, "0123456789abcdefABCDEFx");
+//  txtContractAddress->setText(cd->m_contractAddress);
+//
+//  y += 30;
+//  TB("Read Contract", 120, y, 120, 24);
 }
 
 NetworkView::~NetworkView() {
@@ -217,34 +217,33 @@ void NetworkView::paint(Graphics& g) {
 }
 
 void NetworkView::buttonClicked(Button* btn) {
-  auto txt = btn->getButtonText();
-  if (txt == "Read Contract") {
-    const auto url = txtURL->getText();
-    const auto address = txtContractAddress->getText();
-
-    ReadContractThread t(url.toStdString(), address.toStdString());
-    if (t.runThread(9)) {
-      if (!t.s.is_ok()) {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Error occurred!",
-                                       t.s.msg);
-      } else {
-        auto cd = AutomatonContractData::getInstance();
-        cd->setData(url.toStdString(), t.contract_addr, t.mask,
-                    t.min_difficulty, t.slots_number,
-                    t.slots_claimed, t.slots);
-
-        AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,
-                                         "Operation successful!",
-                                         "Contract data loaded successfully and settings updated");
-      }
-    } else {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Operation aborted!",
-                                       "Current settings were not affected.");
-    }
-    m_proposalsManager->fetchProposals();
-  }
+//  auto txt = btn->getButtonText();
+//  if (txt == "Read Contract") {
+//    const auto url = txtURL->getText();
+//    const auto address = txtContractAddress->getText();
+//
+//    ReadContractThread t(url.toStdString(), address.toStdString());
+//    if (t.runThread(9)) {
+//      if (!t.s.is_ok()) {
+//      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+//                                       "Error occurred!",
+//                                       t.s.msg);
+//      } else {
+//        auto cd = AutomatonContractData::getInstance();
+//        cd->setData(url.toStdString(), t.contract_addr, t.mask,
+//                    t.min_difficulty, t.slots_number,
+//                    t.slots_claimed, t.slots);
+//
+//        AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,
+//                                         "Operation successful!",
+//                                         "Contract data loaded successfully and settings updated");
+//      }
+//    } else {
+//      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+//                                       "Operation aborted!",
+//                                       "Current settings were not affected.");
+//    }
+//  }
 }
 
 void NetworkView::resized() {

@@ -21,7 +21,9 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Config/Config.h"
+#include "../Login/AccountsModel.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
+#include "automaton/core/common/status.h"
 
 struct ValidatorSlot {
   std::string difficulty;
@@ -29,11 +31,13 @@ struct ValidatorSlot {
   std::string last_claim_time;
 };
 
-class AutomatonContractData : DeletedAtShutdown {
+class AutomatonContractData : public std::enable_shared_from_this<AutomatonContractData> {
  public:
+  using Ptr = std::shared_ptr<AutomatonContractData>;
+
   AutomatonContractData();
+  void init(const Config& _config);
   ~AutomatonContractData();
-  void init(Config* _config);
   void setData(const std::string& _eth_url,
                const std::string& _contractAddress,
                const std::string& _mask,
@@ -44,6 +48,7 @@ class AutomatonContractData : DeletedAtShutdown {
 
   bool readContract(const std::string& url, const std::string& contractAddress);
   std::shared_ptr<automaton::core::interop::ethereum::eth_contract> getContract();
+  automaton::core::common::status call(const std::string& f, const std::string& params);
 
   bool loadAbi();
   std::string getAbi();
@@ -53,6 +58,8 @@ class AutomatonContractData : DeletedAtShutdown {
   std::string getMinDifficulty() const noexcept;
   uint32_t getSlotsNumber() const noexcept;
   uint32_t getSlotsClaimed() const noexcept;
+  std::shared_ptr<AccountsModel> getAccountsModel() const noexcept;
+  void addAccount(Account::Ptr account, NotificationType notification);
 
   std::string m_contractAbi;
   std::string m_ethUrl;
@@ -63,10 +70,11 @@ class AutomatonContractData : DeletedAtShutdown {
   uint32_t m_slotsClaimed;
   std::vector<ValidatorSlot> m_slots;
 
-  JUCE_DECLARE_SINGLETON(AutomatonContractData, true)
-
   CriticalSection m_criticalSection;
 
+  Config& getConfig();
+
  private:
-  Config* config;
+  Config config;
+  std::shared_ptr<AccountsModel> m_accountsModel;
 };

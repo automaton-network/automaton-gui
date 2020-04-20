@@ -45,9 +45,17 @@
 			isa = PBXBuildFile;
 			fileRef = 340CD4D56FDFE7CD6BBEBD50;
 		};
+		01CBC7278473FE18C0FE6558 = {
+			isa = PBXBuildFile;
+			fileRef = C4EEBAFDBAAB75BD83825F8E;
+		};
 		512118B6F16E9FE6A26E5333 = {
 			isa = PBXBuildFile;
 			fileRef = B0900C36AF07AFF88A422DF2;
+		};
+		E545BFA4899633DD9D12C7AE = {
+			isa = PBXBuildFile;
+			fileRef = 5FC2136BF897AB4739C21D10;
 		};
 		2BF750FDBC8DCF0149147F2E = {
 			isa = PBXBuildFile;
@@ -422,6 +430,13 @@
 			path = ../../Source/Utils/AsyncTask.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		5FC2136BF897AB4739C21D10 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Account.cpp;
+			path = ../../Source/Login/Account.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		63E9BAEFD1CC58069F2AB51D = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -625,6 +640,13 @@
 			path = ../../Source/Data/AutomatonContractData.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		B8A150687955BD42A2977BD1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = TasksPanel.h;
+			path = ../../Source/Utils/TasksPanel.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		BA288CD361E5BFCC337628EB = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -651,6 +673,13 @@
 			lastKnownFileType = file.nib;
 			name = RecentFilesMenuTemplate.nib;
 			path = RecentFilesMenuTemplate.nib;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C4EEBAFDBAAB75BD83825F8E = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = TasksPanel.cpp;
+			path = ../../Source/Utils/TasksPanel.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C96D53B60D798069E2D6DDAA = {
@@ -700,6 +729,13 @@
 			lastKnownFileType = file;
 			name = "juce_gui_basics";
 			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_gui_basics";
+			sourceTree = "SOURCE_ROOT";
+		};
+		E3F1E7626819B78F811DEA9F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Account.h;
+			path = ../../Source/Login/Account.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		E5B0838487DE7547C1C1E1A4 = {
@@ -806,6 +842,8 @@
 				5DA8E9EC8390C21FB637ABF0,
 				340CD4D56FDFE7CD6BBEBD50,
 				B0C9B78D5FA95CB19E6291D7,
+				C4EEBAFDBAAB75BD83825F8E,
+				B8A150687955BD42A2977BD1,
 				B0900C36AF07AFF88A422DF2,
 				63E9BAEFD1CC58069F2AB51D,
 			);
@@ -815,6 +853,8 @@
 		A5F3935FE58429F9F2E04941 = {
 			isa = PBXGroup;
 			children = (
+				5FC2136BF897AB4739C21D10,
+				E3F1E7626819B78F811DEA9F,
 				417321119444057352E75D2E,
 				6E20455EDB2D36EF90214650,
 				983C39C12CA4D0F8F53A86E9,
@@ -1260,7 +1300,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B490FE0296395CA08CE442B,
+				01CBC7278473FE18C0FE6558,
 				512118B6F16E9FE6A26E5333,
+				E545BFA4899633DD9D12C7AE,
 				2BF750FDBC8DCF0149147F2E,
 				6A954FA3C51846B51AA555E4,
 				C793573B812E92F2E1F9A3F1,

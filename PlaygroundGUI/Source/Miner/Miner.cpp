@@ -112,7 +112,7 @@ void Miner::stopMining() {
 }
 
 void Miner::processMinedKey(std::string _pk, int keys_generated) {
-  auto cd = AutomatonContractData::getInstance();
+  auto cd = m_accountData->getContractData();
   ScopedLock lock(cd->m_criticalSection);
 
   total_keys_generated += abs(keys_generated);
@@ -141,8 +141,9 @@ void Miner::processMinedKey(std::string _pk, int keys_generated) {
 class TableSlots: public TableListBox, TableListBoxModel {
  public:
   Miner* owner;
+  AutomatonContractData::Ptr contractData;
 
-  TableSlots(Miner * _owner) : owner(_owner) {
+  TableSlots(Miner * _owner, AutomatonContractData::Ptr _contractData) : owner(_owner), contractData(_contractData) {
     // Create our table component and add it to this component..
     // addAndMakeVisible(table);
     setModel(this);
@@ -187,9 +188,8 @@ class TableSlots: public TableListBox, TableListBoxModel {
 
   // This is overloaded from TableListBoxModel, and must return the total number of rows in our table
   int getNumRows() override {
-    auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->m_criticalSection);
-    return static_cast<int>(cd->m_slots.size());
+    ScopedLock lock(contractData->m_criticalSection);
+    return static_cast<int>(contractData->m_slots.size());
   }
 
   void selectedRowsChanged(int) override {
@@ -210,8 +210,7 @@ class TableSlots: public TableListBox, TableListBoxModel {
   // components.
   void paintCell(Graphics& g, int rowNumber, int columnId,
                 int width, int height, bool /*rowIsSelected*/) override {
-    auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->m_criticalSection);
+    ScopedLock lock(contractData->m_criticalSection);
 
     g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
     g.setFont(font);
@@ -227,11 +226,11 @@ class TableSlots: public TableListBox, TableListBoxModel {
         break;
       }
       case 2: {
-        text = bin2hex(cd->m_slots[rowNumber].difficulty);
+        text = bin2hex(contractData->m_slots[rowNumber].difficulty);
         break;
       }
       case 3: {
-        text = "0x" + cd->m_slots[rowNumber].owner;
+        text = "0x" + contractData->m_slots[rowNumber].owner;
         break;
       }
       case 4: {
@@ -290,9 +289,9 @@ static String sepitoa(uint64 n, bool lz = false) {
 }
 
 //==============================================================================
-Miner::Miner(Config* config) {
-  private_key = config->get_string("private_key");
-  eth_address = config->get_string("eth_address");
+Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
+  private_key = m_accountData->getPrivateKey();
+  eth_address = m_accountData->getAddress();
 
   int y = 0;
 
@@ -350,7 +349,7 @@ Miner::Miner(Config* config) {
   LBL("Claim Slot Parameters:", 650, y, 300, 24);
 
   y += 30;
-  tblSlots = new TableSlots(this);
+  tblSlots = new TableSlots(this, m_accountData->getContractData());
   tblSlots->setBounds(20, y, 600, 300);
   addComponent(tblSlots);
   txtClaim = TXT("CLAIM", 650, y, 600, 300);
@@ -384,7 +383,7 @@ Miner::Miner(Config* config) {
 }
 
 void Miner::updateContractData() {
-  auto cd = AutomatonContractData::getInstance();
+  auto cd = m_accountData->getContractData();
   ScopedLock lock(cd->m_criticalSection);
   setSlotsNumber(cd->m_slotsNumber);
   setMaskHex(cd->m_mask);
@@ -534,14 +533,16 @@ void Miner::createSignature() {
 
 class ClaimSlotThread: public ThreadWithProgressWindow {
  public:
+  AutomatonContractData::Ptr cd;
   std::string private_key;
   std::string mined_key;
   std::string address;
   std::string bin_address;
   status s;
 
-  ClaimSlotThread(std::string _private_key, std::string _mined_key):
+  ClaimSlotThread(AutomatonContractData::Ptr _cd, std::string _private_key, std::string _mined_key):
       ThreadWithProgressWindow("Claim Slot Thread", true, true),
+      cd(_cd),
       private_key(_private_key),
       mined_key(_mined_key),
       s(status::ok()) {
@@ -550,7 +551,6 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
   }
 
   void run() override {
-    auto cd = AutomatonContractData::getInstance();
     ScopedLock lock(cd->m_criticalSection);
 
     setStatusMessage("Getting nonce for account " + address);
@@ -636,7 +636,7 @@ void Miner::claimMinedSlots() {
   if (mined_slots.size() > 0) {
     auto ms = mined_slots.back();
     mined_slots.pop_back();
-    ClaimSlotThread t(private_key, ms.private_key);
+    ClaimSlotThread t(m_accountData->getContractData(), private_key, ms.private_key);
     if (!t.runThread(9)) {
       AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
                                        "Claim slot failed!",

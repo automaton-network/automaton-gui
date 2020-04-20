@@ -20,12 +20,12 @@
 #pragma once
 
 #include <memory>
+#include <Login/Account.h>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
 class ProposalsManager;
 class DEXManager;
-class Config;
 class TasksPanel;
 
 class DemosMainComponent:
@@ -37,7 +37,7 @@ class DemosMainComponent:
   enum CommandIDs {
   };
 
-  DemosMainComponent(Config* config);
+  DemosMainComponent(Account::Ptr accountData);
   ~DemosMainComponent();
 
   void paint(Graphics& g) override;
@@ -74,11 +74,9 @@ class DemosMainComponent:
  private:
   std::unique_ptr<MenuBarComponent> m_menuBar;
   std::unique_ptr<TabbedComponent> m_tabbedComponent;
-  std::unique_ptr<ProposalsManager> m_proposalsManager;
-  std::unique_ptr<DEXManager> m_dexManager;
   std::unique_ptr<TasksPanel> m_tasksPanel;
   std::unique_ptr<TextButton> m_showTasksPanelBtn;
-  Config* m_config;
+  Account::Ptr m_accountData;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemosMainComponent)
 };

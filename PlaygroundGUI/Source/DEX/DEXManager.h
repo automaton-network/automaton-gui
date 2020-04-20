@@ -20,26 +20,22 @@
 #pragma once
 #include <JuceHeader.h>
 #include "Order.h"
+#include "../Login/Account.h"
 #include "../Config/Config.h"
 
 class OrdersModel;
 
 class DEXManager {
  public:
-  DEXManager(Config* config);
+  DEXManager(Account::Ptr accountData);
   ~DEXManager();
   std::shared_ptr<OrdersModel> getModel();
-  std::string getEthBalance();
-  std::string getAutoBalance();
 
   bool fetchOrders();
 
  private:
   std::shared_ptr<OrdersModel> m_model;
-  std::string m_ethBalance;
-  std::string m_autoBalance;
 
-  std::string m_privateKey;
-  std::string m_ethAddress;
-  std::string m_ethAddressAlias;
+  Account::Ptr m_accountData;
+  std::shared_ptr<AutomatonContractData> m_contractData;
 };

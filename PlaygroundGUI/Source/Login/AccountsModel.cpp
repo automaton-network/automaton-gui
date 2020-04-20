@@ -17,50 +17,26 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "AccountsModel.h"
-
-Account::Account() {
-}
-
-Account::Account(const String& address) {
-  m_address = address;
-}
-
-const String& Account::getAddress() const noexcept {
-  return m_address;
-}
-
-String Account::getAlias() const noexcept {
-  return m_config.get_string("account_alias");
-}
-
-Config& Account::getConfig() noexcept {
-  return m_config;
-}
-
-bool Account::operator==(const Account& other) const noexcept {
-  return m_address == other.m_address;
-}
 
 int AccountsModel::size() const {
   return m_accounts.size();
 }
 
-Account AccountsModel::getAt(int index) {
+Account::Ptr AccountsModel::getAt(int index) {
   return m_accounts[index];
 }
 
-Account& AccountsModel::getReferenceAt(int index) {
+Account::Ptr& AccountsModel::getReferenceAt(int index) {
   return m_accounts.getReference(index);
 }
 
-void AccountsModel::addItem(const Account& account, NotificationType notification) {
+void AccountsModel::addItem(Account::Ptr account, NotificationType notification) {
   m_accounts.addIfNotAlreadyThere(account);
   notifyModelChanged(notification);
 }
 
-void AccountsModel::removeItem(const Account& account, NotificationType notification) {
+void AccountsModel::removeItem(Account::Ptr account, NotificationType notification) {
   m_accounts.removeFirstMatchingValue(account);
   notifyModelChanged(notification);
 }

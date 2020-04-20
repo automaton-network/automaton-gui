@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <Login/Account.h>
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "Components/FormMaker.h"
 #include "Config/Config.h"
@@ -34,7 +35,7 @@ class Miner:
   private Timer {
  public:
   //==============================================================================
-  Miner(Config* config);
+  Miner(Account::Ptr accountData);
   ~Miner();
 
   void paint(Graphics& g) override;
@@ -76,6 +77,8 @@ class Miner:
   void setMinerAddress(std::string _address);
 
  private:
+  Account::Ptr m_accountData;
+
   // Mining
   uint32 totalSlots = 1024;
   std::vector<mined_slot> mined_slots;

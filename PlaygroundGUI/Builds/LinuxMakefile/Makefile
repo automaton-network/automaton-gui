@@ -69,7 +69,9 @@ endif
 
 OBJECTS_APP := \
   $(JUCE_OBJDIR)/TasksManager_3dcc4806.o \
+  $(JUCE_OBJDIR)/TasksPanel_654cf7dd.o \
   $(JUCE_OBJDIR)/Utils_13f97694.o \
+  $(JUCE_OBJDIR)/Account_76e32948.o \
   $(JUCE_OBJDIR)/AccountsModel_2a80de7e.o \
   $(JUCE_OBJDIR)/LoginComponent_661412a3.o \
   $(JUCE_OBJDIR)/DEXManager_a5533d37.o \
@@ -120,9 +122,19 @@ $(JUCE_OBJDIR)/TasksManager_3dcc4806.o: ../../Source/Utils/TasksManager.cpp
 	@echo "Compiling TasksManager.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
+$(JUCE_OBJDIR)/TasksPanel_654cf7dd.o: ../../Source/Utils/TasksPanel.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling TasksPanel.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
 $(JUCE_OBJDIR)/Utils_13f97694.o: ../../Source/Utils/Utils.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling Utils.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/Account_76e32948.o: ../../Source/Login/Account.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling Account.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/AccountsModel_2a80de7e.o: ../../Source/Login/AccountsModel.cpp

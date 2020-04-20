@@ -40,28 +40,18 @@ using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
-static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus);
-static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 proposalId, status* resStatus);
-static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract, uint64 numOfSlots, status* resStatus);
-static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus);
-static void voteWithSlot(std::shared_ptr<eth_contract> contract,
+static uint64 getNumSlots(AutomatonContractData::Ptr contract, status* resStatus);
+static uint64 getNumSlotsPaid(AutomatonContractData::Ptr contract, uint64 proposalId, status* resStatus);
+static std::vector<std::string> getOwners(AutomatonContractData::Ptr contract, uint64 numOfSlots, status* resStatus);
+static uint64 getLastProposalId(AutomatonContractData::Ptr contract, status* resStatus);
+static void voteWithSlot(AutomatonContractData::Ptr contract,
                          uint64 id, uint64 slot, uint64 choice,
                          status* resStatus);
 
-static std::shared_ptr<eth_contract> getContract(status* resStatus) {
-  const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract(cd->getAddress());
-  if (contract == nullptr)
-    *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
-
-  return contract;
-}
-
-ProposalsManager::ProposalsManager(Config* config)
-  : m_model(std::make_shared<ProposalsModel>()) {
-  m_privateKey = config->get_string("private_key");
-  m_ethAddress = config->get_string("eth_address");
-  m_ethAddressAlias = config->get_string("account_alias");
+ProposalsManager::ProposalsManager(Account::Ptr accountData)
+  : m_model(std::make_shared<ProposalsModel>())
+  , m_accountData(accountData) {
+  m_contractData = m_accountData->getContractData();
 }
 
 ProposalsManager::~ProposalsManager() {
@@ -71,13 +61,9 @@ bool ProposalsManager::fetchProposals() {
   TasksManager::launchTask([&](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
-
     m_model->clear(NotificationType::dontSendNotification);
 
-    const auto lastProposalId = getLastProposalId(contract, &s);
+    const auto lastProposalId = getLastProposalId(m_contractData, &s);
     if (!s.is_ok())
       return false;
 
@@ -88,14 +74,14 @@ bool ProposalsManager::fetchProposals() {
       jInput.push_back(i);
       std::string params = jInput.dump();
 
-      s = contract->call("getProposal", params);
+      s = m_contractData->call("getProposal", params);
 
       if (!s.is_ok())
         return false;
 
       Proposal proposal(i, String(s.msg));
 
-      s = contract->call("calcVoteDifference", params);
+      s = m_contractData->call("calcVoteDifference", params);
       if (!s.is_ok())
         return false;
 
@@ -103,13 +89,12 @@ bool ProposalsManager::fetchProposals() {
       const int approvalRating = std::stoi((*j_output.begin()).get<std::string>());
       proposal.setApprovalRating(approvalRating);
 
-      const auto numSlotsPaid = getNumSlotsPaid(contract, i, &s);
+      const auto numSlotsPaid = getNumSlotsPaid(m_contractData, i, &s);
       if (!s.is_ok())
         return false;
 
       proposal.setNumSlotsPaid(numSlotsPaid);
-      const auto cd = AutomatonContractData::getInstance();
-      const bool areAllSlotsPaid = (numSlotsPaid == cd->getSlotsNumber());
+      const bool areAllSlotsPaid = (numSlotsPaid == m_accountData->getContractData()->getSlotsNumber());
       proposal.setAllSlotsPaid(areAllSlotsPaid);
       if (!areAllSlotsPaid)
         proposal.setStatus(Proposal::Status::PrepayingGas);
@@ -137,18 +122,13 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
-    const auto cd = AutomatonContractData::getInstance();
-    const auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
-
     task->setProgress(0.1);
 
-    const auto lastProposalId = getLastProposalId(contract, &s);
+    const auto lastProposalId = getLastProposalId(m_contractData, &s);
     proposal->setId(lastProposalId + 1);
     task->setProgress(0.25);
 
-    s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
+    s = eth_getTransactionCount(m_contractData->getUrl(), m_accountData->getAddress());
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -182,11 +162,11 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     transaction.nonce = nonce;
     transaction.gas_price = "1388";  // 5 000
     transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = cd->getAddress().substr(2);
+    transaction.to = m_contractData->getAddress().substr(2);
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
-    s = contract->call("createProposal", transaction.sign_tx(m_privateKey));
+    s = m_contractData->call("createProposal", transaction.sign_tx(m_accountData->getPrivateKey()));
 
     if (!s.is_ok())
       return false;
@@ -215,14 +195,9 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
-    const auto cd = AutomatonContractData::getInstance();
-    const auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
-
     task->setProgress(0.1);
 
-    s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
+    s = eth_getTransactionCount(m_contractData->getUrl(), m_accountData->getAddress());
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -243,11 +218,11 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     transaction.nonce = nonce;
     transaction.gas_price = "1388";  // 5 000
     transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = cd->getAddress().substr(2);
+    transaction.to = m_contractData->getAddress().substr(2);
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
-    s = contract->call("payForGas", transaction.sign_tx(m_privateKey));
+    s = m_contractData->call("payForGas", transaction.sign_tx(m_accountData->getPrivateKey()));
 
     if (!s.is_ok())
       return false;
@@ -265,13 +240,12 @@ void ProposalsManager::notifyProposalsUpdated() {
   m_model->notifyModelChanged(NotificationType::sendNotificationAsync);
 }
 
-static void voteWithSlot(std::shared_ptr<eth_contract> contract,
+static void voteWithSlot(AutomatonContractData::Ptr contract,
                          uint64 id, uint64 slot, uint64 choice,
                          const std::string& ethAddress,
                          const std::string& privateKey,
                          status* resStatus) {
-  const auto cd = AutomatonContractData::getInstance();
-  const auto s = eth_getTransactionCount(cd->getUrl(), ethAddress);
+  const auto s = eth_getTransactionCount(contract->getUrl(), ethAddress);
   *resStatus = s;
   const auto nonce = s.is_ok() ? s.msg : "0";
   if (!s.is_ok())
@@ -294,14 +268,14 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
   transaction.nonce = nonce;
   transaction.gas_price = "1388";  // 5 000
   transaction.gas_limit = "5B8D80";  // 6M
-  transaction.to = cd->getAddress().substr(2);
+  transaction.to = contract->getAddress().substr(2);
   transaction.value = "";
   transaction.data = txData.str();
   transaction.chain_id = "01";
   *resStatus = contract->call("castVote", transaction.sign_tx(privateKey));
 }
 
-static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus) {
+static uint64 getNumSlots(AutomatonContractData::Ptr contract, status* resStatus) {
   auto s = contract->call("numSlots", "");
   *resStatus = s;
   if (!s.is_ok()) {
@@ -314,7 +288,7 @@ static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resSta
   return slots_number;
 }
 
-static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 proposalId, status* resStatus) {
+static uint64 getNumSlotsPaid(AutomatonContractData::Ptr contract, uint64 proposalId, status* resStatus) {
   json j_input;
   j_input.push_back(proposalId);
   const std::string params = j_input.dump();
@@ -334,7 +308,7 @@ static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 pro
   return numSlotsPaid;
 }
 
-static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract,
+static std::vector<std::string> getOwners(AutomatonContractData::Ptr contract,
                                           uint64 numOfSlots,
                                           status* resStatus) {
   json j_input;
@@ -354,7 +328,7 @@ static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract
   return owners;
 }
 
-static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus) {
+static uint64 getLastProposalId(AutomatonContractData::Ptr contract, status* resStatus) {
   auto s = contract->call("proposalsData", "");
   *resStatus = s;
   if (!s.is_ok())
@@ -380,31 +354,27 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
-
     task->setProgress(0.1);
 
-    const auto numOfSlots = getNumSlots(contract, &s);
+    const auto numOfSlots = getNumSlots(m_contractData, &s);
 
     if (!s.is_ok())
       return false;
 
-    const auto owners = getOwners(contract, numOfSlots, &s);
+    const auto owners = getOwners(m_contractData, numOfSlots, &s);
 
     if (!s.is_ok())
       return false;
 
-    const auto cd = AutomatonContractData::getInstance();
-    const String callAddress = m_ethAddress.substr(2);
+    const String callAddress = m_accountData->getAddress().substr(2);
 
     bool isOwnerForAnySlot = false;
     for (uint64 slot = 0; slot < owners.size(); ++slot) {
       String owner = owners[slot];
       if (owner.equalsIgnoreCase(callAddress)) {
         isOwnerForAnySlot = true;
-        voteWithSlot(contract, proposal->getId(), slot, choice, m_ethAddress, m_privateKey, &s);
+        voteWithSlot(m_contractData, proposal->getId(), slot,
+            choice, m_accountData->getAddress(), m_accountData->getPrivateKey(), &s);
 
         if (!s.is_ok() || task->threadShouldExit())
           return false;
@@ -436,14 +406,9 @@ bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardA
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
-    const auto cd = AutomatonContractData::getInstance();
-    auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
-
     task->setProgress(0.1);
 
-    s = eth_getTransactionCount(cd->getUrl(), m_ethAddress);
+    s = eth_getTransactionCount(m_contractData->getUrl(), m_accountData->getAddress());
     const auto nonce = s.is_ok() ? s.msg : "0";
     if (!s.is_ok())
       return false;
@@ -465,11 +430,11 @@ bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardA
     transaction.nonce = nonce;
     transaction.gas_price = "1388";  // 5 000
     transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = cd->getAddress().substr(2);
+    transaction.to = m_contractData->getAddress().substr(2);
     transaction.value = "";
     transaction.data = txData.str();
     transaction.chain_id = "01";
-    s = contract->call("claimReward", transaction.sign_tx(m_privateKey));
+    s = m_contractData->call("claimReward", transaction.sign_tx(m_accountData->getPrivateKey()));
     DBG("Call result: " << s.msg << "\n");
 
     if (!s.is_ok())
