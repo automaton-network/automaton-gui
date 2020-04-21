@@ -22,16 +22,10 @@
 #include "../Utils/AsyncTask.h"
 #include "../Data/AutomatonContractData.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
-#include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
 #include "automaton/core/common/status.h"
 
 using automaton::core::common::status;
-using automaton::core::interop::ethereum::dec_to_32hex;
-using automaton::core::interop::ethereum::eth_transaction;
-using automaton::core::interop::ethereum::eth_getTransactionCount;
-using automaton::core::interop::ethereum::eth_getTransactionReceipt;
-using automaton::core::interop::ethereum::encode;
 using automaton::core::interop::ethereum::eth_contract;
 using automaton::core::interop::ethereum::eth_getBalance;
 using automaton::core::io::bin2hex;
