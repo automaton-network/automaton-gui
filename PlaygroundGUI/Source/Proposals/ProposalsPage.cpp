@@ -113,14 +113,11 @@ void ProposalsPage::paint(Graphics&) {
 void ProposalsPage::resized() {
   auto bounds = getLocalBounds().reduced(20);
   m_createProposalView->setBounds(bounds);
-  m_proposalsListBox->setBounds(bounds.removeFromTop(500));
-  m_proposalsListBox->getHeader().resizeAllColumnsToFit(bounds.getWidth());
-  bounds.removeFromTop(20);
 
-  const int buttonsWidth = 150;
   const int buttonsHeight = 50;
   const int buttonsSpacing = 10;
-  auto buttonsArea = bounds.removeFromTop(buttonsHeight);
+  const int buttonsWidth = 120;
+  auto buttonsArea = bounds.removeFromBottom(buttonsHeight);
   m_fetchProposalsBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
   m_createProposalBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
@@ -136,6 +133,10 @@ void ProposalsPage::resized() {
   m_filterByStatusComboBox->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
   m_FilterBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
+
+  bounds.removeFromBottom(buttonsSpacing * 2);
+  m_proposalsListBox->setBounds(bounds);
+  m_proposalsListBox->getHeader().resizeAllColumnsToFit(bounds.getWidth());
 }
 
 void ProposalsPage::setModel(std::shared_ptr<ProposalsModel> model) {

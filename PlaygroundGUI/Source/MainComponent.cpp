@@ -49,10 +49,6 @@ class DemoBlank: public Component {
 DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData(accountData) {
   accountData->initManagers();
 
-  m_showTasksPanelBtn = std::make_unique<TextButton>("Panel");
-  m_showTasksPanelBtn->addListener(this);
-  addAndMakeVisible(m_showTasksPanelBtn.get());
-
   m_accountData->getProposalsManager()->fetchProposals();
   m_accountData->getDexManager()->fetchOrders();
 
@@ -78,8 +74,8 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
   m_tabbedComponent->setCurrentTabIndex(0);
 
   m_tasksPanel = std::make_unique<TasksPanel>();
+  addAndMakeVisible(m_tasksPanel->getStatusBarComponent());
   addChildComponent(m_tasksPanel.get());
-  addChildComponent(m_tasksPanel->getProgressBar());
 
   setSize(1024, 768);
 }
@@ -95,16 +91,12 @@ void DemosMainComponent::paint(Graphics& g) {
 
 void DemosMainComponent::resized() {
   auto bounds = getLocalBounds();
-  auto progressBounds = bounds.removeFromBottom(20);
+  const auto statusBarBounds = bounds.removeFromBottom(20);
 
   m_tasksPanel->setBounds(bounds.withWidth(300));
   m_tabbedComponent->setBounds(8, 8, bounds.getWidth() - 16, bounds.getHeight() - 16);
-  m_showTasksPanelBtn->setBounds(progressBounds.removeFromLeft(30));
-  m_tasksPanel->getProgressBar()->setBounds(progressBounds);
+  m_tasksPanel->getStatusBarComponent()->setBounds(statusBarBounds);
 }
 
 void DemosMainComponent::buttonClicked(Button* button) {
-  if (button == m_showTasksPanelBtn.get()) {
-    m_tasksPanel->setVisible(!m_tasksPanel->isVisible());
-  }
 }

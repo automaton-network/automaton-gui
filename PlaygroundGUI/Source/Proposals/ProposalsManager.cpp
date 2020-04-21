@@ -101,6 +101,7 @@ bool ProposalsManager::fetchProposals() {
 
       addProposal(proposal, NotificationType::dontSendNotification);
     }
+    task->setStatusMessage("Fetched " + String(m_model->size()) + " proposals");
 
     notifyProposalsUpdated();
     return true;
@@ -148,6 +149,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     task->setProgress(1.0);
 
     m_model->addItem(proposal, NotificationType::sendNotificationAsync);
+    task->setStatusMessage("Proposal \"" + proposal->getTitle() + "\" successfully created");
 
     return true;
   }, [=](AsyncTask* task) {

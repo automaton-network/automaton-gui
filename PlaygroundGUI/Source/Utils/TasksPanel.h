@@ -23,6 +23,7 @@
 
 class TasksProxyModel;
 class TaskComponent;
+class TaskStatusBar;
 
 class TasksPanel : public Component
                  , public AbstractListModelBase::Listener {
@@ -30,17 +31,18 @@ class TasksPanel : public Component
   TasksPanel();
   ~TasksPanel();
 
-  ProgressBar* getProgressBar() const noexcept;
-  void setProgress(double progress);
+  Component* getStatusBarComponent() const noexcept;
+
   void resized() override;
   void paint(Graphics& g) override;
+  void mouseUp(const MouseEvent& e) override;
 
   // AbstractListModelBase::Listener
   void modelChanged(AbstractListModelBase* base) override;
 
  private:
   std::shared_ptr<TasksProxyModel> m_tasksProxyModel;
-  std::unique_ptr<ProgressBar> m_progressBar;
+  std::unique_ptr<TaskStatusBar> m_statusBar;
+
   OwnedArray<TaskComponent> m_tasksComponents;
-  double m_progress;
 };
