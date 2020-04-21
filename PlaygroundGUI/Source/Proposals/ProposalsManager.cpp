@@ -21,9 +21,10 @@
 #include <functional>
 
 #include "ProposalsManager.h"
-#include "../Utils/AsyncTask.h"
-#include "../Utils/TasksManager.h"
-#include "../Data/AutomatonContractData.h"
+#include "Utils/AsyncTask.h"
+#include "Utils/TasksManager.h"
+#include "Data/AutomatonContractData.h"
+
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
@@ -114,12 +115,9 @@ void ProposalsManager::addProposal(const Proposal& proposal, NotificationType no
 }
 
 bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& contributor) {
+  const auto topicName = "(" + String(proposal->getId()) + ") " + "Create proposal";
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
-
-    const auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
 
     task->setProgress(0.1);
 
@@ -141,7 +139,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
 
     task->setProgress(0.5);
 
-    s = contract->call("createProposal", jProposal.dump(), m_accountData->getPrivateKey());
+    s = m_contractData->call("createProposal", jProposal.dump(), m_accountData->getPrivateKey());
     if (!s.is_ok())
       return false;
 
@@ -153,7 +151,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
 
     return true;
   }, [=](AsyncTask* task) {
-  }, "Creating proposal...");
+  }, topicName);
 
   return true;
 }
@@ -166,6 +164,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
       "The proposal is not valid");
   }
 
+  const auto topicName = "(" + String(proposal->getId()) + ") " + "Pay for gas";
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
@@ -176,16 +175,18 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     jInput.push_back(slotsToPay);
 
     task->setProgress(0.5);
-    s = contract->call("payForGas", jInput.dump(), m_accountData->getPrivateKey());
+    task->setStatusMessage("Pay gas for " + String(slotsToPay) + " slots");
+    s = m_contractData->call("payForGas", jInput.dump(), m_accountData->getPrivateKey());
 
     if (!s.is_ok())
       return false;
 
+    task->setStatusMessage("Successfully paid gas for " + String(slotsToPay) + " slots");
     task->setProgress(1.0);
 
     return true;
   }, [=](AsyncTask* task) {
-  }, "Paying for gas....");
+  }, topicName);
 
   return true;
 }
@@ -283,10 +284,13 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
       "The proposal is not valid");
   }
 
+  // TODO(Kirill) fetch choices names
+  const auto choiceName = choice == 1 ? "YES" : choice == 2 ? "NO" : "Unspecified";
+  const auto topicName = "(" + String(proposal->getId()) + ") " + "Vote " + choiceName;
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
-    task->setProgress(0.1);
+    task->setProgress(0.01);
 
     const auto numOfSlots = getNumSlots(m_contractData, &s);
 
@@ -300,11 +304,15 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
 
     const String callAddress = m_accountData->getAddress().substr(2);
 
+    uint64 numOwnedSlots = 0;
     bool isOwnerForAnySlot = false;
     for (uint64 slot = 0; slot < owners.size(); ++slot) {
       String owner = owners[slot];
       if (owner.equalsIgnoreCase(callAddress)) {
         isOwnerForAnySlot = true;
+        ++numOwnedSlots;
+
+        task->setStatusMessage("Voting for slot " + String(slot) + "...");
         voteWithSlot(m_contractData, proposal->getId(), slot,
             choice, m_accountData->getAddress(), m_accountData->getPrivateKey(), &s);
 
@@ -319,10 +327,11 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
       s = status::internal("You own no single slot. Voting is impossible");
       return false;
     }
+    task->setStatusMessage("Successfully voted for " + String(numOwnedSlots) + " slots!");
 
     return true;
   }, [=](AsyncTask* task) {
-  }, "Voting....");
+  }, topicName);
 
   return true;
 }
@@ -334,49 +343,30 @@ bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardA
       "ERROR",
       "The proposal is not valid");
   }
+  const auto topicName = "(" + String(proposal->getId()) + ") " + "Claim reward";
 
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);
-
-    s = eth_getTransactionCount(m_contractData->getUrl(), m_accountData->getAddress());
-    const auto nonce = s.is_ok() ? s.msg : "0";
-    if (!s.is_ok())
-      return false;
-
-    task->setProgress(0.3);
+    task->setStatusMessage("Claiming reward...");
 
     json jInput;
     jInput.push_back(proposal->getId());
     jInput.push_back(rewardAmount.toStdString());
 
-    json jSignature;
-    jSignature.push_back("uint256");
-    jSignature.push_back("uint256");
-
-    std::stringstream txData;
-    txData << "86bb8f37" << bin2hex(encode(jSignature.dump(), jInput.dump()));
-
-    eth_transaction transaction;
-    transaction.nonce = nonce;
-    transaction.gas_price = "1388";  // 5 000
-    transaction.gas_limit = "5B8D80";  // 6M
-    transaction.to = m_contractData->getAddress().substr(2);
-    transaction.value = "";
-    transaction.data = txData.str();
-    transaction.chain_id = "01";
-    s = m_contractData->call("claimReward", transaction.sign_tx(m_accountData->getPrivateKey()));
+    s = m_contractData->call("claimReward", jInput.dump(), m_accountData->getPrivateKey());
     DBG("Call result: " << s.msg << "\n");
 
     if (!s.is_ok())
       return false;
 
     task->setProgress(1.0);
+    task->setStatusMessage("Claiming reward...success!");
 
     return true;
   }, [=](AsyncTask* task) {
-  }, "Claiming reward....");
+  }, topicName);
 
   return true;
 }

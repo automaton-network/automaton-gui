@@ -48,7 +48,9 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
 
   bool readContract(const std::string& url, const std::string& contractAddress);
   std::shared_ptr<automaton::core::interop::ethereum::eth_contract> getContract();
-  automaton::core::common::status call(const std::string& f, const std::string& params);
+  automaton::core::common::status call(const std::string& f,
+                                       const std::string& params,
+                                       const std::string& privateKey = "");
 
   bool loadAbi();
   std::string getAbi();

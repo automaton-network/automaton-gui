@@ -212,9 +212,11 @@ std::shared_ptr<eth_contract> AutomatonContractData::getContract() {
   return eth_contract::get_contract(getAddress());
 }
 
-status AutomatonContractData::call(const std::string& f, const std::string& params) {
+status AutomatonContractData::call(const std::string& f,
+                                   const std::string& params,
+                                   const std::string& privateKey) {
   ScopedLock sl(m_criticalSection);
-  return getContract()->call (f, params);
+  return getContract()->call(f, params, privateKey);
 }
 
 std::string AutomatonContractData::getAbi() {

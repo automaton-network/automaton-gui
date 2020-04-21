@@ -550,12 +550,6 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
   void run() override {
     ScopedLock lock(cd->m_criticalSection);
 
-    auto contract = eth_contract::get_contract(cd->m_contractAddress);
-    if (contract == nullptr) {
-      s = status::internal("Contract is NULL!");
-      return;
-    }
-
     setStatusMessage("Generating signature...");
 
     // Generate signature.
@@ -573,7 +567,7 @@ class ClaimSlotThread: public ThreadWithProgressWindow {
     jInput.push_back(bin2hex(sig.substr(32, 32)));  // S
 
     setStatusMessage("Claiming slot...");
-    s = contract->call("claimSlot", jInput.dump(), private_key);
+    s = cd->call("claimSlot", jInput.dump(), private_key);
     if (!s.is_ok()) {
       return;
     }
