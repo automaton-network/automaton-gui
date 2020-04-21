@@ -49,7 +49,6 @@ class TasksManager : public DeletedAtShutdown {
                          const String& title);
 
   void addTask(AsyncTask::Ptr task);
-  void runQueuedTask();
   std::shared_ptr<AsyncTaskModel> getModel();
 
   JUCE_DECLARE_SINGLETON(TasksManager, true)
