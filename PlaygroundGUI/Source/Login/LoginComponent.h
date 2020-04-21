@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <Data/AutomatonContractData.h>
 #include "../Models/AbstractProxyModel.h"
 #include "AccountsModel.h"
 
@@ -29,6 +30,7 @@ class ConfigFile;
 class LoginComponent  : public Component
                       , public ComponentListener
                       , public Button::Listener
+                      , public ComboBox::Listener
                       , public TableListBoxModel
                       , public AbstractListModelBase::Listener {
  public:
@@ -40,9 +42,10 @@ class LoginComponent  : public Component
   void buttonClicked(Button* btn) override;
   void componentVisibilityChanged(Component& component) override;
   void modelChanged(AbstractListModelBase* base) override;
-  void openAccount(Account::Ptr account);
-  void removeAccount(Account::Ptr account);
-  void setAccountsModel(std::shared_ptr<AccountsModel> model);
+  void openAccount(AccountConfig* accountConfig);
+  void removeAccount(const AccountConfig& accountConfig);
+
+  void comboBoxChanged(ComboBox *comboBoxThatHasChanged) override;
 
   // TableListBoxModel
   // ==============================================================================
@@ -60,22 +63,28 @@ class LoginComponent  : public Component
   void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent&) override;
 
  private:
-  void switchLoginState(bool isNetworkConfig);
+  void initContractsComboBox(const Array<std::shared_ptr<AutomatonContractData>>& contracts);
+  void initRPCComboBox(const Array<String>& rpcList);
+  String getCurrentRPC();
+  Array<std::shared_ptr<AutomatonContractData>> getCurrentContracts();
   std::shared_ptr<AutomatonContractData> getCurrentContract();
+
+  void addContract(const Config& config);
+  void addRPC(const String& rpc);
 
  private:
   AccountWindow* getWindowByAddress(const String& address);
-  std::shared_ptr<AccountsModel> m_model;
   std::unique_ptr<Drawable> m_logo;
   std::unique_ptr<TableListBox> m_accountsTable;
   std::unique_ptr<TextButton> m_importPrivateKeyBtn;
   std::unique_ptr<Label> m_rpcLabel;
-  std::unique_ptr<TextEditor> m_rpcEditor;
   std::unique_ptr<Label> m_contractAddrLabel;
-  std::unique_ptr<TextEditor> m_contractAddrEditor;
-  std::unique_ptr<TextButton> m_readContractBtn;
+  std::unique_ptr<ComboBox> m_rpcComboBox;
+  std::unique_ptr<ComboBox> m_contractComboBox;
 
-  Array<std::shared_ptr<AutomatonContractData>> m_contracts;
+  std::map<String/*rpc*/, Array<std::shared_ptr<AutomatonContractData>>> m_contracts;
+  Array<String> m_rpcList;
+  std::shared_ptr<AccountsModel> m_accountsModel;
   OwnedArray<AccountWindow> m_accountWindows;
   ConfigFile* m_configFile;
 

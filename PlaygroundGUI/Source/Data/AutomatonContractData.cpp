@@ -41,27 +41,15 @@ using automaton::core::io::hex2bin;
 using automaton::core::io::hex2dec;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
 
-AutomatonContractData::AutomatonContractData() : m_accountsModel(std::make_shared<AccountsModel>()) {
-}
-
-void AutomatonContractData::init(const Config& _config) {
-  config  = _config;
+AutomatonContractData::AutomatonContractData(const Config& _config) {
   loadAbi();
-
+  config  = _config;
   m_ethUrl = config.get_string("eth_url");
   m_contractAddress = config.get_string("contract_address");
   m_mask = config.get_string("mask");
   m_minDifficulty = config.get_string("min_difficulty");
   m_slotsNumber = static_cast<uint32_t>(config.get_number("slots_number"));
   m_slotsClaimed = static_cast<uint32_t>(config.get_number("slots_claimed"));
-
-  auto accountsJson = _config.get_json("accounts");
-  for (const auto& el : accountsJson.items()) {
-    Config configData;
-    configData.restoreFrom_json(el.value());
-    auto account = std::make_shared<Account>(configData, el.key(), shared_from_this());
-    addAccount(account, NotificationType::dontSendNotification);
-  }
 }
 
 AutomatonContractData::~AutomatonContractData() {
@@ -91,8 +79,10 @@ void AutomatonContractData::setData(const std::string& _eth_url,
   config.set_number("slots_claimed", m_slotsClaimed);
 }
 
-bool AutomatonContractData::readContract(const std::string& url,
-                                         const std::string& contractAddress) {
+bool AutomatonContractData::readContract() {
+  const std::string& url = m_ethUrl;
+  const std::string& contractAddress = m_contractAddress;
+
   auto result = TasksManager::launchTask([&](TaskWithProgressWindow* task){
     auto& s = task->m_status;
     eth_contract::register_contract(url, contractAddress, getAbi());
@@ -115,7 +105,7 @@ bool AutomatonContractData::readContract(const std::string& url,
       return false;
     }
     json j_output = json::parse(s.msg);
-    auto slotsNumber = std::stoul((*j_output.begin()).get<std::string>());
+    auto slotsNumber = String(((*j_output.begin()).get<std::string>())).getIntValue();
     std::vector<ValidatorSlot> validatorSlots;
     validatorSlots.resize(slotsNumber);
 
@@ -195,7 +185,7 @@ bool AutomatonContractData::readContract(const std::string& url,
     s = contract->call("numTakeOvers", "");
     j_output = json::parse(s.msg);
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
-    auto slotsClaimed = std::stoul(slots_claimed_string);
+    auto slotsClaimed = String(slots_claimed_string).getLargeIntValue();
     task->setStatusMessage("Number of slot claims: " + slots_claimed_string);
     task->setProgress(1.0);
 
@@ -265,22 +255,6 @@ uint32_t AutomatonContractData::getSlotsClaimed() const noexcept {
   return m_slotsClaimed;
 }
 
-std::shared_ptr<AccountsModel> AutomatonContractData::getAccountsModel() const noexcept {
-  return m_accountsModel;
-}
-
-void AutomatonContractData::addAccount(Account::Ptr account, NotificationType notification) {
-  m_accountsModel->addItem(account, notification);
-}
-
 Config& AutomatonContractData::getConfig() {
-  json accounts;
-  for (int i = 0; i < m_accountsModel->size(); ++i) {
-    auto item = m_accountsModel->getAt(i);
-    accounts[item->getAddress()] = item->getConfig().to_json();
-  }
-
-  config.set_json("accounts", accounts);
-
   return config;
 }

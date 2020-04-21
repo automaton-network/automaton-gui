@@ -25,10 +25,11 @@
 class ProposalsManager;
 class DEXManager;
 class AutomatonContractData;
+class AccountConfig;
 
 class Account : public std::enable_shared_from_this<Account> {
  public:
-  Account(const Config& config, const std::string& address, std::shared_ptr<AutomatonContractData> contractData);
+  Account(AccountConfig* config, std::shared_ptr<AutomatonContractData> contractData);
   ~Account();
 
   void initManagers();
@@ -40,7 +41,6 @@ class Account : public std::enable_shared_from_this<Account> {
   const std::string& getAddress() const noexcept;
   std::string getPrivateKey() const noexcept;
   std::string getAlias() const noexcept;
-  Config& getConfig() noexcept;
   std::string getEthBalance() const noexcept;
   std::string getAutoBalance() const noexcept;
 
@@ -54,7 +54,7 @@ class Account : public std::enable_shared_from_this<Account> {
   std::string m_ethBalance;
   std::string m_autoBalance;
   std::string m_address;
-  Config m_config;
+  AccountConfig* m_config;
   std::shared_ptr<AutomatonContractData> m_contractData;
   std::unique_ptr<ProposalsManager> m_proposalsManager;
   std::unique_ptr<DEXManager> m_dexManager;

@@ -22,12 +22,12 @@
 #include "../Data/AutomatonContractData.h"
 #include "../Proposals/ProposalsManager.h"
 #include "../DEX/DEXManager.h"
+#include "../Login/AccountsModel.h"
 
-Account::Account(const Config& config,
-                 const std::string& address,
-                 std::shared_ptr<AutomatonContractData> contractData) : m_contractData(contractData) {
-  m_config = config;
-  m_address = address;
+Account::Account(AccountConfig* config,
+                 std::shared_ptr<AutomatonContractData> contractData) : m_contractData(contractData)
+                                                                      , m_config(config) {
+  m_address = m_config->getAddress().toStdString();
   m_ethBalance = "Undefined";
   m_autoBalance = "Undefined";
 }
@@ -57,15 +57,11 @@ const std::string& Account::getAddress() const noexcept {
 }
 
 std::string Account::getPrivateKey() const noexcept {
-  return m_config.get_string("private_key");
+  return m_config->getPrivateKey().toStdString();
 }
 
 std::string Account::getAlias() const noexcept {
-  return m_config.get_string("account_alias");
-}
-
-Config& Account::getConfig() noexcept {
-  return m_config;
+  return m_config->getAlias().toStdString();
 }
 
 bool Account::operator==(const Account& other) const noexcept {

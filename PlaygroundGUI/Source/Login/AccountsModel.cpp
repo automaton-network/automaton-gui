@@ -17,26 +17,54 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #include "AccountsModel.h"
+
+AccountConfig::AccountConfig() {
+}
+
+AccountConfig::AccountConfig(const String& address) {
+  m_address = address;
+}
+
+const String& AccountConfig::getAddress() const noexcept {
+  return m_address;
+}
+
+String AccountConfig::getPrivateKey() const noexcept {
+  return m_config.get_string("private_key");
+}
+
+String AccountConfig::getAlias() const noexcept {
+  return m_config.get_string("account_alias");
+}
+
+Config& AccountConfig::getConfig() noexcept {
+  return m_config;
+}
+
+bool AccountConfig::operator==(const AccountConfig& other) const noexcept {
+  return m_address == other.m_address;
+}
 
 int AccountsModel::size() const {
   return m_accounts.size();
 }
 
-Account::Ptr AccountsModel::getAt(int index) {
+AccountConfig AccountsModel::getAt(int index) {
   return m_accounts[index];
 }
 
-Account::Ptr& AccountsModel::getReferenceAt(int index) {
+AccountConfig& AccountsModel::getReferenceAt(int index) {
   return m_accounts.getReference(index);
 }
 
-void AccountsModel::addItem(Account::Ptr account, NotificationType notification) {
+void AccountsModel::addItem(const AccountConfig& account, NotificationType notification) {
   m_accounts.addIfNotAlreadyThere(account);
   notifyModelChanged(notification);
 }
 
-void AccountsModel::removeItem(Account::Ptr account, NotificationType notification) {
+void AccountsModel::removeItem(const AccountConfig& account, NotificationType notification) {
   m_accounts.removeFirstMatchingValue(account);
   notifyModelChanged(notification);
 }

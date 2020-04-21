@@ -219,7 +219,7 @@ static uint64 getNumSlots(AutomatonContractData::Ptr contract, status* resStatus
   }
 
   json j_output = json::parse(s.msg);
-  const uint64 slots_number = std::stoul((*j_output.begin()).get<std::string>());
+  const uint64 slots_number = String((*j_output.begin()).get<std::string>()).getLargeIntValue();
   return slots_number;
 }
 
@@ -239,7 +239,7 @@ static uint64 getNumSlotsPaid(AutomatonContractData::Ptr contract, uint64 propos
     return 0;
   }
 
-  const uint64 numSlotsPaid = std::stoul(ballotBoxJson[2].get<std::string>());
+  const uint64 numSlotsPaid = String(ballotBoxJson[2].get<std::string>()).getLargeIntValue();
   return numSlotsPaid;
 }
 
@@ -271,7 +271,7 @@ static uint64 getLastProposalId(AutomatonContractData::Ptr contract, status* res
 
   const json proposalsDataJson = json::parse(s.msg);
   if (proposalsDataJson.size() > 3) {
-    const uint64 lastProposalId = std::stoul(proposalsDataJson[3].get<std::string>());
+    const uint64 lastProposalId = String(proposalsDataJson[3].get<std::string>()).getLargeIntValue();
     return lastProposalId;
   }
 

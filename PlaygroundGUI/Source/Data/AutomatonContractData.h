@@ -35,8 +35,7 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
  public:
   using Ptr = std::shared_ptr<AutomatonContractData>;
 
-  AutomatonContractData();
-  void init(const Config& _config);
+  AutomatonContractData(const Config& _config);
   ~AutomatonContractData();
   void setData(const std::string& _eth_url,
                const std::string& _contractAddress,
@@ -46,7 +45,7 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
                uint32_t _slots_claimed,
                const std::vector<ValidatorSlot>& _slots);
 
-  bool readContract(const std::string& url, const std::string& contractAddress);
+  bool readContract();
   std::shared_ptr<automaton::core::interop::ethereum::eth_contract> getContract();
   automaton::core::common::status call(const std::string& f,
                                        const std::string& params,
@@ -60,8 +59,6 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
   std::string getMinDifficulty() const noexcept;
   uint32_t getSlotsNumber() const noexcept;
   uint32_t getSlotsClaimed() const noexcept;
-  std::shared_ptr<AccountsModel> getAccountsModel() const noexcept;
-  void addAccount(Account::Ptr account, NotificationType notification);
 
   std::string m_contractAbi;
   std::string m_ethUrl;
@@ -78,5 +75,4 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
 
  private:
   Config config;
-  std::shared_ptr<AccountsModel> m_accountsModel;
 };
