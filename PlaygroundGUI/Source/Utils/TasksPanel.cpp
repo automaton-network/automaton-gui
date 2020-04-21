@@ -39,8 +39,9 @@ class TasksProxyModel : public AbstractProxyModel<AsyncTask::Ptr> {
   String m_currentOwnerId;
 };
 
-class TaskComponent : public Component,
-                      public AsyncTask::Listener{
+class TaskComponent : public Component
+                    , public AsyncUpdater
+                    , public AsyncTask::Listener{
  public:
   TaskComponent(TasksPanel* owner, AsyncTask::Ptr task) {
     addAndMakeVisible(m_titleLabel);
@@ -60,12 +61,16 @@ class TaskComponent : public Component,
   }
 
   void taskMessageChanged(AsyncTask::Ptr task) override {
-    m_messageLabel.setText(task->getStatusMessage(), NotificationType::dontSendNotification);
-    repaint();
+    triggerAsyncUpdate();
   }
 
   void taskProgressChanged(AsyncTask::Ptr task) override {
     m_owner->setProgress(task->getProgress());
+  }
+
+  void handleAsyncUpdate() override {
+    m_messageLabel.setText(m_task->getStatusMessage(), NotificationType::dontSendNotification);
+    repaint();
   }
 
   AsyncTask::Ptr getTask() {
@@ -74,7 +79,7 @@ class TaskComponent : public Component,
 
   void resized() override {
     auto bounds = getLocalBounds();
-    m_titleLabel.setBounds(bounds.removeFromTop(getHeight()/2));
+    m_titleLabel.setBounds(bounds.removeFromTop(getHeight() / 2));
     m_messageLabel.setBounds(bounds);
   }
 
@@ -111,7 +116,7 @@ void TasksPanel::resized() {
   auto bounds = getLocalBounds();
 
   for (auto comp : m_tasksComponents) {
-    comp->setBounds(bounds.removeFromTop(100));
+    comp->setBounds(bounds.removeFromTop(60));
   }
 }
 

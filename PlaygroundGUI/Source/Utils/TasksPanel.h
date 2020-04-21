@@ -25,7 +25,7 @@ class TasksProxyModel;
 class TaskComponent;
 
 class TasksPanel : public Component
-                 , public AbstractListModelBase::Listener{
+                 , public AbstractListModelBase::Listener {
  public:
   TasksPanel();
   ~TasksPanel();
@@ -34,6 +34,7 @@ class TasksPanel : public Component
   void setProgress(double progress);
   void resized() override;
   void paint(Graphics& g) override;
+
   // AbstractListModelBase::Listener
   void modelChanged(AbstractListModelBase* base) override;
 
