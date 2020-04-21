@@ -91,10 +91,11 @@ void DemosMainComponent::paint(Graphics& g) {
 
 void DemosMainComponent::resized() {
   auto bounds = getLocalBounds();
-  const auto statusBarBounds = bounds.removeFromBottom(20);
+  const auto statusBarBounds = bounds.removeFromBottom(25);
 
   m_tasksPanel->setBounds(bounds.withWidth(300));
-  m_tabbedComponent->setBounds(8, 8, bounds.getWidth() - 16, bounds.getHeight() - 16);
+  m_tabbedComponent->setBounds(8, 8,
+                               bounds.getWidth() - 16, getLocalBounds().getHeight() - 8 - statusBarBounds.getHeight());
   m_tasksPanel->getStatusBarComponent()->setBounds(statusBarBounds);
 }
 
