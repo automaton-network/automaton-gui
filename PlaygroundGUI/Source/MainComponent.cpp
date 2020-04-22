@@ -29,6 +29,7 @@
 #include "DEX/DEXManager.h"
 #include "MainComponent.h"
 #include "Utils/TasksPanel.h"
+#include "Data/AutomatonContractData.h"
 
 class DemoBlank: public Component {
  public:
@@ -77,6 +78,10 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
   addAndMakeVisible(m_tasksPanel->getStatusBarComponent());
   addChildComponent(m_tasksPanel.get());
 
+  m_refreshButton = std::make_unique<TextButton>("Refresh");
+  m_refreshButton->addListener(this);
+  addAndMakeVisible(m_refreshButton.get());
+
   setSize(1024, 768);
 }
 
@@ -94,6 +99,7 @@ void DemosMainComponent::resized() {
   auto bounds = getLocalBounds();
   const auto statusBarBounds = bounds.removeFromBottom(25);
 
+  m_refreshButton->setBounds(getLocalBounds().reduced(10).removeFromRight(80).removeFromTop(25));
   m_tasksPanel->setBounds(bounds.withWidth(300));
   m_tabbedComponent->setBounds(8, 8,
                                bounds.getWidth() - 16, getLocalBounds().getHeight() - 8 - statusBarBounds.getHeight());
@@ -101,4 +107,9 @@ void DemosMainComponent::resized() {
 }
 
 void DemosMainComponent::buttonClicked(Button* button) {
+  if (m_refreshButton.get() == button) {
+    m_accountData->getContractData()->readContract();
+    m_accountData->getProposalsManager()->fetchProposals();
+    m_accountData->getDexManager()->fetchOrders();
+  }
 }

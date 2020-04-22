@@ -75,6 +75,7 @@ class DemosMainComponent:
   std::unique_ptr<MenuBarComponent> m_menuBar;
   std::unique_ptr<TabbedComponent> m_tabbedComponent;
   std::unique_ptr<TasksPanel> m_tasksPanel;
+  std::unique_ptr<TextButton> m_refreshButton;
   Account::Ptr m_accountData;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemosMainComponent)
