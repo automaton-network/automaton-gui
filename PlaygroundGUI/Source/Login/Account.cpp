@@ -37,6 +37,11 @@ void Account::initManagers() {
   m_dexManager = std::make_unique<DEXManager>(shared_from_this());
 }
 
+void Account::clearManagers() {
+  m_proposalsManager = nullptr;
+  m_dexManager = nullptr;
+}
+
 Account::~Account() {
 }
 

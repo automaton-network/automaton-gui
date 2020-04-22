@@ -81,6 +81,7 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
 }
 
 DemosMainComponent::~DemosMainComponent() {
+  m_accountData->clearManagers();
   m_tabbedComponent = nullptr;
 }
 

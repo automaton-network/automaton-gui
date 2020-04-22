@@ -437,4 +437,5 @@ void LoginComponent::addContract(const Config& config) {
 
 void LoginComponent::addRPC(const String& rpc) {
   m_rpcList.addIfNotAlreadyThere(rpc);
+  initRPCComboBox(m_rpcList);
 }

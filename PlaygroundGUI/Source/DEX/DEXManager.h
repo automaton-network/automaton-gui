@@ -41,4 +41,6 @@ class DEXManager {
 
   Account::Ptr m_accountData;
   std::shared_ptr<AutomatonContractData> m_contractData;
+
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DEXManager)
 };

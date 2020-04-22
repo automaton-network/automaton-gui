@@ -71,12 +71,15 @@ class TaskStatusBar : public Component
       : m_numTasks(0)
       , m_progress(0.0)
       , m_statusMessage("")
-      , m_progressBar(std::make_unique<ProgressBar>(m_progress))
-      , m_progressBarLookAndFeel(std::make_unique<FlatProgressBarLookAndFeel>()) {
-    m_progressBar->setLookAndFeel(m_progressBarLookAndFeel.get());
+      , m_progressBar(std::make_unique<ProgressBar>(m_progress)) {
+    m_progressBar->setLookAndFeel(&m_progressBarLookAndFeel.get());
     m_progressBar->setColour(ProgressBar::backgroundColourId, Colours::transparentBlack);
     m_progressBar->setColour(ProgressBar::foregroundColourId, Colour(0xFF00BCD4));
     addAndMakeVisible(m_progressBar.get());
+  }
+
+  ~TaskStatusBar() {
+    m_progressBar->setLookAndFeel(nullptr);
   }
 
   void paint(Graphics& g) override {
@@ -153,7 +156,7 @@ class TaskStatusBar : public Component
   Component* m_owner = nullptr;
 
   std::unique_ptr<ProgressBar> m_progressBar;
-  std::unique_ptr<LookAndFeel> m_progressBarLookAndFeel;
+  SharedResourcePointer<FlatProgressBarLookAndFeel> m_progressBarLookAndFeel;
 };
 
 class TaskComponent : public Component

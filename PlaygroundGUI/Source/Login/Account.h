@@ -33,6 +33,7 @@ class Account : public std::enable_shared_from_this<Account> {
   ~Account();
 
   void initManagers();
+  void clearManagers();
 
   std::shared_ptr<AutomatonContractData> getContractData() const noexcept;
   ProposalsManager* getProposalsManager();
