@@ -69,11 +69,11 @@ bool Account::operator==(const Account& other) const noexcept {
 }
 
 std::string Account::getAutoBalance() const noexcept {
-  return m_ethBalance;
+  return m_autoBalance;
 }
 
 std::string Account::getEthBalance() const noexcept {
-  return m_autoBalance;
+  return m_ethBalance;
 }
 
 void Account::setBalance(const std::string& ethBalance, const std::string& autoBalance) {
