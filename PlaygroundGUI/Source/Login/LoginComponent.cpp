@@ -65,8 +65,12 @@ class AccountWindow : public DocumentWindow {
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AccountWindow)
 };
 
+static const Array<RPCConfig> RPC_DEFAULT_LIST = {RPCConfig("http://127.0.0.1:7545", "Localhost 7545"),
+                                                  RPCConfig("http://127.0.0.1:8545", "Localhost 8545")};
+
 //==============================================================================
 LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile) {
+  m_rpcList = RPC_DEFAULT_LIST;
   m_accountsModel = std::make_shared<AccountsModel>();
   m_accountsModel->addListener(this);
 
@@ -85,7 +89,7 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
 
   auto rpcJson = m_configFile->get_json("rpcList");
   for (const auto& el : rpcJson.items()) {
-    m_rpcList.add(el.key());
+    m_rpcList.addIfNotAlreadyThere(RPCConfig(el.key(), el.value()));
   }
 
   auto contractsJson = m_configFile->get_json("contracts");
@@ -148,7 +152,7 @@ LoginComponent::~LoginComponent() {
   json rpcList;
   for (int i = 0; i < m_rpcList.size(); ++i) {
     auto item = m_rpcList[i];
-    rpcList[item.toStdString()] = item.toStdString();
+    rpcList[item.m_url] = item.m_alias;
   }
   m_configFile->set_json("rpcList", rpcList);
 
@@ -392,10 +396,10 @@ void LoginComponent::initContractsComboBox(const Array<std::shared_ptr<Automaton
   m_contractComboBox->addItem("Add contract", m_contractComboBox->getNumItems() + 1);
 }
 
-void LoginComponent::initRPCComboBox(const Array<String>& rpcList) {
+void LoginComponent::initRPCComboBox(const Array<RPCConfig>& rpcList) {
   m_rpcComboBox->clear(NotificationType::dontSendNotification);
   for (auto& rpc : rpcList) {
-    m_rpcComboBox->addItem(rpc, m_rpcComboBox->getNumItems() + 1);
+    m_rpcComboBox->addItem(rpc.m_alias, m_rpcComboBox->getNumItems() + 1);
   }
   m_rpcComboBox->addSeparator();
   m_rpcComboBox->setSelectedId(m_rpcComboBox->getNumItems() + 1, NotificationType::dontSendNotification);
@@ -403,7 +407,7 @@ void LoginComponent::initRPCComboBox(const Array<String>& rpcList) {
 }
 
 String LoginComponent::getCurrentRPC() {
-  return m_rpcList[m_rpcComboBox->getSelectedItemIndex()];
+  return m_rpcList[m_rpcComboBox->getSelectedItemIndex()].m_url;
 }
 
 Array<std::shared_ptr<AutomatonContractData>> LoginComponent::getCurrentContracts() {
@@ -436,6 +440,6 @@ void LoginComponent::addContract(const Config& config) {
 }
 
 void LoginComponent::addRPC(const String& rpc) {
-  m_rpcList.addIfNotAlreadyThere(rpc);
+  m_rpcList.addIfNotAlreadyThere(RPCConfig(rpc.toStdString(), rpc.toStdString()));
   initRPCComboBox(m_rpcList);
 }

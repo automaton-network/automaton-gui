@@ -27,6 +27,21 @@ class DemosMainComponent;
 class AccountWindow;
 class ConfigFile;
 
+struct RPCConfig {
+  RPCConfig(){}
+  RPCConfig(std::string url, std::string alias) {
+    m_url = url;
+    m_alias = alias;
+  }
+
+  bool operator==(const RPCConfig& other) const noexcept {
+    return m_url == other.m_url;
+  }
+
+  std::string m_url;
+  std::string m_alias;
+};
+
 class LoginComponent  : public Component
                       , public ComponentListener
                       , public Button::Listener
@@ -64,7 +79,7 @@ class LoginComponent  : public Component
 
  private:
   void initContractsComboBox(const Array<std::shared_ptr<AutomatonContractData>>& contracts);
-  void initRPCComboBox(const Array<String>& rpcList);
+  void initRPCComboBox(const Array<RPCConfig>& rpcList);
   String getCurrentRPC();
   Array<std::shared_ptr<AutomatonContractData>> getCurrentContracts();
   std::shared_ptr<AutomatonContractData> getCurrentContract();
@@ -83,7 +98,7 @@ class LoginComponent  : public Component
   std::unique_ptr<ComboBox> m_contractComboBox;
 
   std::map<String/*rpc*/, Array<std::shared_ptr<AutomatonContractData>>> m_contracts;
-  Array<String> m_rpcList;
+  Array<RPCConfig> m_rpcList;
   std::shared_ptr<AccountsModel> m_accountsModel;
   OwnedArray<AccountWindow> m_accountWindows;
   ConfigFile* m_configFile;
