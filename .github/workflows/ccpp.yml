@@ -9,6 +9,9 @@ on:
     paths:
       - 'PlaygroundGUI/**'
       - '.github/workflows/ccpp.yml'
+  schedule:
+    # Every day at 4am UTC
+    - cron: '0 4 * * *'
 
 jobs:
   windows:
