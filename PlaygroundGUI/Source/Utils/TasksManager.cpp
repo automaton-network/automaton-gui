@@ -84,9 +84,17 @@ void TasksManager::addTask(AsyncTask::Ptr task) {
   ScopedLock sl(m_lock);
   m_model->addItem(task, NotificationType::sendNotification);
 
-  task->runThread([=](AsyncTask* task){
-    m_model->removeItem(task, NotificationType::sendNotification);
-  });
+  if (m_model->size() == 1)
+    runQueuedTask();
+}
+
+void TasksManager::runQueuedTask() {
+  if (auto task = m_model->getAt(0)) {
+    task->runThread([=](AsyncTask* task){
+      m_model->removeItem(task, NotificationType::sendNotification);
+      runQueuedTask();
+    });
+  }
 }
 
 std::shared_ptr<AsyncTaskModel> TasksManager::getModel() {
