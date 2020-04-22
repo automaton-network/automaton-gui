@@ -29,4 +29,7 @@ class Utils {
   static std::unique_ptr<Drawable> loadSVG(const String& xmlData);
   static String fromWei(CoinUnit unitTo, const String& value);
   static String toWei(CoinUnit unitTo, const String& value);
+
+  static const String numericalIntegerAllowed;
+  static const String numericalFloatAllowed;
 };

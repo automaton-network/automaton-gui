@@ -24,29 +24,27 @@ CreateProposalComponent::CreateProposalComponent() {
   m_titleEditor = std::make_unique<TextEditor>(translate("Title"));
   addAndMakeVisible(m_titleEditor.get());
 
-  const String numericalIntegersAllowed("0123456789");
-  const String numericalFloatAllowed("0123456789.");
   m_budgetEditor = std::make_unique<TextEditor>(translate("Budget (AUTO)"));
-  m_budgetEditor->setInputRestrictions(8, numericalFloatAllowed);
+  m_budgetEditor->setInputRestrictions(8, Utils::numericalFloatAllowed);
   m_budgetEditor->addListener(this);
   addAndMakeVisible(m_budgetEditor.get());
 
   m_numPeriodsEditor = std::make_unique<TextEditor>(translate("Num periods"));
-  m_numPeriodsEditor->setInputRestrictions(5, numericalIntegersAllowed);
+  m_numPeriodsEditor->setInputRestrictions(5, Utils::numericalIntegerAllowed);
   m_numPeriodsEditor->addListener(this);
   addAndMakeVisible(m_numPeriodsEditor.get());
 
   m_totalBudgetEditor = std::make_unique<TextEditor>(translate("Total Budget (AUTO)"));
-  m_totalBudgetEditor->setInputRestrictions(8, numericalFloatAllowed);
+  m_totalBudgetEditor->setInputRestrictions(8, Utils::numericalFloatAllowed);
   m_totalBudgetEditor->setReadOnly(true);
   addAndMakeVisible(m_totalBudgetEditor.get());
 
   m_targetBonusEditor = std::make_unique<TextEditor>(translate("Target bonus (AUTO)"));
-  m_targetBonusEditor->setInputRestrictions(8, numericalFloatAllowed);
+  m_targetBonusEditor->setInputRestrictions(8, Utils::numericalFloatAllowed);
   // addAndMakeVisible(m_targetBonusEditor.get());
 
   m_lengthDaysEditor = std::make_unique<TextEditor>(translate("Length (days)"));
-  m_lengthDaysEditor->setInputRestrictions(5, numericalIntegersAllowed);
+  m_lengthDaysEditor->setInputRestrictions(5, Utils::numericalIntegerAllowed);
   addAndMakeVisible(m_lengthDaysEditor.get());
 
   m_createProposalBtn = std::make_unique<TextButton>(translate("Create proposal"));

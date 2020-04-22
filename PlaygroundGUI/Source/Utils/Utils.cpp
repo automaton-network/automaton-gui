@@ -33,6 +33,9 @@ using automaton::core::interop::ethereum::eth_contract;
 using automaton::core::io::bin2hex;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
 
+const String Utils::numericalIntegerAllowed = "0123456789";
+const String Utils::numericalFloatAllowed = "0123456789.";
+
 
 std::string Utils::gen_ethereum_address(const std::string& privkey_hex) {
   auto private_key = hex2bin(privkey_hex);

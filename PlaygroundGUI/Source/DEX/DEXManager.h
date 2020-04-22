@@ -20,8 +20,8 @@
 #pragma once
 #include <JuceHeader.h>
 #include "Order.h"
-#include "../Login/Account.h"
-#include "../Config/Config.h"
+#include "Login/Account.h"
+#include "Config/Config.h"
 
 class OrdersModel;
 
@@ -32,6 +32,9 @@ class DEXManager {
   std::shared_ptr<OrdersModel> getModel();
 
   bool fetchOrders();
+  bool createSellOrder(const String& amountAUTO, const String& amountETH);
+  bool createBuyOrder(const String& amountAUTO, const String& amountETH);
+
 
  private:
   std::shared_ptr<OrdersModel> m_model;

@@ -28,6 +28,7 @@ class OrdersUIModel;
 class DEXManager;
 
 class DEXPage : public Component
+              , public Button::Listener
               , public AbstractListModelBase::Listener {
  public:
   DEXPage(Account::Ptr accountData);
@@ -35,6 +36,7 @@ class DEXPage : public Component
 
   void paint(Graphics&) override;
   void resized() override;
+  void buttonClicked(Button* buttonThatWasClicked) override;
 
   // AbstractListModelBase::Listener
   void modelChanged(AbstractListModelBase* model) override;
@@ -46,6 +48,8 @@ class DEXPage : public Component
   std::unique_ptr<OrdersUIModel> m_buyingUIModel;
   std::unique_ptr<Label> m_sellingLabel;
   std::unique_ptr<Label> m_buyingLabel;
+  std::unique_ptr<TextButton> m_createSellOrderBtn;
+  std::unique_ptr<TextButton> m_createBuyOrderBtn;
   std::unique_ptr<TableListBox> m_sellingTable;
   std::unique_ptr<TableListBox> m_buyingTable;
   std::shared_ptr<OrdersProxyModel> m_sellingProxyModel;
