@@ -118,7 +118,8 @@ bool DEXManager::fetchOrders() {
 
     return true;
   }, [=](AsyncTask* task) {
-  }, "Fetching orders...");
+  }, "Fetching orders..."
+   , m_accountData);
 
   return true;
 }
@@ -149,7 +150,7 @@ bool DEXManager::createSellOrder(const String& amountAUTO, const String& amountE
 
     return true;
   }, [=](AsyncTask* task) {
-  }, topicName);
+  }, topicName, m_accountData);
 
   return true;
 }
@@ -206,7 +207,7 @@ bool DEXManager::createBuyOrder(const String& amountAUTO, const String& amountET
 
     return true;
   }, [=](AsyncTask* task) {
-  }, topicName);
+  }, topicName, m_accountData);
 
   return true;
 }

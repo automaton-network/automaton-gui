@@ -18,6 +18,7 @@
  */
 
 #pragma once
+#include <Login/Account.h>
 #include "JuceHeader.h"
 #include "../Models/AbstractListModel.h"
 
@@ -28,7 +29,7 @@ class TaskStatusBar;
 class TasksPanel : public Component
                  , public AbstractListModelBase::Listener {
  public:
-  TasksPanel();
+  TasksPanel(Account::Ptr accountData);
   ~TasksPanel();
 
   Component* getStatusBarComponent() const noexcept;

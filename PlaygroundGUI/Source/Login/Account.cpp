@@ -30,6 +30,7 @@ Account::Account(AccountConfig* config,
   m_address = m_config->getAddress().toStdString();
   m_ethBalance = "Undefined";
   m_autoBalance = "Undefined";
+  m_accountId = String(getAddress() + m_contractData->getAddress() + m_contractData->getUrl()).hashCode64();
 }
 
 void Account::initManagers() {
@@ -55,6 +56,10 @@ ProposalsManager* Account::getProposalsManager() {
 
 DEXManager* Account::getDexManager() {
   return m_dexManager.get();
+}
+
+int64 Account::getAccountId() const noexcept {
+  return m_accountId;
 }
 
 const std::string& Account::getAddress() const noexcept {

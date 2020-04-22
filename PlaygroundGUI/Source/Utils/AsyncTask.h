@@ -41,11 +41,13 @@ class AsyncTask : public Thread
 
   AsyncTask(std::function<bool(AsyncTask*)> fun,
             std::function<void(AsyncTask*)> postAsyncAction,
-            const String& title)
+            const String& title,
+            int64 ownerId)
       : m_status(status::ok())
       , m_title(title)
       , m_fun(fun)
       , m_postAsyncAction(postAsyncAction)
+      , m_ownerId(ownerId)
       , Thread(title) {
   }
 
@@ -87,7 +89,7 @@ class AsyncTask : public Thread
     Logger::writeToLog(String("(") + String(m_status.code) + String(") :") + m_status.msg);
   }
 
-  const String& getOwnerId() const noexcept {
+  int64 getOwnerId() const noexcept {
     return m_ownerId;
   }
 
@@ -121,7 +123,7 @@ class AsyncTask : public Thread
   }
 
  private:
-  String m_ownerId;
+  int64 m_ownerId;
   String m_title;
   double m_progress;
   String m_message;

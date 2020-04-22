@@ -20,6 +20,7 @@
 #pragma once
 
 #include <Models/AbstractListModel.h>
+#include <Login/Account.h>
 #include "JuceHeader.h"
 #include "AsyncTask.h"
 
@@ -42,7 +43,8 @@ class TasksManager : public DeletedAtShutdown {
 
   static void launchTask(std::function<bool(AsyncTask*)> fun,
                          std::function<void(AsyncTask*)> postAsyncAction,
-                         const String& title);
+                         const String& title,
+                         Account::Ptr account);
 
   static bool launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
                          std::function<void(TaskWithProgressWindow*)> postAction,

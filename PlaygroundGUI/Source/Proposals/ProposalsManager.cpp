@@ -106,7 +106,8 @@ bool ProposalsManager::fetchProposals() {
     notifyProposalsUpdated();
     return true;
   }, [=](AsyncTask* task) {
-  }, "Fetching proposals...");
+  }, "Fetching proposals..."
+   , m_accountData);
 
   return true;
 }
@@ -153,7 +154,8 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
 
     return true;
   }, [=](AsyncTask* task) {
-  }, topicName);
+  }, topicName
+   , m_accountData);
 
   return true;
 }
@@ -188,7 +190,8 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
 
     return true;
   }, [=](AsyncTask* task) {
-  }, topicName);
+  }, topicName
+   , m_accountData);
 
   return true;
 }
@@ -333,7 +336,8 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
 
     return true;
   }, [=](AsyncTask* task) {
-  }, topicName);
+  }, topicName
+   , m_accountData);
 
   return true;
 }
@@ -368,7 +372,8 @@ bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardA
 
     return true;
   }, [=](AsyncTask* task) {
-  }, topicName);
+  }, topicName
+   , m_accountData);
 
   return true;
 }

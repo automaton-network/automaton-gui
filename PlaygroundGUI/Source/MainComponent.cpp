@@ -73,7 +73,7 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
   // tabbedComponent->addTab(TRANS("Network Simulation"), Colour(0xff404040), new DemoSimNet(), true);
   m_tabbedComponent->setCurrentTabIndex(0);
 
-  m_tasksPanel = std::make_unique<TasksPanel>();
+  m_tasksPanel = std::make_unique<TasksPanel>(accountData);
   addAndMakeVisible(m_tasksPanel->getStatusBarComponent());
   addChildComponent(m_tasksPanel.get());
 

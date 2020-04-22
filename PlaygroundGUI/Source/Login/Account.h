@@ -39,6 +39,7 @@ class Account : public std::enable_shared_from_this<Account> {
   ProposalsManager* getProposalsManager();
   DEXManager* getDexManager();
 
+  int64 getAccountId() const noexcept;
   const std::string& getAddress() const noexcept;
   std::string getPrivateKey() const noexcept;
   std::string getAlias() const noexcept;
@@ -52,6 +53,7 @@ class Account : public std::enable_shared_from_this<Account> {
  private:
   void setBalance(const std::string& ethBalance, const std::string& autoBalance);
 
+  int64 m_accountId;
   std::string m_ethBalance;
   std::string m_autoBalance;
   std::string m_address;

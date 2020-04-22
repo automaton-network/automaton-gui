@@ -23,6 +23,11 @@
 #include "TasksManager.h"
 
 class TasksProxyModel : public AbstractProxyModel<AsyncTask::Ptr> {
+ public:
+  TasksProxyModel(int64 ownerId) {
+    m_currentOwnerId = ownerId;
+  }
+
  protected:
   bool isAccept(const AsyncTask::Ptr& item) override {
     return item->getOwnerId() == m_currentOwnerId;
@@ -36,7 +41,7 @@ class TasksProxyModel : public AbstractProxyModel<AsyncTask::Ptr> {
     return 0;
   }
 
-  String m_currentOwnerId;
+  int64 m_currentOwnerId;
 };
 
 class FlatProgressBarLookAndFeel : public LookAndFeel_V4 {
@@ -222,8 +227,8 @@ class TaskComponent : public Component
   AsyncTask::Ptr m_task;
 };
 
-TasksPanel::TasksPanel()
-    : m_tasksProxyModel(std::make_shared<TasksProxyModel>())
+TasksPanel::TasksPanel(Account::Ptr accountData)
+    : m_tasksProxyModel(std::make_shared<TasksProxyModel>(accountData->getAccountId()))
     , m_statusBar(std::make_unique<TaskStatusBar>()) {
   m_tasksProxyModel->setModel(TasksManager::getInstance()->getModel());
   m_tasksProxyModel->addListener(this);
