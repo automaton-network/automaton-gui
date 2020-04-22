@@ -50,7 +50,8 @@ void TasksManager::launchTask(std::function<bool(AsyncTask*)> fun,
                               std::function<void(AsyncTask*)> postAsyncAction,
                               const String& title,
                               Account::Ptr account) {
-  TasksManager::getInstance()->addTask(std::make_shared<AsyncTask> (fun, postAsyncAction, title, account->getAccountId()));
+  TasksManager::getInstance()->addTask(std::make_shared<AsyncTask> (fun, postAsyncAction,
+      title, account->getAccountId()));
 }
 
 bool TasksManager::launchTask(std::function<bool(TaskWithProgressWindow*)> fun,

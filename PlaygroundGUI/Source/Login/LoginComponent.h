@@ -28,7 +28,7 @@ class AccountWindow;
 class ConfigFile;
 
 struct RPCConfig {
-  RPCConfig(){}
+  RPCConfig() {}
   RPCConfig(std::string url, std::string alias) {
     m_url = url;
     m_alias = alias;
