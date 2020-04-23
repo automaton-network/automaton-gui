@@ -87,6 +87,9 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   tableHeader.addColumn(translate("Alias"), 1, 50);
   tableHeader.addColumn(translate("Address"), 2, 300);
 
+  m_selectedRPC = m_configFile->get_string ("selectedRPC", "");
+  m_selectedContract = m_configFile->get_string ("selectedContract", "");
+
   auto rpcJson = m_configFile->get_json("rpcList");
   for (const auto& el : rpcJson.items()) {
     m_rpcList.addIfNotAlreadyThere(RPCConfig(el.key(), el.value()));
@@ -114,6 +117,7 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   addAndMakeVisible(m_rpcComboBox.get());
 
   m_contractComboBox = std::make_unique<ComboBox>();
+  initContractsComboBox(getCurrentContracts());
   m_contractComboBox->addListener(this);
   addAndMakeVisible(m_contractComboBox.get());
 
@@ -155,6 +159,9 @@ LoginComponent::~LoginComponent() {
     rpcList[item.m_url] = item.m_alias;
   }
   m_configFile->set_json("rpcList", rpcList);
+
+  m_configFile->set_string ("selectedRPC", m_selectedRPC);
+  m_configFile->set_string ("selectedContract", m_selectedContract);
 
   m_configFile->save_to_local_file();
 }
@@ -290,6 +297,8 @@ void LoginComponent::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
         auto rpc = w.getTextEditorContents("rpc");
         addRPC(rpc);
       }
+    } else {
+      m_selectedRPC = getCurrentRPC().toStdString();
     }
     initContractsComboBox(getCurrentContracts());
   } else if (comboBoxThatHasChanged == m_contractComboBox.get()) {
@@ -300,29 +309,27 @@ void LoginComponent::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
                                          "Invalid contract!",
                                          "Select valid RPC!");
         m_contractComboBox->setSelectedId(-1, NotificationType::dontSendNotification);
-        return;
+      } else {
+        AlertWindow w("Add contract",
+                      "Enter contract Info.",
+                      AlertWindow::QuestionIcon);
+
+        w.addTextEditor("contract", "", "Contract Address: ", false);
+        w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+        w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+        if (w.runModalLoop() == 1) {
+          auto contractAddr = w.getTextEditorContents("contract");
+          Config contractConfig;
+          contractConfig.set_string("eth_url", getCurrentRPC().toStdString());
+          contractConfig.set_string("contract_address", contractAddr.toStdString());
+          addContract(contractConfig);
+        }
       }
-
-      AlertWindow w("Add contract",
-                    "Enter contract Info.",
-                    AlertWindow::QuestionIcon);
-
-      w.addTextEditor("contract", "", "Contract Address: ", false);
-      w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-      w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-
-      m_contractComboBox->setSelectedId(-1, NotificationType::dontSendNotification);
-
-      if (w.runModalLoop() == 1) {
-        auto contractAddr = w.getTextEditorContents("contract");
-        Config contractConfig;
-        contractConfig.set_string("eth_url", getCurrentRPC().toStdString());
-        contractConfig.set_string("contract_address", contractAddr.toStdString());
-        addContract(contractConfig);
-      }
-
-      initContractsComboBox(getCurrentContracts());
+    } else {
+      m_selectedContract = getCurrentContract()->getAddress();
     }
+    initContractsComboBox(getCurrentContracts());
   }
 }
 
@@ -390,9 +397,11 @@ void LoginComponent::initContractsComboBox(const Array<std::shared_ptr<Automaton
   m_contractComboBox->clear(NotificationType::dontSendNotification);
   for (auto& contract : contracts) {
     m_contractComboBox->addItem(contract->getAddress(), m_contractComboBox->getNumItems() + 1);
+
+    if (contract->getAddress() == m_selectedContract)
+      m_contractComboBox->setSelectedItemIndex (m_contractComboBox->getNumItems() - 1, NotificationType::dontSendNotification);
   }
   m_contractComboBox->addSeparator();
-  m_contractComboBox->setSelectedId(m_rpcComboBox->getNumItems() + 1, NotificationType::dontSendNotification);
   m_contractComboBox->addItem("Add contract", m_contractComboBox->getNumItems() + 1);
 }
 
@@ -400,9 +409,11 @@ void LoginComponent::initRPCComboBox(const Array<RPCConfig>& rpcList) {
   m_rpcComboBox->clear(NotificationType::dontSendNotification);
   for (auto& rpc : rpcList) {
     m_rpcComboBox->addItem(rpc.m_alias, m_rpcComboBox->getNumItems() + 1);
+
+    if (rpc.m_url == m_selectedRPC)
+      m_rpcComboBox->setSelectedItemIndex (m_rpcComboBox->getNumItems() - 1, NotificationType::dontSendNotification);
   }
   m_rpcComboBox->addSeparator();
-  m_rpcComboBox->setSelectedId(m_rpcComboBox->getNumItems() + 1, NotificationType::dontSendNotification);
   m_rpcComboBox->addItem("Add Custom RPC", m_rpcComboBox->getNumItems() + 1);
 }
 

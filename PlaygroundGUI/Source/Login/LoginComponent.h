@@ -103,5 +103,8 @@ class LoginComponent  : public Component
   OwnedArray<AccountWindow> m_accountWindows;
   ConfigFile* m_configFile;
 
+  std::string m_selectedRPC;
+  std::string m_selectedContract;
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoginComponent)
 };
