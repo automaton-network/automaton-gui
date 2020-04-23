@@ -149,7 +149,6 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     proposal->setStatus(Proposal::Status::Started);
     task->setProgress(1.0);
 
-    m_model->addItem(proposal, NotificationType::sendNotificationAsync);
     task->setStatusMessage("Proposal \"" + proposal->getTitle() + "\" successfully created");
 
     return true;

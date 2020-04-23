@@ -146,6 +146,10 @@ void ProposalsPage::setModel(std::shared_ptr<ProposalsModel> model) {
 void ProposalsPage::modelChanged(AbstractListModelBase*) {
   m_proposalsListBox->updateContent();
   m_proposalsListBox->repaint();
+  if (const auto selectedRow = m_proposalsListBox->getSelectedRow()) {
+    const auto proposal = m_proxyModel->getAt(selectedRow);
+    updateButtonsForSelectedProposal(proposal);
+  }
 }
 
 void ProposalsPage::createProposalViewActionHappened(CreateProposalComponent* componentInWhichActionHappened,
@@ -232,14 +236,19 @@ void ProposalsPage::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
 }
 
 void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedProposal) {
+  const proposalStatus = selectedProposal->getStatus();
   const bool isRowSelected = m_proposalsListBox->getNumSelectedRows() > 0;
-  m_payForGasBtn->setEnabled(isRowSelected);
+  m_payForGasBtn->setEnabled(proposalStatus == Proposal::Status::PrepayingGas);
   m_abandonProposalBtn->setEnabled(isRowSelected);
   m_voteYesBtn->setEnabled(isRowSelected);
   m_voteNoBtn->setEnabled(isRowSelected);
 
   // TODO(Kirill) need to think which statuses are eligible for claiming (perhaps, Accepted, Completed as well)
-  const bool isClaimingActive = selectedProposal->getStatus() == Proposal::Status::Started;
+  // Temporarily enable claiming reward button at "Started" state as well. That's because proposal state is updated
+  // in smart contract only before each vote. So the proposal can have 100% approval rate but still remain in
+  // "Started" state until some action that calls updateProposalState() smart-contract function is performed.
+  const bool isClaimingActive = proposalStatus == Proposal::Status::Accepted
+                                || proposalStatus == Proposal::Status::Started;
   if (isClaimingActive)
     m_claimRewardBtn->setTooltip("Claim your reward now!");
   else

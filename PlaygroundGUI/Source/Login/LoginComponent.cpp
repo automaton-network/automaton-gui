@@ -188,7 +188,7 @@ void LoginComponent::resized() {
   m_accountsTable->setBounds(bounds.removeFromTop(200));
   bounds.removeFromTop(20);
   auto btnBounds = bounds.removeFromTop(40);
-  m_importPrivateKeyBtn->setBounds(btnBounds.removeFromLeft(120));
+  m_importPrivateKeyBtn->setBounds(btnBounds);
 }
 
 void LoginComponent::buttonClicked(Button* btn) {
