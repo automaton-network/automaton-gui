@@ -236,7 +236,7 @@ void ProposalsPage::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
 }
 
 void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedProposal) {
-  const proposalStatus = selectedProposal->getStatus();
+  const auto proposalStatus = selectedProposal->getStatus();
   const bool isRowSelected = m_proposalsListBox->getNumSelectedRows() > 0;
   m_payForGasBtn->setEnabled(proposalStatus == Proposal::Status::PrepayingGas);
   m_abandonProposalBtn->setEnabled(isRowSelected);
