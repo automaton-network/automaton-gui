@@ -148,7 +148,8 @@ void ProposalsPage::modelChanged(AbstractListModelBase*) {
   m_proposalsListBox->repaint();
   if (const auto selectedRow = m_proposalsListBox->getSelectedRow()) {
     const auto proposal = m_proxyModel->getAt(selectedRow);
-    updateButtonsForSelectedProposal(proposal);
+    if (proposal)
+      updateButtonsForSelectedProposal(proposal);
   }
 }
 
@@ -236,6 +237,9 @@ void ProposalsPage::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
 }
 
 void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedProposal) {
+  if (!selectedProposal)
+    return;
+
   const auto proposalStatus = selectedProposal->getStatus();
   const bool isRowSelected = m_proposalsListBox->getNumSelectedRows() > 0;
   m_payForGasBtn->setEnabled(proposalStatus == Proposal::Status::PrepayingGas);
