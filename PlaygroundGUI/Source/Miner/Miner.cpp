@@ -65,48 +65,41 @@ static std::string get_pub_key_x(const unsigned char* priv_key) {
   return std::string(reinterpret_cast<char*>(pub_key_serialized+1), 32);
 }
 
-class MinerThread: public Thread {
- public:
-  uint64 keysMined;
-  int64 startTime;
+void Miner::addMinerThread() {
+  auto miner = TasksManager::launchTask([=](AsyncTask* task) {
+    uint64 keysMined = 0;
+    int64 startTime;
 
-  Miner* owner;
-
-  MinerThread(Miner* _owner) : Thread("Miner Thread"), keysMined(0), owner(_owner) {
-  }
-
-  void run() override {
-    keysMined = 0;
     startTime = Time::getCurrentTime().toMilliseconds();
 
     unsigned char mask[32];
     unsigned char difficulty[32];
     unsigned char pk[32];
 
-    memcpy(mask, owner->getMask(), 32);
-    memcpy(difficulty, owner->getDifficulty(), 32);
+    memcpy(mask, getMask(), 32);
+    memcpy(difficulty, getDifficulty(), 32);
 
-    while (!threadShouldExit()) {
+    while (!task->threadShouldExit()) {
       unsigned int keys_generated = mine_key(mask, difficulty, pk);
-      if (owner) {
-        owner->processMinedKey(std::string(reinterpret_cast<const char*>(pk), 32), keys_generated);
-      }
-      // wait(20);
+      processMinedKey(std::string(reinterpret_cast<const char*>(pk), 32), keys_generated);
     }
-  }
-};
 
-void Miner::addMinerThread() {
-  Thread * miner = new MinerThread(this);
-  miner->startThread();
+    return true;
+  }, nullptr, "Miner Thread", m_accountData, false);
+
   miners.add(miner);
 }
 
 void Miner::stopMining() {
-  for (int i = 0; i < miners.size(); i++) {
-    miners[i]->stopThread(3000);
+  for (int i = 0; i < miners.size(); ++i) {
+    miners[i]->signalThreadShouldExit();
   }
-  miners.clear(true);
+
+  for (int i = 0; i < miners.size(); ++i) {
+    miners[i]->waitForThreadToExit(-1);
+  }
+
+  miners.clear();
 }
 
 void Miner::processMinedKey(std::string _pk, int keys_generated) {
@@ -389,6 +382,7 @@ void Miner::updateContractData() {
 }
 
 Miner::~Miner() {
+  stopMining();
 }
 
 // TODO(asen): Fix this.
@@ -567,8 +561,7 @@ void Miner::claimMinedSlots() {
 
       task->setStatusMessage("Claiming slot...success!");
       return true;
-
-    },[=](AsyncTask* task) {
+    }, [=](AsyncTask* task) {
     }, "Claiming slot", m_accountData);
   }
 }
