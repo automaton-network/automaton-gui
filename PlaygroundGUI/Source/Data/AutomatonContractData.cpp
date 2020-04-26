@@ -206,7 +206,10 @@ status AutomatonContractData::call(const std::string& f,
                                    const std::string& params,
                                    const std::string& privateKey) {
   ScopedLock sl(m_criticalSection);
-  return getContract()->call(f, params, privateKey);
+  if (auto contract = getContract())
+    return getContract()->call(f, params, privateKey);
+
+  return status::internal("Contract is NULL.");
 }
 
 std::string AutomatonContractData::getAbi() {

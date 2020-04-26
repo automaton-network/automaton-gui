@@ -22,6 +22,7 @@
 #include "Miner.h"
 #include "../Data/AutomatonContractData.h"
 #include "Utils/Utils.h"
+#include "Utils/TasksManager.h"
 
 #include "automaton/core/crypto/cryptopp/Keccak_256_cryptopp.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
@@ -528,62 +529,47 @@ void Miner::createSignature() {
 */
 }
 
-class ClaimSlotThread: public ThreadWithProgressWindow {
- public:
-  AutomatonContractData::Ptr cd;
-  std::string private_key;
-  std::string mined_key;
-  std::string address;
-  std::string bin_address;
-  status s;
-
-  ClaimSlotThread(AutomatonContractData::Ptr _cd, std::string _private_key, std::string _mined_key):
-      ThreadWithProgressWindow("Claim Slot Thread", true, true),
-      cd(_cd),
-      private_key(_private_key),
-      mined_key(_mined_key),
-      s(status::ok()) {
-    address = Utils::gen_ethereum_address(private_key);
-    bin_address = hex2bin(std::string(24, '0') + address.substr(2));
-  }
-
-  void run() override {
-    ScopedLock lock(cd->m_criticalSection);
-
-    setStatusMessage("Generating signature...");
-
-    // Generate signature.
-    std::string pub_key = gen_pub_key(reinterpret_cast<const unsigned char *>(mined_key.c_str()));
-    std::string sig = sign(
-        reinterpret_cast<const unsigned char *>(mined_key.c_str()),
-        reinterpret_cast<const unsigned char *>(bin_address.c_str()));
-
-    int32_t v = sig[64];
-    json jInput;
-    jInput.push_back(bin2hex(pub_key.substr(0, 32)));  // public key X
-    jInput.push_back(bin2hex(pub_key.substr(32, 32)));  // public key Y
-    jInput.push_back(std::to_string(v));
-    jInput.push_back(bin2hex(sig.substr(0, 32)));  // R
-    jInput.push_back(bin2hex(sig.substr(32, 32)));  // S
-
-    setStatusMessage("Claiming slot...");
-    s = cd->call("claimSlot", jInput.dump(), private_key);
-    if (!s.is_ok()) {
-      return;
-    }
-  }
-};
-
 void Miner::claimMinedSlots() {
   if (mined_slots.size() > 0) {
     auto ms = mined_slots.back();
     mined_slots.pop_back();
-    ClaimSlotThread t(m_accountData->getContractData(), private_key, ms.private_key);
-    if (!t.runThread(9)) {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Claim slot failed!",
-                                       t.s.msg);
-    }
+
+    auto mined_key = ms.private_key;
+
+    TasksManager::launchTask([=](AsyncTask* task) {
+      auto& s = task->m_status;
+
+      task->setStatusMessage("Generating signature...");
+
+      const auto address = Utils::gen_ethereum_address(private_key);
+      const auto bin_address = hex2bin(std::string(24, '0') + address.substr(2));
+
+      // Generate signature.
+      std::string pub_key = gen_pub_key(reinterpret_cast<const unsigned char *>(mined_key.c_str()));
+      std::string sig = sign(
+          reinterpret_cast<const unsigned char *>(mined_key.c_str()),
+          reinterpret_cast<const unsigned char *>(bin_address.c_str()));
+
+      int32_t v = sig[64];
+      json jInput;
+      jInput.push_back(bin2hex(pub_key.substr(0, 32)));  // public key X
+      jInput.push_back(bin2hex(pub_key.substr(32, 32)));  // public key Y
+      jInput.push_back(std::to_string(v));
+      jInput.push_back(bin2hex(sig.substr(0, 32)));  // R
+      jInput.push_back(bin2hex(sig.substr(32, 32)));  // S
+
+      task->setStatusMessage("Claiming slot...");
+      s = m_accountData->getContractData()->call("claimSlot", jInput.dump(), private_key);
+
+      if (!s.is_ok()) {
+        return false;
+      }
+
+      task->setStatusMessage("Claiming slot...success!");
+      return true;
+
+    },[=](AsyncTask* task) {
+    }, "Claiming slot", m_accountData);
   }
 }
 
