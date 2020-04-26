@@ -42,6 +42,7 @@ static std::vector<std::string> getOwners(AutomatonContractData::Ptr contract, u
 static uint64 getLastProposalId(AutomatonContractData::Ptr contract, status* resStatus);
 static void voteWithSlot(AutomatonContractData::Ptr contract,
                          uint64 id, uint64 slot, uint64 choice,
+                         const std::string& privateKey,
                          status* resStatus);
 
 ProposalsManager::ProposalsManager(Account::Ptr accountData)
@@ -199,7 +200,6 @@ void ProposalsManager::notifyProposalsUpdated() {
 
 static void voteWithSlot(AutomatonContractData::Ptr contract,
                          uint64 id, uint64 slot, uint64 choice,
-                         const std::string& ethAddress,
                          const std::string& privateKey,
                          status* resStatus) {
   json jInput;
@@ -316,7 +316,7 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
 
         task->setStatusMessage("Voting for slot " + String(slot) + "...");
         voteWithSlot(m_contractData, proposal->getId(), slot,
-            choice, m_accountData->getAddress(), m_accountData->getPrivateKey(), &s);
+            choice, m_accountData->getPrivateKey(), &s);
 
         if (!s.is_ok() || task->threadShouldExit())
           return false;
