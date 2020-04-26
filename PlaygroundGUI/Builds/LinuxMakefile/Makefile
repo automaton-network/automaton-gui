@@ -78,6 +78,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/DEXPage_119e148f.o \
   $(JUCE_OBJDIR)/Order_30383997.o \
   $(JUCE_OBJDIR)/OrdersModel_86d6378d.o \
+  $(JUCE_OBJDIR)/ProposalDetailsComponent_61b032a4.o \
   $(JUCE_OBJDIR)/Proposal_bae9729.o \
   $(JUCE_OBJDIR)/ProposalsModel_40a09f9f.o \
   $(JUCE_OBJDIR)/CreateProposalComponent_d7aea502.o \
@@ -165,6 +166,11 @@ $(JUCE_OBJDIR)/Order_30383997.o: ../../Source/DEX/Order.cpp
 $(JUCE_OBJDIR)/OrdersModel_86d6378d.o: ../../Source/DEX/OrdersModel.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling OrdersModel.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/ProposalDetailsComponent_61b032a4.o: ../../Source/Proposals/ProposalDetailsComponent.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling ProposalDetailsComponent.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/Proposal_bae9729.o: ../../Source/Proposals/Proposal.cpp

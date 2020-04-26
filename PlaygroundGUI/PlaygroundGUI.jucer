@@ -60,6 +60,10 @@
         <FILE id="GaasMi" name="OrdersModel.h" compile="0" resource="0" file="Source/DEX/OrdersModel.h"/>
       </GROUP>
       <GROUP id="{BEADF6D5-B88A-B1C3-2B00-06EE3D256D87}" name="Proposals">
+        <FILE id="QjIgEa" name="ProposalDetailsComponent.h" compile="0" resource="0"
+              file="Source/Proposals/ProposalDetailsComponent.h"/>
+        <FILE id="kUdIAn" name="ProposalDetailsComponent.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalDetailsComponent.cpp"/>
         <FILE id="sYLkKA" name="Proposal.cpp" compile="1" resource="0" file="Source/Proposals/Proposal.cpp"/>
         <FILE id="hA94JD" name="Proposal.h" compile="0" resource="0" file="Source/Proposals/Proposal.h"/>
         <FILE id="oItQcN" name="ProposalsModel.cpp" compile="1" resource="0"

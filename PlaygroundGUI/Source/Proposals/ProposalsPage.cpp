@@ -21,6 +21,7 @@
 #include "ProposalsManager.h"
 #include "../Utils/Utils.h"
 #include "../Data/AutomatonContractData.h"
+#include "ProposalDetailsComponent.h"
 
 //==============================================================================
 ProposalsPage::ProposalsPage(Account::Ptr accountData)
@@ -91,6 +92,9 @@ ProposalsPage::ProposalsPage(Account::Ptr accountData)
   m_createProposalView->addListener(this);
   addChildComponent(m_createProposalView.get());
 
+  m_proposalDetailslView = std::make_unique<ProposalDetailsComponent>(m_accountData);
+  addChildComponent(m_proposalDetailslView.get());
+
   addAndMakeVisible(m_fetchProposalsBtn.get());
   addAndMakeVisible(m_createProposalBtn.get());
   addAndMakeVisible(m_payForGasBtn.get());
@@ -113,6 +117,7 @@ void ProposalsPage::paint(Graphics&) {
 void ProposalsPage::resized() {
   auto bounds = getLocalBounds().reduced(20);
   m_createProposalView->setBounds(bounds);
+  m_proposalDetailslView->setBounds(bounds);
 
   const int buttonsHeight = 50;
   const int buttonsSpacing = 10;
@@ -258,6 +263,12 @@ void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedPropo
   else
     m_claimRewardBtn->setTooltip("Proposal claiming is unavailable. Check proposal status, please");
   m_claimRewardBtn->setEnabled(isClaimingActive);
+}
+
+void ProposalsPage::openProposalDetails(Proposal::Ptr proposal) {
+  m_proposalDetailslView->setProposal(proposal);
+  m_proposalDetailslView->setVisible(true);
+  m_proposalDetailslView->setAlwaysOnTop(true);
 }
 
 // TableListBoxModel
@@ -448,4 +459,10 @@ void ProposalsPage::selectedRowsChanged(int lastRowSelected) {
   if (!selectedItem)
       return;
   updateButtonsForSelectedProposal(selectedItem);
+}
+
+void ProposalsPage::cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) {
+  if (e.mods.isLeftButtonDown()) {
+    openProposalDetails(m_proxyModel->getAt(rowNumber));
+  }
 }

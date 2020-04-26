@@ -81,6 +81,10 @@
 			isa = PBXBuildFile;
 			fileRef = EDA72D64D0C8122D56A91779;
 		};
+		59AAE5A0E46CFEAD8DEEECDE = {
+			isa = PBXBuildFile;
+			fileRef = 342AE2B18CF907F9289C538F;
+		};
 		94F672D3BDA08865353B9C45 = {
 			isa = PBXBuildFile;
 			fileRef = 999124BB54C7EFFB15C28C9A;
@@ -344,6 +348,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = TasksManager.cpp;
 			path = ../../Source/Utils/TasksManager.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		342AE2B18CF907F9289C538F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalDetailsComponent.cpp;
+			path = ../../Source/Proposals/ProposalDetailsComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		3604DF6B545750B665E78AE0 = {
@@ -731,6 +742,13 @@
 			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_gui_basics";
 			sourceTree = "SOURCE_ROOT";
 		};
+		D966836DF41928929D3925A7 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalDetailsComponent.h;
+			path = ../../Source/Proposals/ProposalDetailsComponent.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		E3F1E7626819B78F811DEA9F = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -890,6 +908,8 @@
 		C2050576413F623B249937CF = {
 			isa = PBXGroup;
 			children = (
+				D966836DF41928929D3925A7,
+				342AE2B18CF907F9289C538F,
 				999124BB54C7EFFB15C28C9A,
 				AC725974DA4D5A793B592A09,
 				D60BF1DB6AB1382EC05AFF91,
@@ -1309,6 +1329,7 @@
 				5A3DA206190F057B44FDA6A4,
 				3FAABEF679539A4A35C12933,
 				81315ABE1B5196E62FEAF085,
+				59AAE5A0E46CFEAD8DEEECDE,
 				94F672D3BDA08865353B9C45,
 				B16A028E08A88B3CC4C157B1,
 				119F3E08EA0700D3227756D8,

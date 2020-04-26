@@ -289,6 +289,9 @@
     <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\ProposalDetailsComponent.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Proposals\Proposal.cpp">
       <Filter>PlaygroundGUI\Source\Proposals</Filter>
     </ClCompile>
@@ -1661,6 +1664,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\DEX\OrdersModel.h">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\ProposalDetailsComponent.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Proposals\Proposal.h">
       <Filter>PlaygroundGUI\Source\Proposals</Filter>

@@ -152,6 +152,7 @@
     <ClCompile Include="..\..\Source\DEX\DEXPage.cpp"/>
     <ClCompile Include="..\..\Source\DEX\Order.cpp"/>
     <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp"/>
+    <ClCompile Include="..\..\Source\Proposals\ProposalDetailsComponent.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\Proposal.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\ProposalsModel.cpp"/>
     <ClCompile Include="..\..\Source\Proposals\CreateProposalComponent.cpp"/>
@@ -1368,6 +1369,7 @@
     <ClInclude Include="..\..\Source\DEX\DEXPage.h"/>
     <ClInclude Include="..\..\Source\DEX\Order.h"/>
     <ClInclude Include="..\..\Source\DEX\OrdersModel.h"/>
+    <ClInclude Include="..\..\Source\Proposals\ProposalDetailsComponent.h"/>
     <ClInclude Include="..\..\Source\Proposals\Proposal.h"/>
     <ClInclude Include="..\..\Source\Proposals\ProposalsModel.h"/>
     <ClInclude Include="..\..\Source\Proposals\CreateProposalComponent.h"/>
