@@ -46,12 +46,14 @@ TasksManager::~TasksManager() {
   clearSingletonInstance();
 }
 
-void TasksManager::launchTask(std::function<bool(AsyncTask*)> fun,
-                              std::function<void(AsyncTask*)> postAsyncAction,
-                              const String& title,
-                              Account::Ptr account) {
-  TasksManager::getInstance()->addTask(std::make_shared<AsyncTask> (fun, postAsyncAction,
-      title, account->getAccountId()));
+AsyncTask::Ptr TasksManager::launchTask(std::function<bool(AsyncTask*)> fun,
+                                        std::function<void(AsyncTask*)> postAsyncAction,
+                                        const String& title,
+                                        Account::Ptr account,
+                                        bool isQueued) {
+  auto task = std::make_shared<AsyncTask> (fun, postAsyncAction, title, account->getAccountId());
+  TasksManager::getInstance()->addTask(task, isQueued);
+  return task;
 }
 
 bool TasksManager::launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
@@ -80,18 +82,26 @@ bool TasksManager::launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
   return task.m_status.is_ok();
 }
 
-void TasksManager::addTask(AsyncTask::Ptr task) {
+void TasksManager::addTask(AsyncTask::Ptr task, bool isQueued) {
   ScopedLock sl(m_lock);
   m_model->addItem(task, NotificationType::sendNotification);
 
-  if (m_model->size() == 1)
-    runQueuedTask();
+  if (isQueued) {
+    m_queuedTasks.add(task);
+    if (m_queuedTasks.size() == 1)
+      runQueuedTask();
+  } else {
+    task->runThread([=](AsyncTask* task){
+      m_model->removeItem(task, NotificationType::sendNotification);
+    });
+  }
 }
 
 void TasksManager::runQueuedTask() {
-  if (auto task = m_model->getAt(0)) {
+  if (auto task = m_queuedTasks.getFirst()) {
     task->runThread([=](AsyncTask* task){
       m_model->removeItem(task, NotificationType::sendNotification);
+      m_queuedTasks.removeIf([&](AsyncTask::Ptr itemPtr){return itemPtr.get() == task;});
       runQueuedTask();
     });
   }

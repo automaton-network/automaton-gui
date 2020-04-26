@@ -41,16 +41,17 @@ class TasksManager : public DeletedAtShutdown {
   TasksManager();
   ~TasksManager();
 
-  static void launchTask(std::function<bool(AsyncTask*)> fun,
-                         std::function<void(AsyncTask*)> postAsyncAction,
-                         const String& title,
-                         Account::Ptr account);
+  static AsyncTask::Ptr launchTask(std::function<bool(AsyncTask*)> fun,
+                                   std::function<void(AsyncTask*)> postAsyncAction,
+                                   const String& title,
+                                   Account::Ptr account,
+                                   bool isQueued = true);
 
   static bool launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
                          std::function<void(TaskWithProgressWindow*)> postAction,
                          const String& title);
 
-  void addTask(AsyncTask::Ptr task);
+  void addTask(AsyncTask::Ptr task, bool isQueued);
   void runQueuedTask();
   std::shared_ptr<AsyncTaskModel> getModel();
 
@@ -58,5 +59,6 @@ class TasksManager : public DeletedAtShutdown {
 
  private:
   std::shared_ptr<AsyncTaskModel> m_model;
+  Array<AsyncTask::Ptr> m_queuedTasks;
   CriticalSection m_lock;
 };
