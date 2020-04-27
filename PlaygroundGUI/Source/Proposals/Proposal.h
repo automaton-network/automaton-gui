@@ -26,6 +26,12 @@
 
 class Proposal {
  public:
+  class Listener {
+   public:
+    virtual ~Listener() = default;
+    virtual void proposalChanged() = 0;
+  };
+
   enum class Status {
     Uninitialized = 0  // there is no proposal connected to this ballot
     // ACTIVE statuses
@@ -62,6 +68,7 @@ class Proposal {
   void setDocumentHash(const String& documentHash)  { m_documentHash = documentHash; }
   void setStatus(Proposal::Status status)           { m_status = status; }
 
+  void setSlots(const Array<uint64>& slots, NotificationType notify);
   void setInitialVotingEndDate(uint64 dateUnix);
   void setInitialContestEndDate(uint64 dateUnix);
   void setNextPaymentDate(uint64 dateUnix);
@@ -85,12 +92,25 @@ class Proposal {
   String getDocumentHash() const noexcept     { return m_documentHash; }
   Proposal::Status getStatus() const noexcept { return m_status; }
 
+  Array<uint64> getSlots() const              { return m_slots; }
   Time getInitialVotingEndDate() const noexcept     { return m_initialVotingEndDate; }
   Time getInitialContestEndDate() const noexcept    { return m_initialContestEndDate; }
   Time getNextPaymentDate() const noexcept          { return m_nextPaymentDate; }
 
   float getSpentPrecent() const;
   float getBounusPrecent() const;
+
+  void addListener(Listener* listener) {
+    m_listeners.add(listener);
+  }
+
+  void removeListener(Listener* listener) {
+    m_listeners.remove(listener);
+  }
+
+  void notifyChanged() {
+    m_listeners.call(&Listener::proposalChanged);
+  }
 
  private:
   uint64 m_id;
@@ -117,4 +137,7 @@ class Proposal {
   Time m_nextPaymentDate;
 
   Proposal::Status m_status;
+  Array<uint64> m_slots;
+
+  ListenerList<Listener> m_listeners;
 };

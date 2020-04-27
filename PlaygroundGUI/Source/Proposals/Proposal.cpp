@@ -109,6 +109,13 @@ bool Proposal::isRewardClaimable() const noexcept {
   return isClaimingActive;
 }
 
+void Proposal::setSlots(const Array<uint64>& slots, NotificationType notify) {
+  m_slots = slots;
+
+  if (notify != NotificationType::dontSendNotification)
+    notifyChanged();
+}
+
 void Proposal::setInitialVotingEndDate(uint64 dateUnix) {
   m_initialVotingEndDate = Time(dateUnix * 1000);
 }

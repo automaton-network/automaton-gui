@@ -36,6 +36,11 @@ void ProposalsModel::addItem(Proposal::Ptr item, NotificationType notification) 
   notifyModelChanged(notification);
 }
 
+void ProposalsModel::addItems(Array<Proposal::Ptr> items, NotificationType notification) {
+  m_items.addArray(items);
+  notifyModelChanged(notification);
+}
+
 void ProposalsModel::clear(NotificationType notification) {
   m_items.clearQuick();
   notifyModelChanged(notification);

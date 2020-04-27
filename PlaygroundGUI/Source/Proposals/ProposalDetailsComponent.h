@@ -27,7 +27,13 @@
 //==============================================================================
 /*
 */
-class ProposalDetailsComponent : public Component, public Button::Listener {
+
+class VoteSlotsGrid;
+
+class ProposalDetailsComponent : public Component
+  , public Button::Listener
+  , public Proposal::Listener
+  , public AsyncUpdater {
  public:
   ProposalDetailsComponent(Account::Ptr accountData);
   ~ProposalDetailsComponent();
@@ -37,6 +43,8 @@ class ProposalDetailsComponent : public Component, public Button::Listener {
   void paint(Graphics&) override;
   void resized() override;
   void buttonClicked(Button* button) override;
+  void proposalChanged() override;
+  void handleAsyncUpdate() override;
 
  private:
   Proposal::Ptr m_proposal;
@@ -45,6 +53,7 @@ class ProposalDetailsComponent : public Component, public Button::Listener {
   Label m_status;
   std::unique_ptr<HyperlinkButton> m_linkToDocument;
   std::unique_ptr<TextButton> m_backBtn;
+  std::unique_ptr<VoteSlotsGrid> m_slotsGrid;
 
   Account::Ptr m_accountData;
 

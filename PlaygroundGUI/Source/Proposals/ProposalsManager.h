@@ -30,7 +30,8 @@ class ProposalsManager {
   ~ProposalsManager();
 
   bool fetchProposals();
-  void addProposal(const Proposal& proposal, NotificationType notification);
+  bool fetchProposalVotes(Proposal::Ptr proposal);
+  void addProposal(Proposal::Ptr proposal, NotificationType notification);
   bool createProposal(Proposal::Ptr proposal, const String& contributor);
   bool payForGas(Proposal::Ptr proposal, uint64 slotsToPay);
   bool castVote(Proposal::Ptr proposal, uint64 choice);

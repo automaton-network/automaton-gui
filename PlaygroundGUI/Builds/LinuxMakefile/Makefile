@@ -88,6 +88,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/ProposalsPage_2056ab63.o \
   $(JUCE_OBJDIR)/Config_ddf25eb0.o \
   $(JUCE_OBJDIR)/FormMaker_de6ddb10.o \
+  $(JUCE_OBJDIR)/SlotsGrid_c0f7e2cb.o \
   $(JUCE_OBJDIR)/ValidatorGrid_67967568.o \
   $(JUCE_OBJDIR)/AutomatonContractData_2dae4430.o \
   $(JUCE_OBJDIR)/DemoGrid_cd2fdfb1.o \
@@ -216,6 +217,11 @@ $(JUCE_OBJDIR)/Config_ddf25eb0.o: ../../Source/Config/Config.cpp
 $(JUCE_OBJDIR)/FormMaker_de6ddb10.o: ../../Source/Components/FormMaker.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling FormMaker.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/SlotsGrid_c0f7e2cb.o: ../../Source/Components/SlotsGrid.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling SlotsGrid.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/ValidatorGrid_67967568.o: ../../Source/Components/ValidatorGrid.cpp

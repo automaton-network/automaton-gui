@@ -125,6 +125,10 @@
 			isa = PBXBuildFile;
 			fileRef = EB48C8B94DF3F88534EF2E02;
 		};
+		ED3FADA2A1778903DF17D688 = {
+			isa = PBXBuildFile;
+			fileRef = 740572ACE23F45A42BC820FB;
+		};
 		680397493A45449A817BD319 = {
 			isa = PBXBuildFile;
 			fileRef = 674BD8AB93DB872747B5BE69;
@@ -476,11 +480,25 @@
 			path = "../../Resources/default_config.json";
 			sourceTree = "SOURCE_ROOT";
 		};
+		6CAB651C4CF26AF67F72EACD = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = SlotsGrid.h;
+			path = ../../Source/Components/SlotsGrid.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		6E20455EDB2D36EF90214650 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = AccountsModel.h;
 			path = ../../Source/Login/AccountsModel.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		740572ACE23F45A42BC820FB = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = SlotsGrid.cpp;
+			path = ../../Source/Components/SlotsGrid.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		7CD743C8F4204EBC883A2C7F = {
@@ -942,6 +960,8 @@
 			children = (
 				EB48C8B94DF3F88534EF2E02,
 				510F04B2A4332278F5F209C3,
+				740572ACE23F45A42BC820FB,
+				6CAB651C4CF26AF67F72EACD,
 				674BD8AB93DB872747B5BE69,
 				A13B15A0E08E44FD6C17A560,
 			);
@@ -1340,6 +1360,7 @@
 				A43EEE53B12550669E555382,
 				AE1A08B1BFB106256FE4F53E,
 				88D3B11922D089AF4E26BDC0,
+				ED3FADA2A1778903DF17D688,
 				680397493A45449A817BD319,
 				C04966EEAA0333308456359D,
 				9104E8F6687A7FD224B757A9,

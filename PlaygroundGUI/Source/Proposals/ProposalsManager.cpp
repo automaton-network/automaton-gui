@@ -64,8 +64,12 @@ bool ProposalsManager::fetchProposals() {
     if (!s.is_ok())
       return false;
 
+    task->setStatusMessage("Fetching proposals...");
+
     // ballotBoxIDs initial value is 99, and the first proposal is at 100
     static const uint32_t PROPOSAL_START_ID = 100;
+    Array<Proposal::Ptr> proposals;
+
     for (int i = PROPOSAL_START_ID; i <= lastProposalId; ++i) {
       json jInput;
       jInput.push_back(i);
@@ -76,7 +80,7 @@ bool ProposalsManager::fetchProposals() {
       if (!s.is_ok())
         return false;
 
-      Proposal proposal(i, String(s.msg));
+      auto proposal = std::make_shared<Proposal>(i, String(s.msg));
 
       s = m_contractData->call("calcVoteDifference", params);
       if (!s.is_ok())
@@ -84,27 +88,28 @@ bool ProposalsManager::fetchProposals() {
 
       json j_output = json::parse(s.msg);
       const int approvalRating = std::stoi((*j_output.begin()).get<std::string>());
-      proposal.setApprovalRating(approvalRating);
+      proposal->setApprovalRating(approvalRating);
 
       const auto numSlotsPaid = getNumSlotsPaid(m_contractData, i, &s);
       if (!s.is_ok())
         return false;
 
-      proposal.setNumSlotsPaid(numSlotsPaid);
+      proposal->setNumSlotsPaid(numSlotsPaid);
       const bool areAllSlotsPaid = (numSlotsPaid == m_accountData->getContractData()->getSlotsNumber());
-      proposal.setAllSlotsPaid(areAllSlotsPaid);
+      proposal->setAllSlotsPaid(areAllSlotsPaid);
       if (!areAllSlotsPaid)
-        proposal.setStatus(Proposal::Status::PrepayingGas);
+        proposal->setStatus(Proposal::Status::PrepayingGas);
 
       // TODO(Kirill): set all aliases for all accounts we have
-      if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal.getCreator()))
-        proposal.setCreatorAlias(getEthAddressAlias());
+      if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal->getCreator()))
+        proposal->setCreatorAlias(getEthAddressAlias());
 
-      addProposal(proposal, NotificationType::dontSendNotification);
+      proposals.add(proposal);
     }
+
+    m_model->addItems(proposals, NotificationType::sendNotificationAsync);
     task->setStatusMessage("Fetched " + String(m_model->size()) + " proposals");
 
-    notifyProposalsUpdated();
     return true;
   }, [=](AsyncTask* task) {
   }, "Fetching proposals..."
@@ -113,12 +118,49 @@ bool ProposalsManager::fetchProposals() {
   return true;
 }
 
-void ProposalsManager::addProposal(const Proposal& proposal, NotificationType notification) {
-  m_model->addItem(std::make_shared<Proposal>(proposal), notification);
+bool ProposalsManager::fetchProposalVotes(Proposal::Ptr proposal) {
+    const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Fetch votes";
+    TasksManager::launchTask([&, proposal](AsyncTask* task) {
+    auto& s = task->m_status;
+    const int numOfSlots = m_accountData->getContractData()->getSlotsNumber();
+    task->setStatusMessage("Fetching " + String(numOfSlots) + " votes for proposal "
+                           + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
+
+    Array<uint64> slots;
+    for (int i = 0; i < numOfSlots; ++i) {
+      json jInput;
+      jInput.push_back(proposal->getId());
+      jInput.push_back(i);
+      std::string params = jInput.dump();
+
+      s = m_contractData->call("getVote", params);
+
+      if (!s.is_ok())
+        return false;
+
+      json j_output = json::parse(s.msg);
+      uint64 slotVote = static_cast<uint64>(String((*j_output.begin()).get<std::string>()).getLargeIntValue());
+      slots.add(slotVote);
+      task->setProgress(i / static_cast<double>(numOfSlots));
+    }
+
+    proposal->setSlots(slots, NotificationType::sendNotification);
+    task->setStatusMessage("Fetched " + String(numOfSlots) + " votes for proposal "
+                           + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
+}
+
+void ProposalsManager::addProposal(Proposal::Ptr proposal, NotificationType notification) {
+  m_model->addItem(proposal, notification);
 }
 
 bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& contributor) {
-  const auto topicName = "(" + String(proposal->getId()) + ") " + "Create proposal";
+  const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Create proposal";
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
