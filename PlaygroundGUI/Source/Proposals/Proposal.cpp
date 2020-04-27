@@ -60,13 +60,11 @@ Proposal::Proposal(uint32_t id, const String& jsonString)
     setLengthDays(std::stoul(json_proposal.at(4).get<std::string>()));
     setNumPeriods(std::stoul(json_proposal.at(5).get<std::string>()));
     setBudget(json_proposal.at(6).get<std::string>());
-    // TODO(Kirill)
-    // setNextPaymentDate(json_proposal.at(7.get<uint64_t>()));
+    setNextPaymentDate(std::stoul(json_proposal.at(7).get<std::string>()));
 
     setStatus(static_cast<Proposal::Status>(std::stoul(json_proposal.at(8).get<std::string>())));
-    // TODO(Kirill)
-    // setInitialEndDate(json_proposal.at(9).get<uint64_t>());
-    // setContestEndDate(json_proposal.at(10).get<uint64_t>());
+    setInitialVotingEndDate(std::stoul(json_proposal.at(9).get<std::string>()));
+    setInitialContestEndDate(std::stoul(json_proposal.at(10).get<std::string>()));
 }
 
 String Proposal::getStatusStr(Proposal::Status status) {
@@ -99,4 +97,26 @@ float Proposal::getSpentPrecent() const {
 
 float Proposal::getBounusPrecent() const {
   return getPercentage(m_targetBonus, m_budget);
+}
+
+bool Proposal::isRewardClaimable() const noexcept {
+  // TODO(Kirill) need to think which statuses are eligible for claiming (perhaps, Accepted, Completed as well)
+  // Temporarily enable claiming reward button at "Started" state as well. That's because proposal state is updated
+  // in smart contract only before each vote. So the proposal can have 100% approval rate but still remain in
+  // "Started" state until some action that calls updateProposalState() smart-contract function is performed.
+  const bool isClaimingActive = getStatus() == Proposal::Status::Accepted
+                                || getStatus() == Proposal::Status::Started;
+  return isClaimingActive;
+}
+
+void Proposal::setInitialVotingEndDate(uint64 dateUnix) {
+  m_initialVotingEndDate = Time(dateUnix * 1000);
+}
+
+void Proposal::setInitialContestEndDate(uint64 dateUnix) {
+  m_initialContestEndDate = Time(dateUnix * 1000);
+}
+
+void Proposal::setNextPaymentDate(uint64 dateUnix) {
+  m_nextPaymentDate = Time(dateUnix * 1000);
 }

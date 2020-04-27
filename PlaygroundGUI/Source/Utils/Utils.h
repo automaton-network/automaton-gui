@@ -30,6 +30,8 @@ class Utils {
   static String fromWei(CoinUnit unitTo, const String& value);
   static String toWei(CoinUnit unitTo, const String& value);
 
+  static bool isZeroTime(const Time& time);
+
   static const String numericalIntegerAllowed;
   static const String numericalFloatAllowed;
 };

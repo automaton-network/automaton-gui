@@ -62,6 +62,12 @@ class Proposal {
   void setDocumentHash(const String& documentHash)  { m_documentHash = documentHash; }
   void setStatus(Proposal::Status status)           { m_status = status; }
 
+  void setInitialVotingEndDate(uint64 dateUnix);
+  void setInitialContestEndDate(uint64 dateUnix);
+  void setNextPaymentDate(uint64 dateUnix);
+
+  bool isRewardClaimable() const noexcept;
+
   uint64 getId() const noexcept               { return m_id; }
   String getAmountSpent() const noexcept      { return m_amountSpent; }
   String getBudget() const noexcept           { return m_budget; }
@@ -78,6 +84,10 @@ class Proposal {
   String getDocumentLink() const noexcept     { return m_documentLink; }
   String getDocumentHash() const noexcept     { return m_documentHash; }
   Proposal::Status getStatus() const noexcept { return m_status; }
+
+  Time getInitialVotingEndDate() const noexcept     { return m_initialVotingEndDate; }
+  Time getInitialContestEndDate() const noexcept    { return m_initialContestEndDate; }
+  Time getNextPaymentDate() const noexcept          { return m_nextPaymentDate; }
 
   float getSpentPrecent() const;
   float getBounusPrecent() const;
@@ -101,6 +111,10 @@ class Proposal {
   String m_creatorAlias;
   String m_documentLink;
   String m_documentHash;
+
+  Time m_initialVotingEndDate;
+  Time m_initialContestEndDate;
+  Time m_nextPaymentDate;
 
   Proposal::Status m_status;
 };

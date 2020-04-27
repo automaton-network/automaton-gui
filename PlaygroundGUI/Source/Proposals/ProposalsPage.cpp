@@ -252,12 +252,7 @@ void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedPropo
   m_voteYesBtn->setEnabled(isRowSelected);
   m_voteNoBtn->setEnabled(isRowSelected);
 
-  // TODO(Kirill) need to think which statuses are eligible for claiming (perhaps, Accepted, Completed as well)
-  // Temporarily enable claiming reward button at "Started" state as well. That's because proposal state is updated
-  // in smart contract only before each vote. So the proposal can have 100% approval rate but still remain in
-  // "Started" state until some action that calls updateProposalState() smart-contract function is performed.
-  const bool isClaimingActive = proposalStatus == Proposal::Status::Accepted
-                                || proposalStatus == Proposal::Status::Started;
+  const bool isClaimingActive = selectedProposal->isRewardClaimable();
   if (isClaimingActive)
     m_claimRewardBtn->setTooltip("Claim your reward now!");
   else
@@ -401,6 +396,17 @@ void ProposalsPage::paintCell(Graphics& g,
                    0, 0, width, height / 2, Justification::centred);
         g.drawText(String(item->getNumSlotsPaid()) + String("/") + String(numSlots) + String(" paid"),
                    0, height / 2, width, height / 2, Justification::centred);
+      } else if (status == Proposal::Status::Started) {  // Voting state
+        const auto initialVotingEndDate = item->getInitialVotingEndDate();
+        if (Utils::isZeroTime(initialVotingEndDate) == false) {
+          const auto votingEnded = initialVotingEndDate.toMilliseconds() < Time::getCurrentTime().toMilliseconds();
+          const auto initialVotingEndDateMsg = (votingEnded ? "Ended at " : "Ends at ")
+                                                + initialVotingEndDate.toString(true, true, true, true);
+          g.drawText(Proposal::getStatusStr(item->getStatus()), 0, 0, width, height / 2, Justification::centred);
+          g.drawText(initialVotingEndDateMsg, 0, height / 2, width, height / 2, Justification::centred);
+        } else {
+          g.drawText("Started", 0, 0, width, height, Justification::centred);
+        }
       } else {
         g.drawText(Proposal::getStatusStr(item->getStatus()), 0, 0, width, height, Justification::centred);
       }
@@ -412,8 +418,27 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Budget: {
-      g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudget()) + String(" AUTO"),
-                 0, 0, width, height, Justification::centred);
+      // Due to smart contract's specifics, the proposal can be claimable even if it's still in Started state and
+      // next payment date is 0. Look at Proposal::isRewardClaimable() method for more details
+      const auto nextPaymentDate = item->getNextPaymentDate();
+      if (item->isRewardClaimable()
+          && Utils::isZeroTime(nextPaymentDate) == false) {
+        const auto claimableInMs = nextPaymentDate.toMilliseconds() - Time::getCurrentTime().toMilliseconds();
+        String claimText;
+        if (claimableInMs >= 0) {
+          const RelativeTime claimableInRelativeTime(claimableInMs / 1000);
+          claimText = "Claimable in " + claimableInRelativeTime.getDescription();
+        } else {
+          claimText = "Claim now!";
+        }
+        g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudget()) + String(" AUTO"),
+                   0, 0, width, height / 2, Justification::centred);
+        g.drawText(claimText,
+                   0, height / 2, width, height / 2, Justification::centred);
+      } else {
+        g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudget()) + String(" AUTO"),
+                   0, 0, width, height, Justification::centred);
+      }
       break;
     }
     case Periods: {

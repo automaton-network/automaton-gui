@@ -113,3 +113,7 @@ String Utils::toWei(CoinUnit unitTo, const String& value) {
 
   return (result * factor).toString(10);
 }
+
+bool Utils::isZeroTime(const Time& time) {
+  return time.toMilliseconds() == 0;
+}
