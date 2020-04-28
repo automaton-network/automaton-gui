@@ -139,11 +139,11 @@ void CreateProposalComponent::buttonClicked(Button* buttonThatWasClicked) {
     // Length days could be empty
 
     m_proposal->setTitle(m_titleEditor->getText());
-    m_proposal->setBudget(Utils::toWei(CoinUnit::AUTO, m_budgetEditor->getText()));
-    m_proposal->setNumPeriods(static_cast<uint64>(m_numPeriodsEditor->getText().getLargeIntValue()));
+    m_proposal->setBudgetPerPeriod(Utils::toWei(CoinUnit::AUTO, m_budgetEditor->getText()));
+    m_proposal->setNumPeriodsLeft(static_cast<uint64>(m_numPeriodsEditor->getText().getLargeIntValue()));
     // m_proposal->setTargetBonus(Utils::toWei(CoinUnit::AUTO, m_targetBonusEditor->getText()));
     if (!m_lengthDaysEditor->isEmpty())
-      m_proposal->setLengthDays(static_cast<uint64>(m_lengthDaysEditor->getText().getLargeIntValue()));
+      m_proposal->setBudgetPeriodLength(static_cast<uint64>(m_lengthDaysEditor->getText().getLargeIntValue()));
 
     m_listeners.call(&CreateProposalComponent::Listener::createProposalViewActionHappened,
                      this,

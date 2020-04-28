@@ -61,18 +61,18 @@ static uint64 getNumOrders(AutomatonContractData::Ptr contract, status* resStatu
   return ordersLength;
 }
 
-static std::string getEthBalance(AutomatonContractData::Ptr contract
-    , const std::string& m_ethAddress
-    , status* resStatus) {
+static std::string getEthBalance(AutomatonContractData::Ptr contract,
+                                 const std::string& m_ethAddress,
+                                 status* resStatus) {
   *resStatus = eth_getBalance(contract->getUrl(), m_ethAddress);
   BigInteger balance;
   balance.parseString(resStatus->msg, 16);
   return balance.toString(10).toStdString();
 }
 
-static std::string getAutoBalance(AutomatonContractData::Ptr contract
-    , const std::string& m_ethAddress
-    , status* resStatus) {
+static std::string getAutoBalance(AutomatonContractData::Ptr contract,
+                                  const std::string& m_ethAddress,
+                                  status* resStatus) {
   json jInput;
   jInput.push_back(m_ethAddress.substr(2));
   *resStatus = contract->call("balanceOf", jInput.dump());
@@ -101,7 +101,7 @@ bool DEXManager::fetchOrders() {
       return false;
 
     Array<Order::Ptr> orders;
-    for (int i = 1; i <= numOfOrders; ++i) {
+    for (size_t i = 1; i <= numOfOrders; ++i) {
       json jInput;
       jInput.push_back(i);
 
@@ -118,8 +118,7 @@ bool DEXManager::fetchOrders() {
 
     return true;
   }, [=](AsyncTask* task) {
-  }, "Fetching orders..."
-   , m_accountData);
+  }, "Fetching orders...", m_accountData);
 
   return true;
 }

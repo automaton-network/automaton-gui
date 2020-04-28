@@ -34,29 +34,29 @@ class Proposal {
 
   enum class Status {
     Uninitialized = 0  // there is no proposal connected to this ballot
-    // ACTIVE statuses
-    , Started    // first period of voting until initialEndDate
-    , Accepted   // enough "yes" votes during the initial voting period
-    , Contested  // too many "no" votes after the first approval ot the proposal
-    // INACTIVE statuses
-    , Rejected   // not enough "yes" votes during the initial period or during a contest period
-    , Completed  // the proposal was successfully implemented
-    , PrepayingGas  // the proposal is inactive until all slots are paid
+    , Started    // ACTIVE: first period of voting until initialEndDate
+    , Accepted   // ACTIVE: enough "yes" votes during the initial voting period
+    , Rejected   // INACTIVE: not enough "yes" votes during the initial period or during a contest period
+    , Contested  // ACTIVE: too many "no" votes after the first approval ot the proposal
+    , Completed  // INACTIVE: the proposal was successfully implemented
+    , PrepayingGas  // FAKE: the proposal is inactive until all slots are paid. This status is only for convenient.
   };
 
   using Ptr = std::shared_ptr<Proposal>;
 
   Proposal();
-  Proposal(uint32_t id, const String& jsonString);
+  Proposal(uint32_t id, const String& infoJsonString, const String& dataJsonString);
 
   static String getStatusStr(Proposal::Status status);
 
   void setId(uint64 id)                             { m_id = id; }
+  void setNumPeriodsLeft(uint64 numPeriodsLeft)     { m_numPeriodsLeft = numPeriodsLeft; }
+  void setBudgetPeriodLength(uint64 periodLength)   { m_budgetPeriodLength = periodLength; }
+  void setInitialPeriod(uint64 initialPeriod)       { m_initialPeriod = initialPeriod; }
+  void setContestPeriod(uint64 contestPeriod)       { m_contestPeriod = contestPeriod; }
   void setAmountSpent(const String& amountSpent)    { m_amountSpent = amountSpent; }
-  void setBudget(const String& budget)              { m_budget = budget; }
-  void setNumPeriods(uint64 numPeriods)             { m_numPeriods = numPeriods; }
+  void setBudgetPerPeriod(const String& budget)     { m_budgetPerPeriod = budget; }
   void setTargetBonus(const String& targetBonus)    { m_targetBonus = targetBonus; }
-  void setLengthDays(uint64 lengthDays)             { m_lengthDays = lengthDays; }
   void setApprovalRating(int approvalRating)        { m_approvalRating = approvalRating; }
   void setTimeLeftDays(int timeLeftDays)            { m_timeLeft = timeLeftDays; }
   void setNumSlotsPaid(uint64 numSlotsPaid)         { m_numSlotsPaid = numSlotsPaid; }
@@ -75,16 +75,18 @@ class Proposal {
 
   bool isRewardClaimable() const noexcept;
 
-  uint64 getId() const noexcept               { return m_id; }
+  uint64 getId() const noexcept                 { return m_id; }
+  uint64 getNumPeriodsLeft() const  noexcept    { return m_numPeriodsLeft; }
+  uint64 getBudgetPeriodLength() const noexcept { return m_budgetPeriodLength; }
+  uint64 getInitialPeriod() const noexcept      { return m_initialPeriod; }
+  uint64 getContestPeriod() const noexcept      { return m_contestPeriod; }
+  String getBudgetPerPeriod() const noexcept  { return m_budgetPerPeriod; }
   String getAmountSpent() const noexcept      { return m_amountSpent; }
-  String getBudget() const noexcept           { return m_budget; }
-  uint64 getNumPeriods() const  noexcept      { return m_numPeriods; }
   String getTargetBonus() const noexcept      { return m_targetBonus; }
-  uint64 getLengthDays() const noexcept       { return m_lengthDays; }
-  int getApprovalRating() const noexcept      { return m_approvalRating; }
-  int getTimeLeftDays() const noexcept        { return m_timeLeft; }
-  uint64 getNumSlotsPaid() const noexcept     { return m_numSlotsPaid; }
-  bool areAllSlotsPaid() const noexcept       { return m_areAllSlotsPaid; }
+  int getApprovalRating() const noexcept   { return m_approvalRating; }
+  int getTimeLeftDays() const noexcept     { return m_timeLeft; }
+  uint64 getNumSlotsPaid() const noexcept  { return m_numSlotsPaid; }
+  bool areAllSlotsPaid() const noexcept    { return m_areAllSlotsPaid; }
   String getTitle() const noexcept            { return m_title; }
   String getCreator() const noexcept          { return m_creator; }
   String getCreatorAlias() const noexcept     { return m_creatorAlias; }
@@ -92,7 +94,8 @@ class Proposal {
   String getDocumentHash() const noexcept     { return m_documentHash; }
   Proposal::Status getStatus() const noexcept { return m_status; }
 
-  Array<uint64> getSlots() const              { return m_slots; }
+  Array<uint64> getSlots() const { return m_slots; }
+
   Time getInitialVotingEndDate() const noexcept     { return m_initialVotingEndDate; }
   Time getInitialContestEndDate() const noexcept    { return m_initialContestEndDate; }
   Time getNextPaymentDate() const noexcept          { return m_nextPaymentDate; }
@@ -114,11 +117,14 @@ class Proposal {
 
  private:
   uint64 m_id;
+  uint64 m_numPeriodsLeft;
+  uint64 m_budgetPeriodLength;
+  uint64 m_initialPeriod;
+  uint64 m_contestPeriod;
+
+  String m_budgetPerPeriod;
   String m_amountSpent;
-  String m_budget;
-  uint64 m_numPeriods;
   String m_targetBonus;
-  uint32 m_lengthDays;
 
   int32 m_approvalRating;
   int32 m_timeLeft;

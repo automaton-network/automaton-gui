@@ -90,7 +90,7 @@ void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
   m_proposal->addListener(this);
   m_title.setText("Proposal " + proposal->getTitle(), NotificationType::dontSendNotification);
   m_reward.setText(Utils::fromWei(CoinUnit::AUTO,
-      proposal->getBudget()) + String(" AUTO"), NotificationType::dontSendNotification);
+      proposal->getBudgetPerPeriod()) + String(" AUTO"), NotificationType::dontSendNotification);
 
   String statusStr;
   if (!proposal->areAllSlotsPaid()) {

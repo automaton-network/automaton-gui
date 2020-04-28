@@ -75,12 +75,20 @@ bool ProposalsManager::fetchProposals() {
       jInput.push_back(i);
       std::string params = jInput.dump();
 
-      s = m_contractData->call("getProposal", params);
+      s = m_contractData->call("getProposalInfo", params);
 
       if (!s.is_ok())
         return false;
 
-      auto proposal = std::make_shared<Proposal>(i, String(s.msg));
+      const String proposalInfoJson = s.msg;
+
+      s = m_contractData->call("getProposalData", params);
+
+      if (!s.is_ok())
+        return false;
+
+      const String proposalDataJson = s.msg;
+      auto proposal = std::make_shared<Proposal>(i, proposalInfoJson, proposalDataJson);
 
       s = m_contractData->call("calcVoteDifference", params);
       if (!s.is_ok())
@@ -178,9 +186,9 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     jProposal.push_back(proposal->getTitle().toStdString());
     jProposal.push_back("google.com");
     jProposal.push_back("BA5EC0DE");
-    jProposal.push_back(proposal->getLengthDays());
-    jProposal.push_back(proposal->getNumPeriods());
-    jProposal.push_back(proposal->getBudget().toStdString());
+    jProposal.push_back(proposal->getBudgetPeriodLength());
+    jProposal.push_back(proposal->getNumPeriodsLeft());
+    jProposal.push_back(proposal->getBudgetPerPeriod().toStdString());
 
     task->setProgress(0.5);
 

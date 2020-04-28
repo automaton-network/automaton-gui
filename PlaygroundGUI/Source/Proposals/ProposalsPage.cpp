@@ -210,7 +210,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_proposalsManager->fetchProposals();
   } else if (buttonThatWasClicked == m_claimRewardBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    const auto budget = Utils::fromWei(CoinUnit::AUTO, proposal->getBudget());
+    const auto budget = Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod());
     const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
     AlertWindow w("Claim reward for " + proposal->getTitle() + " proposal",
                   rewardMsg,
@@ -314,20 +314,22 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     case Budget: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<String>::compareElements(p1->getBudget(), p2->getBudget());
+                * DefaultElementComparator<String>::compareElements(p1->getBudgetPerPeriod(), p2->getBudgetPerPeriod());
       };
       break;
     }
     case Periods: {
       sorter = [=](Proposal* p1, Proposal* p2) {
-        return direction * DefaultElementComparator<uint64>::compareElements(p1->getNumPeriods(), p2->getNumPeriods());
+        return direction * DefaultElementComparator<uint64>::compareElements(p1->getNumPeriodsLeft(),
+                                                                             p2->getNumPeriodsLeft());
       };
       break;
     }
     case Length: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<String>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
+                * DefaultElementComparator<uint64>::compareElements(p1->getBudgetPeriodLength(),
+                                                                    p2->getBudgetPeriodLength());
       };
       break;
     }
@@ -431,22 +433,22 @@ void ProposalsPage::paintCell(Graphics& g,
         } else {
           claimText = "Claim now!";
         }
-        g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudget()) + String(" AUTO"),
+        g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudgetPerPeriod()) + String(" AUTO"),
                    0, 0, width, height / 2, Justification::centred);
         g.drawText(claimText,
                    0, height / 2, width, height / 2, Justification::centred);
       } else {
-        g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudget()) + String(" AUTO"),
+        g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudgetPerPeriod()) + String(" AUTO"),
                    0, 0, width, height, Justification::centred);
       }
       break;
     }
     case Periods: {
-      g.drawText(String(item->getNumPeriods()), 0, 0, width, height, Justification::centred);
+      g.drawText(String(item->getNumPeriodsLeft()), 0, 0, width, height, Justification::centred);
       break;
     }
     case Length: {
-      const auto lengthDays = item->getLengthDays();
+      const auto lengthDays = item->getBudgetPeriodLength();
       // If length is zero - the proposal has no time limit
       if (lengthDays) {
         const String unit(lengthDays == 1 ? "day" : "days");

@@ -27,44 +27,57 @@ using json = nlohmann::json;
 
 Proposal::Proposal()
   : m_id(0)
+  , m_numPeriodsLeft(0)
+  , m_budgetPeriodLength(0)
+  , m_initialPeriod(0)
+  , m_contestPeriod(0)
+  , m_budgetPerPeriod(String(0))
   , m_amountSpent(String(0))
-  , m_budget(String(0))
-  , m_numPeriods(0)
   , m_targetBonus(String(0))
   , m_approvalRating(0)
-  , m_lengthDays(0)
   , m_timeLeft(0)
   , m_numSlotsPaid(0)
+  , m_areAllSlotsPaid(false)
   , m_status(Proposal::Status::Uninitialized) {
 }
 
-Proposal::Proposal(uint32_t id, const String& jsonString)
+Proposal::Proposal(uint32_t id, const String& infoJsonString, const String& dataJsonString)
   : m_id(0)
+  , m_numPeriodsLeft(0)
+  , m_budgetPeriodLength(0)
+  , m_initialPeriod(0)
+  , m_contestPeriod(0)
+  , m_budgetPerPeriod(String(0))
   , m_amountSpent(String(0))
-  , m_budget(String(0))
-  , m_numPeriods(0)
   , m_targetBonus(String(0))
   , m_approvalRating(0)
-  , m_lengthDays(0)
   , m_timeLeft(0)
+  , m_numSlotsPaid(0)
+  , m_areAllSlotsPaid(false)
   , m_status(Proposal::Status::Uninitialized) {
     setId(id);
 
-    json json_proposal = json::parse(jsonString.toStdString());
+    json json_proposal_info = json::parse(infoJsonString.toStdString());
+    json json_proposal_data = json::parse(dataJsonString.toStdString());
     // TODO(Kirill): add json error handling
 
-    setCreator(json_proposal.at(0).get<std::string>());
-    setTitle(json_proposal.at(1).get<std::string>());
-    setDocumentLink(json_proposal.at(2).get<std::string>());
-    setDocumentHash(json_proposal.at(3).get<std::string>());
-    setLengthDays(std::stoul(json_proposal.at(4).get<std::string>()));
-    setNumPeriods(std::stoul(json_proposal.at(5).get<std::string>()));
-    setBudget(json_proposal.at(6).get<std::string>());
-    setNextPaymentDate(std::stoul(json_proposal.at(7).get<std::string>()));
+    // Set "info" part
+    setCreator(json_proposal_info.at(0).get<std::string>());
+    setTitle(json_proposal_info.at(1).get<std::string>());
+    setDocumentLink(json_proposal_info.at(2).get<std::string>());
+    setDocumentHash(json_proposal_info.at(3).get<std::string>());
+    // divide by timeUnitInSeconds
+    setBudgetPeriodLength(std::stoul(json_proposal_info.at(4).get<std::string>()) / 24 / 60 / 60);
+    setBudgetPerPeriod(json_proposal_info.at(5).get<std::string>());
+    setInitialPeriod(std::stoul(json_proposal_info.at(6).get<std::string>()));
+    setContestPeriod(std::stoul(json_proposal_info.at(7).get<std::string>()));
 
-    setStatus(static_cast<Proposal::Status>(std::stoul(json_proposal.at(8).get<std::string>())));
-    setInitialVotingEndDate(std::stoul(json_proposal.at(9).get<std::string>()));
-    setInitialContestEndDate(std::stoul(json_proposal.at(10).get<std::string>()));
+    // Set "data" part
+    setNumPeriodsLeft(std::stoul(json_proposal_data.at(0).get<std::string>()));
+    setNextPaymentDate(std::stoul(json_proposal_data.at(1).get<std::string>()));
+    setStatus(static_cast<Proposal::Status>(std::stoul(json_proposal_data.at(2).get<std::string>())));
+    setInitialVotingEndDate(std::stoul(json_proposal_data.at(3).get<std::string>()));
+    setInitialContestEndDate(std::stoul(json_proposal_data.at(4).get<std::string>()));
 }
 
 String Proposal::getStatusStr(Proposal::Status status) {
@@ -92,11 +105,11 @@ static float getPercentage(const String& dividend, const String& divisor) {
 }
 
 float Proposal::getSpentPrecent() const {
-  return getPercentage(m_amountSpent, m_budget);
+  return getPercentage(m_amountSpent, m_budgetPerPeriod);
 }
 
 float Proposal::getBounusPrecent() const {
-  return getPercentage(m_targetBonus, m_budget);
+  return getPercentage(m_targetBonus, m_budgetPerPeriod);
 }
 
 bool Proposal::isRewardClaimable() const noexcept {

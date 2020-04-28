@@ -29,6 +29,7 @@ class DEXManager {
  public:
   DEXManager(Account::Ptr accountData);
   ~DEXManager();
+
   std::shared_ptr<OrdersModel> getModel();
 
   bool fetchOrders();
