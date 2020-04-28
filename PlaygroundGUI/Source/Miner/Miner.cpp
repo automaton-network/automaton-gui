@@ -86,7 +86,7 @@ class MinerThread: public Thread {
     memcpy(difficulty, owner->getDifficulty(), 32);
 
     while (!threadShouldExit()) {
-      unsigned int keys_generated = mine_key(mask, difficulty, pk);
+      unsigned int keys_generated = mine_key(mask, difficulty, pk, 1000);
       if (owner) {
         owner->processMinedKey(std::string(reinterpret_cast<const char*>(pk), 32), keys_generated);
       }
