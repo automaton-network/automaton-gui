@@ -235,6 +235,12 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
       }
     }
   }
+
+  // Update buttons state after each action
+  if (m_proposalsListBox->getNumSelectedRows()) {
+    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
+    updateButtonsForSelectedProposal(proposal);
+  }
 }
 
 void ProposalsPage::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
@@ -248,9 +254,9 @@ void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedPropo
   const auto proposalStatus = selectedProposal->getStatus();
   const bool isRowSelected = m_proposalsListBox->getNumSelectedRows() > 0;
   m_payForGasBtn->setEnabled(proposalStatus == Proposal::Status::PrepayingGas);
-  m_abandonProposalBtn->setEnabled(isRowSelected);
-  m_voteYesBtn->setEnabled(isRowSelected);
-  m_voteNoBtn->setEnabled(isRowSelected);
+  m_abandonProposalBtn->setEnabled(proposalStatus != Proposal::Status::PrepayingGas);
+  m_voteYesBtn->setEnabled(proposalStatus != Proposal::Status::PrepayingGas);
+  m_voteNoBtn->setEnabled(proposalStatus != Proposal::Status::PrepayingGas);
 
   const bool isClaimingActive = selectedProposal->isRewardClaimable();
   if (isClaimingActive)
