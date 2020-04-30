@@ -191,10 +191,13 @@ void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
   m_proposal = proposal;
   m_proposal->addListener(this);
   m_title.setText("Proposal " + proposal->getTitle(), NotificationType::dontSendNotification);
-  const String rewardStr = "Reward per period: " + Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod()) + String(" AUTO");
-  const String periodsStr = "Periods left: " + String(m_proposal->getNumPeriodsLeft());
+  const String rewardStr = "Reward per period: " +
+      Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod()) + String(" AUTO");
 
-  m_proposalDetailsLabel.setText(rewardStr + "\n\n" + periodsStr + "\n\n" + formatStatusString(m_proposal, m_accountData) +
+  const String periodsStr = "Periods left: " + String(m_proposal->getNumPeriodsLeft());
+  m_proposalDetailsLabel.setText(rewardStr +
+                                 "\n\n" + periodsStr +
+                                 "\n\n" + formatStatusString(m_proposal, m_accountData) +
                                  "\n\n" + formatClaimString(m_proposal), NotificationType::dontSendNotification);
 
   m_linkToDocument->setButtonText(proposal->getDocumentLink());
@@ -250,11 +253,9 @@ void ProposalDetailsComponent::buttonClicked(Button* button) {
     m_accountData->getProposalsManager()->castVote(m_proposal, 1);
   } else if (button == m_voteNoBtn.get()) {
     m_accountData->getProposalsManager()->castVote(m_proposal, 2);
-  }
-  else if (button == m_unspecifiedBtn.get()) {
+  } else if (button == m_unspecifiedBtn.get()) {
     m_accountData->getProposalsManager()->castVote(m_proposal, 0);
-  }
-  else if (button == m_claimRewardBtn.get()) {
+  } else if (button == m_claimRewardBtn.get()) {
     const auto budget = Utils::fromWei(CoinUnit::AUTO, m_proposal->getBudgetPerPeriod());
     const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
     AlertWindow w("Claim reward for " + m_proposal->getTitle() + " proposal",
