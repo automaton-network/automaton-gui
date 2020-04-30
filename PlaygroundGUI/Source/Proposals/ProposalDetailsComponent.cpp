@@ -23,6 +23,9 @@
 #include "ProposalDetailsComponent.h"
 #include "../Data/AutomatonContractData.h"
 #include "ProposalsManager.h"
+#include "automaton/core/io/io.h"
+
+using automaton::core::io::bin2hex;
 
 class VoteSlotsGrid : public SlotsGrid {
  public:
@@ -49,7 +52,7 @@ class VoteSlotsGrid : public SlotsGrid {
     }
 
     if (isHighlighted)
-      slotColour = Colours::black;
+      slotColour = slotColour.contrasting(0.1f);
 
     return slotColour;
   }
@@ -66,10 +69,11 @@ class VoteSlotsGrid : public SlotsGrid {
     String slotInfo;
     slotInfo << "Slot: " << slotIndex << "\n" <<
                 "Vote: " << (vote == 1 ? "YES" : vote == 2 ? "NO" : "Unspecified") << "\n" <<
-                "Owner: " << m_validatorSlots[slotIndex].owner << "\n";
+                "Owner: " << m_validatorSlots[slotIndex].owner << "\n" <<
+                "Difficulty:" << bin2hex(m_validatorSlots[slotIndex].difficulty) << "\n";
 
     m_popup.m_label.setText(slotInfo, NotificationType::dontSendNotification);
-    m_popup.setSize(400, 80);
+    m_popup.setSize(450, 100);
     m_popup.setVisible(true);
     return &m_popup;
   }

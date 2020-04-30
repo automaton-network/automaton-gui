@@ -63,6 +63,7 @@ void SlotsGrid::timerCallback() {
   stopTimer();
   if (m_popupComponent != nullptr) {
     m_popupComponent->setTopLeftPosition(Desktop::getMousePosition());
+    m_popupComponent->setAlwaysOnTop(true);
     m_popupComponent->addToDesktop(ComponentPeer::StyleFlags::windowIsTemporary);
   }
 }
