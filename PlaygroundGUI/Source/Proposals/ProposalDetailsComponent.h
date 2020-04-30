@@ -50,8 +50,7 @@ class ProposalDetailsComponent : public Component
  private:
   Proposal::Ptr m_proposal;
   Label m_title;
-  Label m_reward;
-  Label m_status;
+  Label m_proposalDetailsLabel;
   std::unique_ptr<HyperlinkButton> m_linkToDocument;
   std::unique_ptr<TextButton> m_backBtn;
   std::unique_ptr<VoteSlotsGrid> m_slotsGrid;

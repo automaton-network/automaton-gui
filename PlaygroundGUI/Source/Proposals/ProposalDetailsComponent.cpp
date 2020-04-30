@@ -124,8 +124,7 @@ ProposalDetailsComponent::ProposalDetailsComponent(Account::Ptr accountData) : m
   m_claimRewardBtn->addListener(this);
 
   addAndMakeVisible(m_title);
-  addAndMakeVisible(m_reward);
-  addAndMakeVisible(m_status);
+  addAndMakeVisible(m_proposalDetailsLabel);
   addAndMakeVisible(m_linkToDocument.get());
   addAndMakeVisible(m_backBtn.get());
   addAndMakeVisible(m_slotsGrid.get());
@@ -162,6 +161,27 @@ static String formatStatusString(Proposal::Ptr proposal, Account::Ptr accountDat
 
   return result;
 }
+
+static String formatClaimString(Proposal::Ptr proposal) {
+  String result;
+
+  const auto nextPaymentDate = proposal->getNextPaymentDate();
+  if (proposal->isRewardClaimable()
+      && Utils::isZeroTime(nextPaymentDate) == false) {
+    const auto claimableInMs = nextPaymentDate.toMilliseconds() - Time::getCurrentTime().toMilliseconds();
+    String claimText;
+    if (claimableInMs >= 0) {
+      const RelativeTime claimableInRelativeTime(claimableInMs / 1000);
+      claimText = "Claimable in " + claimableInRelativeTime.getDescription();
+    } else {
+      claimText = "Claim now!";
+    }
+    result << claimText;
+  }
+
+  return result;
+}
+
 void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
   if (!proposal) {
     setVisible(false);
@@ -171,10 +191,12 @@ void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
   m_proposal = proposal;
   m_proposal->addListener(this);
   m_title.setText("Proposal " + proposal->getTitle(), NotificationType::dontSendNotification);
-  m_reward.setText("Reward per period: " + Utils::fromWei(CoinUnit::AUTO,
-      proposal->getBudgetPerPeriod()) + String(" AUTO"), NotificationType::dontSendNotification);
+  const String rewardStr = "Reward per period: " + Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod()) + String(" AUTO");
+  const String periodsStr = "Periods left: " + String(m_proposal->getNumPeriodsLeft());
 
-  m_status.setText(formatStatusString(m_proposal, m_accountData), NotificationType::dontSendNotification);
+  m_proposalDetailsLabel.setText(rewardStr + "\n\n" + periodsStr + "\n\n" + formatStatusString(m_proposal, m_accountData) +
+                                 "\n\n" + formatClaimString(m_proposal), NotificationType::dontSendNotification);
+
   m_linkToDocument->setButtonText(proposal->getDocumentLink());
   m_linkToDocument->setURL(URL(proposal->getDocumentLink()));
   m_slotsGrid->setSlots(m_proposal->getSlots(), m_accountData->getContractData()->getSlots());
@@ -202,8 +224,7 @@ void ProposalDetailsComponent::paint(Graphics& g) {
 void ProposalDetailsComponent::resized() {
   auto bounds = getLocalBounds().removeFromLeft(getWidth() / 2);
   m_title.setBounds(bounds.removeFromTop(40));
-  m_reward.setBounds(bounds.removeFromTop(30));
-  m_status.setBounds(bounds.removeFromTop(30));
+  m_proposalDetailsLabel.setBounds(bounds.removeFromTop(100));
   m_linkToDocument->setBounds(bounds.removeFromTop(30));
   m_backBtn->setBounds(bounds.removeFromBottom(30).removeFromLeft(100));
 
