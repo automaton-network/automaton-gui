@@ -127,8 +127,11 @@ bool ProposalsManager::fetchProposals() {
 }
 
 bool ProposalsManager::fetchProposalVotes(Proposal::Ptr proposal) {
-    const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Fetch votes";
-    TasksManager::launchTask([&, proposal](AsyncTask* task) {
+  if (!proposal)
+    return false;
+
+  const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Fetch votes";
+  TasksManager::launchTask([&, proposal](AsyncTask* task) {
     auto& s = task->m_status;
     const int numOfSlots = m_accountData->getContractData()->getSlotsNumber();
     task->setStatusMessage("Fetching " + String(numOfSlots) + " votes for proposal "
@@ -210,6 +213,9 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
 }
 
 bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
+  if (!proposal)
+    return false;
+
   if (proposal->getId() <= 0) {
     AlertWindow::showMessageBoxAsync(
       AlertWindow::WarningIcon,
@@ -329,6 +335,9 @@ static uint64 getLastProposalId(AutomatonContractData::Ptr contract, status* res
 }
 
 bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
+  if (!proposal)
+    return false;
+
   if (proposal->getId() <= 0) {
     AlertWindow::showMessageBoxAsync(
       AlertWindow::WarningIcon,
@@ -389,6 +398,9 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
 }
 
 bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardAmount) {
+  if (!proposal)
+    return false;
+
   if (proposal->getId() <= 0) {
     AlertWindow::showMessageBoxAsync(
       AlertWindow::WarningIcon,
