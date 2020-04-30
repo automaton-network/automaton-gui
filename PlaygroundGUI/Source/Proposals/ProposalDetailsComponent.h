@@ -39,6 +39,7 @@ class ProposalDetailsComponent : public Component
   ~ProposalDetailsComponent();
 
   void setProposal(Proposal::Ptr proposal);
+  void updateButtonsForProposal();
 
   void paint(Graphics&) override;
   void resized() override;
@@ -54,6 +55,11 @@ class ProposalDetailsComponent : public Component
   std::unique_ptr<HyperlinkButton> m_linkToDocument;
   std::unique_ptr<TextButton> m_backBtn;
   std::unique_ptr<VoteSlotsGrid> m_slotsGrid;
+
+  std::unique_ptr<TextButton> m_voteYesBtn;
+  std::unique_ptr<TextButton> m_voteNoBtn;
+  std::unique_ptr<TextButton> m_unspecifiedBtn;
+  std::unique_ptr<TextButton> m_claimRewardBtn;
 
   Account::Ptr m_accountData;
 

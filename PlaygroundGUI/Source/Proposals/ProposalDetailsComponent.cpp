@@ -112,17 +112,56 @@ ProposalDetailsComponent::ProposalDetailsComponent(Account::Ptr accountData) : m
 
   m_backBtn->addListener(this);
 
+  m_title.setFont(m_title.getFont().withHeight(35));
+
+  m_voteYesBtn = std::make_unique<TextButton>(translate("Vote YES"));
+  m_voteYesBtn->addListener(this);
+  m_voteNoBtn = std::make_unique<TextButton>(translate("Vote NO"));
+  m_voteNoBtn->addListener(this);
+  m_unspecifiedBtn = std::make_unique<TextButton>(translate("Vote Unspecified"));
+  m_unspecifiedBtn->addListener(this);
+  m_claimRewardBtn = std::make_unique<TextButton>(translate("Claim reward"));
+  m_claimRewardBtn->addListener(this);
+
   addAndMakeVisible(m_title);
   addAndMakeVisible(m_reward);
   addAndMakeVisible(m_status);
   addAndMakeVisible(m_linkToDocument.get());
   addAndMakeVisible(m_backBtn.get());
   addAndMakeVisible(m_slotsGrid.get());
+  addAndMakeVisible(m_voteYesBtn.get());
+  addAndMakeVisible(m_voteNoBtn.get());
+  addAndMakeVisible(m_unspecifiedBtn.get());
+  addAndMakeVisible(m_claimRewardBtn.get());
 }
 
 ProposalDetailsComponent::~ProposalDetailsComponent() {
 }
 
+static String formatStatusString(Proposal::Ptr proposal, Account::Ptr accountData) {
+  const auto status = proposal->getStatus();
+  const auto areAllSlotsPaid = proposal->areAllSlotsPaid();
+  const auto numSlots = accountData->getContractData()->getSlotsNumber();
+  String result;
+  if (!areAllSlotsPaid) {
+    result << Proposal::getStatusStr(Proposal::Status::PrepayingGas) << " "
+    << String(proposal->getNumSlotsPaid()) + String("/") + String(numSlots) + String(" paid");
+  } else if (status == Proposal::Status::Started) {  // Voting state
+    const auto initialVotingEndDate = proposal->getInitialVotingEndDate();
+    if (Utils::isZeroTime(initialVotingEndDate) == false) {
+      const auto votingEnded = initialVotingEndDate.toMilliseconds() < Time::getCurrentTime().toMilliseconds();
+      const auto initialVotingEndDateMsg = (votingEnded ? "Ended at " : "Ends at ")
+          + initialVotingEndDate.toString(true, true, true, true);
+      result << Proposal::getStatusStr(proposal->getStatus()) << " " << initialVotingEndDateMsg;
+    } else {
+      result << "Started";
+    }
+  } else {
+    result << Proposal::getStatusStr(proposal->getStatus());
+  }
+
+  return result;
+}
 void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
   if (!proposal) {
     setVisible(false);
@@ -132,23 +171,27 @@ void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
   m_proposal = proposal;
   m_proposal->addListener(this);
   m_title.setText("Proposal " + proposal->getTitle(), NotificationType::dontSendNotification);
-  m_reward.setText(Utils::fromWei(CoinUnit::AUTO,
+  m_reward.setText("Reward per period: " + Utils::fromWei(CoinUnit::AUTO,
       proposal->getBudgetPerPeriod()) + String(" AUTO"), NotificationType::dontSendNotification);
 
-  String statusStr;
-  if (!proposal->areAllSlotsPaid()) {
-    const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
-    statusStr = Proposal::getStatusStr(Proposal::Status::PrepayingGas) + " ("
-        + String(proposal->getNumSlotsPaid()) + String("/") + String(numSlots) + String(") paid");
-  } else {
-    statusStr = Proposal::getStatusStr(proposal->getStatus());
-  }
-
-  m_status.setText(statusStr, NotificationType::dontSendNotification);
+  m_status.setText(formatStatusString(m_proposal, m_accountData), NotificationType::dontSendNotification);
   m_linkToDocument->setButtonText(proposal->getDocumentLink());
   m_linkToDocument->setURL(URL(proposal->getDocumentLink()));
   m_slotsGrid->setSlots(m_proposal->getSlots(), m_accountData->getContractData()->getSlots());
   m_accountData->getProposalsManager()->fetchProposalVotes(m_proposal);
+  updateButtonsForProposal();
+}
+
+void ProposalDetailsComponent::updateButtonsForProposal() {
+  const auto proposalStatus = m_proposal->getStatus();
+
+  const bool isClaimingActive = m_proposal->isRewardClaimable();
+  if (isClaimingActive)
+    m_claimRewardBtn->setTooltip("Claim your reward now!");
+  else
+    m_claimRewardBtn->setTooltip("Proposal claiming is unavailable. Check proposal status, please");
+
+  m_claimRewardBtn->setEnabled(isClaimingActive);
 }
 
 void ProposalDetailsComponent::paint(Graphics& g) {
@@ -158,11 +201,21 @@ void ProposalDetailsComponent::paint(Graphics& g) {
 
 void ProposalDetailsComponent::resized() {
   auto bounds = getLocalBounds().removeFromLeft(getWidth() / 2);
-  m_title.setBounds(bounds.removeFromTop(30));
+  m_title.setBounds(bounds.removeFromTop(40));
   m_reward.setBounds(bounds.removeFromTop(30));
   m_status.setBounds(bounds.removeFromTop(30));
   m_linkToDocument->setBounds(bounds.removeFromTop(30));
   m_backBtn->setBounds(bounds.removeFromBottom(30).removeFromLeft(100));
+
+  bounds.removeFromTop(30);
+  auto buttonsBounds = bounds.removeFromTop(30);
+  m_voteYesBtn->setBounds(buttonsBounds.removeFromLeft(75));
+  buttonsBounds.removeFromLeft(5);
+  m_voteNoBtn->setBounds(buttonsBounds.removeFromLeft(75));
+  buttonsBounds.removeFromLeft(5);
+  m_unspecifiedBtn->setBounds(buttonsBounds.removeFromLeft(100));
+  buttonsBounds.removeFromLeft(5);
+  m_claimRewardBtn->setBounds(buttonsBounds.removeFromLeft(100));
 
   auto gridBounds = getLocalBounds().removeFromRight(getWidth() / 2);
   m_slotsGrid->setBounds(gridBounds);
@@ -172,6 +225,39 @@ void ProposalDetailsComponent::buttonClicked(Button* button) {
   if (m_backBtn.get() == button) {
     m_proposal->removeListener(this);
     setVisible(false);
+  } else if (button == m_voteYesBtn.get()) {
+    m_accountData->getProposalsManager()->castVote(m_proposal, 1);
+  } else if (button == m_voteNoBtn.get()) {
+    m_accountData->getProposalsManager()->castVote(m_proposal, 2);
+  }
+  else if (button == m_unspecifiedBtn.get()) {
+    m_accountData->getProposalsManager()->castVote(m_proposal, 0);
+  }
+  else if (button == m_claimRewardBtn.get()) {
+    const auto budget = Utils::fromWei(CoinUnit::AUTO, m_proposal->getBudgetPerPeriod());
+    const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
+    AlertWindow w("Claim reward for " + m_proposal->getTitle() + " proposal",
+                  rewardMsg,
+                  AlertWindow::QuestionIcon);
+
+    w.addTextEditor("rewardAmount", "", "Reward Amount:", false);
+    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+    w.getTextEditor("rewardAmount")->setInputRestrictions(8, "0123456789.");
+
+    if (w.runModalLoop() == 1) {
+      const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
+      std::cout << "Reward amount: " << rewardAmount << std::endl;
+      if (rewardAmount > 0.0) {
+        const auto rewardAmountWei = Utils::toWei(CoinUnit::AUTO, w.getTextEditorContents("rewardAmount"));
+        m_accountData->getProposalsManager()->claimReward(m_proposal, rewardAmountWei);
+      } else {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                         "Invalid data",
+                                         "Enter correct amount of reward to claim");
+      }
+    }
   }
 }
 void ProposalDetailsComponent::proposalChanged() {
