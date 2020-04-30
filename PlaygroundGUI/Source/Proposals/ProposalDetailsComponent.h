@@ -40,6 +40,7 @@ class ProposalDetailsComponent : public Component
 
   void setProposal(Proposal::Ptr proposal);
   void updateButtonsForProposal();
+  void updateVotesView();
 
   void paint(Graphics&) override;
   void resized() override;

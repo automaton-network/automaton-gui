@@ -203,8 +203,7 @@ void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
   m_linkToDocument->setButtonText(proposal->getDocumentLink());
   m_linkToDocument->setURL(URL(proposal->getDocumentLink()));
   m_slotsGrid->setSlots(m_proposal->getSlots(), m_accountData->getContractData()->getSlots());
-  m_accountData->getProposalsManager()->fetchProposalVotes(m_proposal);
-  updateButtonsForProposal();
+  updateVotesView();
 }
 
 void ProposalDetailsComponent::updateButtonsForProposal() {
@@ -241,7 +240,9 @@ void ProposalDetailsComponent::resized() {
   buttonsBounds.removeFromLeft(5);
   m_claimRewardBtn->setBounds(buttonsBounds.removeFromLeft(100));
 
-  auto gridBounds = getLocalBounds().removeFromRight(getWidth() / 2);
+  const auto gridSize = jmin(getWidth() / 2, getHeight());
+  const auto gridBounds = getLocalBounds().removeFromRight(getWidth() / 2)
+                            .withSize(gridSize, gridSize).withRightX(getWidth());
   m_slotsGrid->setBounds(gridBounds);
 }
 
@@ -251,10 +252,13 @@ void ProposalDetailsComponent::buttonClicked(Button* button) {
     setVisible(false);
   } else if (button == m_voteYesBtn.get()) {
     m_accountData->getProposalsManager()->castVote(m_proposal, 1);
+    updateVotesView();
   } else if (button == m_voteNoBtn.get()) {
     m_accountData->getProposalsManager()->castVote(m_proposal, 2);
+    updateVotesView();
   } else if (button == m_unspecifiedBtn.get()) {
     m_accountData->getProposalsManager()->castVote(m_proposal, 0);
+    updateVotesView();
   } else if (button == m_claimRewardBtn.get()) {
     const auto budget = Utils::fromWei(CoinUnit::AUTO, m_proposal->getBudgetPerPeriod());
     const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
@@ -288,4 +292,9 @@ void ProposalDetailsComponent::proposalChanged() {
 
 void ProposalDetailsComponent::handleAsyncUpdate() {
   m_slotsGrid->setSlots(m_proposal->getSlots(), m_accountData->getContractData()->getSlots());
+}
+
+void ProposalDetailsComponent::updateVotesView() {
+  m_accountData->getProposalsManager()->fetchProposalVotes(m_proposal);
+  updateButtonsForProposal();
 }
