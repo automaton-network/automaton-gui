@@ -258,6 +258,11 @@ uint32_t AutomatonContractData::getSlotsClaimed() const noexcept {
   return m_slotsClaimed;
 }
 
+std::vector<ValidatorSlot> AutomatonContractData::getSlots() const {
+  ScopedLock sl(m_criticalSection);
+  return m_slots;
+}
+
 Config& AutomatonContractData::getConfig() {
   return config;
 }

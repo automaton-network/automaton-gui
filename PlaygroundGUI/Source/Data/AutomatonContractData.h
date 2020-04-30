@@ -59,6 +59,7 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
   std::string getMinDifficulty() const noexcept;
   uint32_t getSlotsNumber() const noexcept;
   uint32_t getSlotsClaimed() const noexcept;
+  std::vector<ValidatorSlot> getSlots() const;
 
   std::string m_contractAbi;
   std::string m_ethUrl;

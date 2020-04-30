@@ -21,14 +21,23 @@
 
 #include "JuceHeader.h"
 
-class SlotsGrid : public Component {
+class SlotsGrid : public Component,
+                  public Timer {
  public:
   void paint(Graphics& g) override;
+  void mouseMove(const MouseEvent& event) override;
+  void mouseExit(const MouseEvent& event) override;
+  void timerCallback() override;
+  int getSlotIndex(const Point<float>& pos);
 
   virtual void updateContent();
-  virtual Colour getSlotColour(int slotIndex) = 0;
+  virtual Colour getSlotColour(int slotIndex, bool isHighlighted) = 0;
   virtual int getNumOfSlots() = 0;
+  virtual Component* getPopupComponent(int slotIndex) = 0;
 
  private:
   int m_numOfSlotsPerSide = 0;
+  int m_slotSize = 0;
+  int m_highlightedSlot = -1;
+  Component* m_popupComponent = nullptr;
 };

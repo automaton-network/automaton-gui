@@ -32,23 +32,46 @@ class VoteSlotsGrid : public SlotsGrid {
     addAndMakeVisible(m_message);
   }
 
-  void setSlots(const Array<uint64>& slots) {
+  void setSlots(const Array<uint64>& slots, const std::vector<ValidatorSlot>& validatorSlots) {
     m_slots = slots;
+    m_validatorSlots = validatorSlots;
     m_message.setVisible(m_slots.size() == 0);
     updateContent();
   }
 
-  Colour getSlotColour(int slotIndex) override {
+  Colour getSlotColour(int slotIndex, bool isHighlighted) override {
+    Colour slotColour;
     switch (m_slots[slotIndex]) {
-      case 0: return Colour(0xffbdbdbd);  // light gray
-      case 1: return Colour(0xff388e3c);  // Material green
-      case 2: return Colour(0xffff5252);  // Material red
-      default: return Colours::blue;  // Display blue as an unimplemented slot vote (mostly for debug purposes)
+      case 0: slotColour = Colour(0xffbdbdbd); break;  // light gray
+      case 1: slotColour = Colour(0xff388e3c); break;  // Material green
+      case 2: slotColour = Colour(0xffff5252); break;  // Material red
+      default: slotColour = Colours::blue;  // Display blue as an unimplemented slot vote (mostly for debug purposes)
     }
+
+    if (isHighlighted)
+      slotColour = Colours::black;
+
+    return slotColour;
   }
 
   int getNumOfSlots() override {
     return m_slots.size();
+  }
+
+  Component* getPopupComponent(int slotIndex) override {
+    if (slotIndex < 0)
+      return nullptr;
+
+    const auto vote = m_slots[slotIndex];
+    String slotInfo;
+    slotInfo << "Slot: " << slotIndex << "\n" <<
+                "Vote: " << (vote == 1 ? "YES" : vote == 2 ? "NO" : "Unspecified") << "\n" <<
+                "Owner: " << m_validatorSlots[slotIndex].owner << "\n";
+
+    m_popup.m_label.setText(slotInfo, NotificationType::dontSendNotification);
+    m_popup.setSize(400, 80);
+    m_popup.setVisible(true);
+    return &m_popup;
   }
 
   void resized() {
@@ -58,6 +81,22 @@ class VoteSlotsGrid : public SlotsGrid {
  private:
   Label m_message;
   Array<uint64> m_slots;
+  std::vector<ValidatorSlot> m_validatorSlots;
+
+  class SlotPopup : public Component {
+   public:
+    SlotPopup() {
+      addAndMakeVisible(m_label);
+    }
+    void resized() override {
+      m_label.setBounds(getLocalBounds());
+    }
+    void paint(Graphics& g) override {
+      g.fillAll(Colour(0xff404040));
+    }
+
+    Label m_label;
+  } m_popup;
 };
 
 //==============================================================================
@@ -104,7 +143,7 @@ void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
   m_status.setText(statusStr, NotificationType::dontSendNotification);
   m_linkToDocument->setButtonText(proposal->getDocumentLink());
   m_linkToDocument->setURL(URL(proposal->getDocumentLink()));
-  m_slotsGrid->setSlots(m_proposal->getSlots());
+  m_slotsGrid->setSlots(m_proposal->getSlots(), m_accountData->getContractData()->getSlots());
   m_accountData->getProposalsManager()->fetchProposalVotes(m_proposal);
 }
 
@@ -136,5 +175,5 @@ void ProposalDetailsComponent::proposalChanged() {
 }
 
 void ProposalDetailsComponent::handleAsyncUpdate() {
-  m_slotsGrid->setSlots(m_proposal->getSlots());
+  m_slotsGrid->setSlots(m_proposal->getSlots(), m_accountData->getContractData()->getSlots());
 }

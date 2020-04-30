@@ -23,14 +23,14 @@
 void SlotsGrid::paint(Graphics& g) {
   if (m_numOfSlotsPerSide != 0) {
     auto bounds = getLocalBounds();
-    const int slotSize = bounds.getWidth() / m_numOfSlotsPerSide;
+    m_slotSize = getWidth() / m_numOfSlotsPerSide;
 
     int slotIndex = 0;
     for (int i = 0; i < m_numOfSlotsPerSide; ++i) {
-      auto rowBounds = bounds.removeFromTop(slotSize);
+      auto rowBounds = bounds.removeFromTop(m_slotSize);
       for (int j = 0; j < m_numOfSlotsPerSide; ++j) {
-        const auto slotRect = rowBounds.removeFromLeft(slotSize);
-        g.setColour(getSlotColour(slotIndex));
+        const auto slotRect = rowBounds.removeFromLeft(m_slotSize);
+        g.setColour(getSlotColour(slotIndex, m_highlightedSlot == slotIndex));
         g.fillRect(slotRect);
         g.setColour(Colours::black);
         g.drawRect(slotRect);
@@ -38,6 +38,46 @@ void SlotsGrid::paint(Graphics& g) {
       }
     }
   }
+}
+
+void SlotsGrid::mouseMove(const MouseEvent& event) {
+  const auto highlightedSlot = getSlotIndex(event.position);
+  if (m_highlightedSlot != highlightedSlot) {
+    startTimer(500);
+    m_highlightedSlot = highlightedSlot;
+
+    if (m_popupComponent != nullptr)
+      m_popupComponent->removeFromDesktop();
+
+    m_popupComponent = getPopupComponent(m_highlightedSlot);
+  }
+
+  repaint();
+}
+
+void SlotsGrid::mouseExit(const MouseEvent& event) {
+  mouseMove(event);
+}
+
+void SlotsGrid::timerCallback() {
+  stopTimer();
+  if (m_popupComponent != nullptr) {
+    m_popupComponent->setTopLeftPosition(Desktop::getMousePosition());
+    m_popupComponent->addToDesktop(ComponentPeer::StyleFlags::windowIsTemporary);
+  }
+}
+
+int SlotsGrid::getSlotIndex(const Point<float>& pos) {
+  if (m_slotSize <= 0)
+    return -1;
+
+  const int column = static_cast<int>(std::ceil(pos.x / m_slotSize)) - 1;
+  const int row = static_cast<int>(std::ceil(pos.y / m_slotSize)) - 1;
+
+  if (isPositiveAndBelow(column, m_numOfSlotsPerSide) && isPositiveAndBelow (row, m_numOfSlotsPerSide))
+    return row * m_numOfSlotsPerSide + column;
+
+  return -1;
 }
 
 void SlotsGrid::updateContent() {
