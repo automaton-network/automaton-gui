@@ -33,16 +33,24 @@ class Order {
 
   using Ptr = std::shared_ptr<Order>;
 
-  Order(const String& jsonString);
+  Order(uint64 id, const String& jsonString);
 
-  BigInteger getAuto() const { return m_auto; }
-  BigInteger getEth() const { return m_eth; }
-  const String& getOwner() const { return m_owner; }
+  uint64 getId() const noexcept { return m_id; }
   Type getType() const { return m_type; }
+  String getAuto() const { return m_auto; }
+  String getEth() const { return m_eth; }
+  String getPrice() const { return m_price; }
+  const String& getOwner() const { return m_owner; }
+
+  void setId(uint64 id) { m_id = id; }
 
  private:
-  BigInteger m_auto = 0;
-  BigInteger m_eth = 0;
-  String m_owner;
+  uint64 m_id;
+
   Type m_type = Type::None;
+
+  String m_auto;
+  String m_eth;
+  String m_price;
+  String m_owner;
 };

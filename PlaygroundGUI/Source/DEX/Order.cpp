@@ -27,13 +27,18 @@
 using json = nlohmann::json;
 
 
-Order::Order(const String& jsonString) {
+Order::Order(uint64 id, const String& jsonString)
+    : m_id(id) {
   json jsonData = json::parse(jsonString.toStdString());
 
-  const auto amountAUTO = Utils::fromWei(CoinUnit::AUTO,    jsonData.at(0).get<std::string>());
-  const auto amountETH  = Utils::fromWei(CoinUnit::ether,   jsonData.at(1).get<std::string>());
-  m_auto.parseString(amountAUTO, 10);
-  m_eth.parseString(amountETH, 10);
+  BigInteger amountAUTO;
+  amountAUTO.parseString(jsonData.at(0).get<std::string>(), 10);
+  BigInteger amountETH;
+  amountETH.parseString(jsonData.at(1).get<std::string>(), 10);
+
+  m_auto = Utils::fromWei(CoinUnit::AUTO, amountAUTO.toString(10));
+  m_eth = Utils::fromWei(CoinUnit::ether, amountETH.toString(10));
+  m_price = String(m_eth.getDoubleValue() / m_auto.getDoubleValue());
 
   m_owner = jsonData.at(2).get<std::string>();
   m_type = static_cast<Order::Type>(std::stoul(jsonData.at(3).get<std::string>()));

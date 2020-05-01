@@ -28,7 +28,8 @@ static const String AUTO_BALANCE_PREFIX_LABEL = "AUTO Balance: ";
 class OrdersUIModel : public TableListBoxModel {
  public:
   enum Columns {
-    Auto = 1
+    Price = 1
+    , Auto
     , Eth
     , Owner
   };
@@ -52,12 +53,16 @@ class OrdersUIModel : public TableListBoxModel {
     g.setColour(Colours::white);
 
     switch (columnId) {
+      case Price: {
+        g.drawText(item->getPrice(), 0, 0, width, height, Justification::centredLeft);
+        break;
+      }
       case Auto: {
-        g.drawText(item->getAuto().toString(10), 0, 0, width, height, Justification::centredLeft);
+        g.drawText(item->getAuto(), 0, 0, width, height, Justification::centredLeft);
         break;
       }
       case Eth: {
-        g.drawText(item->getEth().toString(10), 0, 0, width, height, Justification::centredLeft);
+        g.drawText(item->getEth(), 0, 0, width, height, Justification::centredLeft);
         break;
       }
       case Owner: {
@@ -126,6 +131,7 @@ DEXPage::DEXPage(Account::Ptr accountData) : m_accountData(accountData) {
   m_sellingTable->setModel(m_sellingUIModel.get());
   auto& sellingHeader = m_sellingTable->getHeader();
   sellingHeader.setStretchToFitActive(true);
+  sellingHeader.addColumn(translate("Price (ETH)"), OrdersUIModel::Price, 50);
   sellingHeader.addColumn(translate("Auto"), OrdersUIModel::Auto, 50);
   sellingHeader.addColumn(translate("Eth"), OrdersUIModel::Eth, 50);
   sellingHeader.addColumn(translate("Owner"), OrdersUIModel::Owner, 200);
@@ -134,6 +140,7 @@ DEXPage::DEXPage(Account::Ptr accountData) : m_accountData(accountData) {
   m_buyingTable->setModel(m_buyingUIModel.get());
   auto& buyingHeader = m_buyingTable->getHeader();
   buyingHeader.setStretchToFitActive(true);
+  buyingHeader.addColumn(translate("Price (ETH)"), OrdersUIModel::Price, 50);
   buyingHeader.addColumn(translate("Auto"), OrdersUIModel::Auto, 50);
   buyingHeader.addColumn(translate("Eth"), OrdersUIModel::Eth, 50);
   buyingHeader.addColumn(translate("Owner"), OrdersUIModel::Owner, 200);
@@ -160,9 +167,9 @@ void DEXPage::resized() {
   const int buttonsWidth = (getLocalBounds().getWidth() - buttonsSpacing) / 2;
   auto bounds = getLocalBounds();
   auto buttonsArea = bounds.removeFromBottom(buttonsHeight);
-  m_createSellOrderBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
-  buttonsArea.removeFromLeft(buttonsSpacing);
   m_createBuyOrderBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
+  buttonsArea.removeFromLeft(buttonsSpacing);
+  m_createSellOrderBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   bounds.removeFromBottom(buttonsSpacing);
 
   auto labelsBounds = bounds.removeFromTop(30);
@@ -172,12 +179,12 @@ void DEXPage::resized() {
   auto tablesBounds = bounds;
   const int tablesMargin = 10;
   const int titlesHeight = 50;
-  auto sellingBounds = tablesBounds.removeFromLeft(getWidth() / 2).reduced(tablesMargin);
-  m_sellingLabel->setBounds(sellingBounds.removeFromTop(titlesHeight));
-  m_sellingTable->setBounds(sellingBounds);
-  auto buyingBounds = tablesBounds.reduced(tablesMargin);
+  auto buyingBounds = tablesBounds.removeFromLeft(getWidth() / 2).reduced(tablesMargin);
   m_buyingLabel->setBounds(buyingBounds.removeFromTop(titlesHeight));
   m_buyingTable->setBounds(buyingBounds);
+  auto sellingBounds = tablesBounds.reduced(tablesMargin);
+  m_sellingLabel->setBounds(sellingBounds.removeFromTop(titlesHeight));
+  m_sellingTable->setBounds(sellingBounds);
 }
 
 void DEXPage::buttonClicked(Button* buttonThatWasClicked) {

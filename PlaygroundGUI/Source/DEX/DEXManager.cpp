@@ -110,8 +110,10 @@ bool DEXManager::fetchOrders() {
       if (!s.is_ok())
         return false;
 
-      auto order = std::make_shared<Order>(String(s.msg));
-      orders.add(order);
+      const auto order = std::make_shared<Order>(i, String(s.msg));
+      // Don't add removed orders
+      if (order->getType() != Order::Type::None)
+        orders.add(order);
     }
     m_model->clear(NotificationType::dontSendNotification);
     m_model->addItems(orders, NotificationType::sendNotificationAsync);
