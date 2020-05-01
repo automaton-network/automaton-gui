@@ -24,29 +24,27 @@ CreateProposalComponent::CreateProposalComponent() {
   m_titleEditor = std::make_unique<TextEditor>(translate("Title"));
   addAndMakeVisible(m_titleEditor.get());
 
-  const String numericalIntegersAllowed("0123456789");
-  const String numericalFloatAllowed("0123456789.");
   m_budgetEditor = std::make_unique<TextEditor>(translate("Budget (AUTO)"));
-  m_budgetEditor->setInputRestrictions(8, numericalFloatAllowed);
+  m_budgetEditor->setInputRestrictions(8, Utils::numericalFloatAllowed);
   m_budgetEditor->addListener(this);
   addAndMakeVisible(m_budgetEditor.get());
 
   m_numPeriodsEditor = std::make_unique<TextEditor>(translate("Num periods"));
-  m_numPeriodsEditor->setInputRestrictions(5, numericalIntegersAllowed);
+  m_numPeriodsEditor->setInputRestrictions(5, Utils::numericalIntegerAllowed);
   m_numPeriodsEditor->addListener(this);
   addAndMakeVisible(m_numPeriodsEditor.get());
 
   m_totalBudgetEditor = std::make_unique<TextEditor>(translate("Total Budget (AUTO)"));
-  m_totalBudgetEditor->setInputRestrictions(8, numericalFloatAllowed);
+  m_totalBudgetEditor->setInputRestrictions(8, Utils::numericalFloatAllowed);
   m_totalBudgetEditor->setReadOnly(true);
   addAndMakeVisible(m_totalBudgetEditor.get());
 
   m_targetBonusEditor = std::make_unique<TextEditor>(translate("Target bonus (AUTO)"));
-  m_targetBonusEditor->setInputRestrictions(8, numericalFloatAllowed);
+  m_targetBonusEditor->setInputRestrictions(8, Utils::numericalFloatAllowed);
   // addAndMakeVisible(m_targetBonusEditor.get());
 
   m_lengthDaysEditor = std::make_unique<TextEditor>(translate("Length (days)"));
-  m_lengthDaysEditor->setInputRestrictions(5, numericalIntegersAllowed);
+  m_lengthDaysEditor->setInputRestrictions(5, Utils::numericalIntegerAllowed);
   addAndMakeVisible(m_lengthDaysEditor.get());
 
   m_createProposalBtn = std::make_unique<TextButton>(translate("Create proposal"));
@@ -56,8 +54,11 @@ CreateProposalComponent::CreateProposalComponent() {
   m_cancelBtn = std::make_unique<TextButton>(translate("Cancel"));
   m_cancelBtn->addListener(this);
   addAndMakeVisible(m_cancelBtn.get());
+}
 
-  m_proposal = std::make_shared<Proposal>();
+CreateProposalComponent::~CreateProposalComponent() {
+  if (m_proposal != nullptr)
+    m_proposal->removeListener(this);
 }
 
 void CreateProposalComponent::paint(Graphics& g) {
@@ -140,13 +141,18 @@ void CreateProposalComponent::buttonClicked(Button* buttonThatWasClicked) {
     // if (!checkEmptiness(m_targetBonusEditor.get(), String("Enter target bonus for proposal, please"))) return;
     // Length days could be empty
 
-    m_proposal->setTitle(m_titleEditor->getText());
-    m_proposal->setBudget(Utils::toWei(EthUnit::ether, m_budgetEditor->getText()));
-    m_proposal->setNumPeriods(static_cast<uint64>(m_numPeriodsEditor->getText().getLargeIntValue()));
-    // m_proposal->setTargetBonus(Utils::toWei(EthUnit::ether, m_targetBonusEditor->getText()));
-    if (!m_lengthDaysEditor->isEmpty())
-      m_proposal->setLengthDays(static_cast<uint64>(m_lengthDaysEditor->getText().getLargeIntValue()));
+    if (m_proposal != nullptr)
+      m_proposal->removeListener(this);
 
+    m_proposal = std::make_shared<Proposal>();
+    m_proposal->setTitle(m_titleEditor->getText());
+    m_proposal->setBudgetPerPeriod(Utils::toWei(CoinUnit::AUTO, m_budgetEditor->getText()));
+    m_proposal->setNumPeriodsLeft(static_cast<uint64>(m_numPeriodsEditor->getText().getLargeIntValue()));
+    // m_proposal->setTargetBonus(Utils::toWei(CoinUnit::AUTO, m_targetBonusEditor->getText()));
+    if (!m_lengthDaysEditor->isEmpty())
+      m_proposal->setBudgetPeriodLength(static_cast<uint64>(m_lengthDaysEditor->getText().getLargeIntValue()));
+
+    m_proposal->addListener(this);
     m_listeners.call(&CreateProposalComponent::Listener::createProposalViewActionHappened,
                      this,
                      Action::ProposalCreated);
@@ -164,4 +170,19 @@ void CreateProposalComponent::textEditorTextChanged(TextEditor& editor) {
     const auto budgetPerPeriod = static_cast<uint64>(m_budgetEditor->getText().getLargeIntValue());
     m_totalBudgetEditor->setText(String(numPeriods * budgetPerPeriod));
   }
+}
+
+void CreateProposalComponent::proposalChanged() {
+  if (m_proposal != nullptr && !isVisible() && m_proposal->getStatus() != Proposal::Status::Uninitialized) {
+    clearFields();
+  }
+}
+
+void CreateProposalComponent::clearFields() {
+  m_titleEditor->clear();
+  m_budgetEditor->clear();
+  m_totalBudgetEditor->clear();
+  m_numPeriodsEditor->clear();
+  m_targetBonusEditor->clear();
+  m_lengthDaysEditor->clear();
 }

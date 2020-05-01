@@ -21,9 +21,14 @@
 #include "ProposalsManager.h"
 #include "../Utils/Utils.h"
 #include "../Data/AutomatonContractData.h"
+#include "ProposalDetailsComponent.h"
 
 //==============================================================================
-ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsManager(proposalsManager) {
+ProposalsPage::ProposalsPage(Account::Ptr accountData)
+    : m_tooltipWindow(this, 500)
+    , m_accountData(accountData) {
+  m_proposalsManager = m_accountData->getProposalsManager();
+
   m_proposalsListBox = std::make_unique<TableListBox>();
   m_proposalsListBox->setRowHeight(50);
   m_proposalsListBox->setRowSelectedOnMouseDown(true);
@@ -58,6 +63,8 @@ ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsMa
   m_voteYesBtn->addListener(this);
   m_voteNoBtn = std::make_unique<TextButton>(translate("Vote NO"));
   m_voteNoBtn->addListener(this);
+  m_claimRewardBtn = std::make_unique<TextButton>(translate("Claim reward"));
+  m_claimRewardBtn->addListener(this);
   m_abandonProposalBtn = std::make_unique<TextButton>(translate("Abandon Proposal"));
 
   m_filterByStatusComboBox = std::make_unique<ComboBox>();
@@ -79,10 +86,14 @@ ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsMa
   m_abandonProposalBtn->setEnabled(false);
   m_voteYesBtn->setEnabled(false);
   m_voteNoBtn->setEnabled(false);
+  m_claimRewardBtn->setEnabled(false);
 
   m_createProposalView = std::make_unique<CreateProposalComponent>();
   m_createProposalView->addListener(this);
   addChildComponent(m_createProposalView.get());
+
+  m_proposalDetailslView = std::make_unique<ProposalDetailsComponent>(m_accountData);
+  addChildComponent(m_proposalDetailslView.get());
 
   addAndMakeVisible(m_fetchProposalsBtn.get());
   addAndMakeVisible(m_createProposalBtn.get());
@@ -90,6 +101,7 @@ ProposalsPage::ProposalsPage(ProposalsManager* proposalsManager) : m_proposalsMa
   addAndMakeVisible(m_FilterBtn.get());
   addAndMakeVisible(m_voteYesBtn.get());
   addAndMakeVisible(m_voteNoBtn.get());
+  addAndMakeVisible(m_claimRewardBtn.get());
   addAndMakeVisible(m_filterByStatusComboBox.get());
   addAndMakeVisible(m_proposalsListBox.get());
 
@@ -105,14 +117,12 @@ void ProposalsPage::paint(Graphics&) {
 void ProposalsPage::resized() {
   auto bounds = getLocalBounds().reduced(20);
   m_createProposalView->setBounds(bounds);
-  m_proposalsListBox->setBounds(bounds.removeFromTop(500));
-  m_proposalsListBox->getHeader().resizeAllColumnsToFit(bounds.getWidth());
-  bounds.removeFromTop(20);
+  m_proposalDetailslView->setBounds(bounds);
 
-  const int buttonsWidth = 150;
   const int buttonsHeight = 50;
   const int buttonsSpacing = 10;
-  auto buttonsArea = bounds.removeFromTop(buttonsHeight);
+  const int buttonsWidth = 120;
+  auto buttonsArea = bounds.removeFromBottom(buttonsHeight);
   m_fetchProposalsBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
   m_createProposalBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
@@ -123,9 +133,15 @@ void ProposalsPage::resized() {
   buttonsArea.removeFromLeft(buttonsSpacing);
   m_voteNoBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
+  m_claimRewardBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
+  buttonsArea.removeFromLeft(buttonsSpacing);
   m_filterByStatusComboBox->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
   buttonsArea.removeFromLeft(buttonsSpacing);
   m_FilterBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
+
+  bounds.removeFromBottom(buttonsSpacing * 2);
+  m_proposalsListBox->setBounds(bounds);
+  m_proposalsListBox->getHeader().resizeAllColumnsToFit(bounds.getWidth());
 }
 
 void ProposalsPage::setModel(std::shared_ptr<ProposalsModel> model) {
@@ -135,6 +151,11 @@ void ProposalsPage::setModel(std::shared_ptr<ProposalsModel> model) {
 void ProposalsPage::modelChanged(AbstractListModelBase*) {
   m_proposalsListBox->updateContent();
   m_proposalsListBox->repaint();
+  if (const auto selectedRow = m_proposalsListBox->getSelectedRow()) {
+    const auto proposal = m_proxyModel->getAt(selectedRow);
+    if (proposal)
+      updateButtonsForSelectedProposal(proposal);
+  }
 }
 
 void ProposalsPage::createProposalViewActionHappened(CreateProposalComponent* componentInWhichActionHappened,
@@ -163,7 +184,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_proposalsManager->castVote(proposal, 2);
   } else if (buttonThatWasClicked == m_payForGasBtn.get()) {
     auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    const auto numSlots = AutomatonContractData::getInstance()->getSlotsNumber();
+    const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
     const auto numSlotsPaid = proposal->getNumSlotsPaid();
     const String slotsMsg = String(numSlotsPaid) + String("/") + String(numSlots) + String(" are paid. ")
                               + String("Enter num of slots to pay");
@@ -172,6 +193,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
                   AlertWindow::QuestionIcon);
 
     w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
+    w.getTextEditor("slotsToPay")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
     w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
     w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
@@ -187,6 +209,38 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     }
   } else if (buttonThatWasClicked == m_fetchProposalsBtn.get()) {
     m_proposalsManager->fetchProposals();
+  } else if (buttonThatWasClicked == m_claimRewardBtn.get()) {
+    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
+    const auto budget = Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod());
+    const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
+    AlertWindow w("Claim reward for " + proposal->getTitle() + " proposal",
+                  rewardMsg,
+                  AlertWindow::QuestionIcon);
+
+    w.addTextEditor("rewardAmount", "", "Reward Amount:", false);
+    w.getTextEditor("rewardAmount")->setInputRestrictions(8, Utils::numericalFloatAllowed);
+    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+
+    if (w.runModalLoop() == 1) {
+      const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
+      std::cout << "Reward amount: " << rewardAmount << std::endl;
+      if (rewardAmount > 0.0) {
+        const auto rewardAmountWei = Utils::toWei(CoinUnit::AUTO, w.getTextEditorContents("rewardAmount"));
+        m_proposalsManager->claimReward(proposal, rewardAmountWei);
+      } else {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                         "Invalid data",
+                                         "Enter correct amount of reward to claim");
+      }
+    }
+  }
+
+  // Update buttons state after each action
+  if (m_proposalsListBox->getNumSelectedRows()) {
+    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
+    updateButtonsForSelectedProposal(proposal);
   }
 }
 
@@ -194,12 +248,29 @@ void ProposalsPage::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
   m_proxyModel->setFilter((ProposalFilter) m_filterByStatusComboBox->getSelectedId());
 }
 
-void ProposalsPage::updateButtons() {
-  const bool isRowSelected = m_proposalsListBox->getNumSelectedRows() > 0;
-  m_payForGasBtn->setEnabled(isRowSelected);
-  m_abandonProposalBtn->setEnabled(isRowSelected);
-  m_voteYesBtn->setEnabled(isRowSelected);
-  m_voteNoBtn->setEnabled(isRowSelected);
+void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedProposal) {
+  if (!selectedProposal)
+    return;
+
+  const auto proposalStatus = selectedProposal->getStatus();
+  const bool isActiveStatus = selectedProposal->hasActiveStatus();
+  m_payForGasBtn->setEnabled(proposalStatus == Proposal::Status::PrepayingGas);
+  m_abandonProposalBtn->setEnabled(proposalStatus != Proposal::Status::PrepayingGas);
+  m_voteYesBtn->setEnabled(isActiveStatus);
+  m_voteNoBtn->setEnabled(isActiveStatus);
+
+  const bool isClaimingActive = selectedProposal->isRewardClaimable();
+  if (isClaimingActive)
+    m_claimRewardBtn->setTooltip("Claim your reward now!");
+  else
+    m_claimRewardBtn->setTooltip("Proposal claiming is unavailable. Check proposal status, please");
+  m_claimRewardBtn->setEnabled(isClaimingActive);
+}
+
+void ProposalsPage::openProposalDetails(Proposal::Ptr proposal) {
+  m_proposalDetailslView->setProposal(proposal);
+  m_proposalDetailslView->setVisible(true);
+  m_proposalDetailslView->setAlwaysOnTop(true);
 }
 
 // TableListBoxModel
@@ -250,20 +321,22 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     case Budget: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<String>::compareElements(p1->getBudget(), p2->getBudget());
+                * DefaultElementComparator<String>::compareElements(p1->getBudgetPerPeriod(), p2->getBudgetPerPeriod());
       };
       break;
     }
     case Periods: {
       sorter = [=](Proposal* p1, Proposal* p2) {
-        return direction * DefaultElementComparator<uint64>::compareElements(p1->getNumPeriods(), p2->getNumPeriods());
+        return direction * DefaultElementComparator<uint64>::compareElements(p1->getNumPeriodsLeft(),
+                                                                             p2->getNumPeriodsLeft());
       };
       break;
     }
     case Length: {
       sorter = [=](Proposal* p1, Proposal* p2) {
         return direction
-                * DefaultElementComparator<String>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
+                * DefaultElementComparator<uint64>::compareElements(p1->getBudgetPeriodLength(),
+                                                                    p2->getBudgetPeriodLength());
       };
       break;
     }
@@ -326,12 +399,23 @@ void ProposalsPage::paintCell(Graphics& g,
     case Status: {
       const auto status = item->getStatus();
       const auto areAllSlotsPaid = item->areAllSlotsPaid();
-      const auto numSlots = AutomatonContractData::getInstance()->getSlotsNumber();
+      const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
       if (!areAllSlotsPaid) {
         g.drawText(Proposal::getStatusStr(Proposal::Status::PrepayingGas),
                    0, 0, width, height / 2, Justification::centred);
         g.drawText(String(item->getNumSlotsPaid()) + String("/") + String(numSlots) + String(" paid"),
                    0, height / 2, width, height / 2, Justification::centred);
+      } else if (status == Proposal::Status::Started) {  // Voting state
+        const auto initialVotingEndDate = item->getInitialVotingEndDate();
+        if (Utils::isZeroTime(initialVotingEndDate) == false) {
+          const auto votingEnded = initialVotingEndDate.toMilliseconds() < Time::getCurrentTime().toMilliseconds();
+          const auto initialVotingEndDateMsg = (votingEnded ? "Ended at " : "Ends at ")
+                                                + initialVotingEndDate.toString(true, true, true, true);
+          g.drawText(Proposal::getStatusStr(item->getStatus()), 0, 0, width, height / 2, Justification::centred);
+          g.drawText(initialVotingEndDateMsg, 0, height / 2, width, height / 2, Justification::centred);
+        } else {
+          g.drawText("Started", 0, 0, width, height, Justification::centred);
+        }
       } else {
         g.drawText(Proposal::getStatusStr(item->getStatus()), 0, 0, width, height, Justification::centred);
       }
@@ -343,16 +427,35 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Budget: {
-      g.drawText(Utils::fromWei(EthUnit::ether, item->getBudget()) + String(" AUTO"),
-                 0, 0, width, height, Justification::centred);
+      // Due to smart contract's specifics, the proposal can be claimable even if it's still in Started state and
+      // next payment date is 0. Look at Proposal::isRewardClaimable() method for more details
+      const auto nextPaymentDate = item->getNextPaymentDate();
+      if (item->isRewardClaimable()
+          && Utils::isZeroTime(nextPaymentDate) == false) {
+        const auto claimableInMs = nextPaymentDate.toMilliseconds() - Time::getCurrentTime().toMilliseconds();
+        String claimText;
+        if (claimableInMs >= 0) {
+          const RelativeTime claimableInRelativeTime(claimableInMs / 1000);
+          claimText = "Claimable in " + claimableInRelativeTime.getDescription();
+        } else {
+          claimText = "Claim now!";
+        }
+        g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudgetPerPeriod()) + String(" AUTO"),
+                   0, 0, width, height / 2, Justification::centred);
+        g.drawText(claimText,
+                   0, height / 2, width, height / 2, Justification::centred);
+      } else {
+        g.drawText(Utils::fromWei(CoinUnit::AUTO, item->getBudgetPerPeriod()) + String(" AUTO"),
+                   0, 0, width, height, Justification::centred);
+      }
       break;
     }
     case Periods: {
-      g.drawText(String(item->getNumPeriods()), 0, 0, width, height, Justification::centred);
+      g.drawText(String(item->getNumPeriodsLeft()), 0, 0, width, height, Justification::centred);
       break;
     }
     case Length: {
-      const auto lengthDays = item->getLengthDays();
+      const auto lengthDays = item->getBudgetPeriodLength();
       // If length is zero - the proposal has no time limit
       if (lengthDays) {
         const String unit(lengthDays == 1 ? "day" : "days");
@@ -361,7 +464,7 @@ void ProposalsPage::paintCell(Graphics& g,
       break;
     }
     case Bonus: {
-      const String text = Utils::fromWei(EthUnit::ether, item->getTargetBonus()) + String(" ETH ")
+      const String text = Utils::fromWei(CoinUnit::AUTO, item->getTargetBonus()) + String(" ETH ")
           + "(" + getPercentStr(item->getBounusPrecent()) + ")";
       g.drawText(text, 0, 0, width, height, Justification::centred);
       break;
@@ -385,6 +488,15 @@ void ProposalsPage::paintRowBackground(Graphics& g,
   g.fillRect(0, 0, width, height);
 }
 
-void ProposalsPage::selectedRowsChanged(int) {
-  updateButtons();
+void ProposalsPage::selectedRowsChanged(int lastRowSelected) {
+  auto selectedItem = m_proxyModel->getAt(lastRowSelected);
+  if (!selectedItem)
+      return;
+  updateButtonsForSelectedProposal(selectedItem);
+}
+
+void ProposalsPage::cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) {
+  if (e.mods.isLeftButtonDown()) {
+    openProposalDetails(m_proxyModel->getAt(rowNumber));
+  }
 }

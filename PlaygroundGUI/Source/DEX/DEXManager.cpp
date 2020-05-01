@@ -17,38 +17,31 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <json.hpp>
+
 #include "DEXManager.h"
 #include "OrdersModel.h"
-#include "../Utils/AsyncTask.h"
-#include "../Data/AutomatonContractData.h"
+#include "Utils/TasksManager.h"
+#include "Utils/Utils.h"
+#include "Data/AutomatonContractData.h"
+
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
+#include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/common/status.h"
 
 using automaton::core::common::status;
 using automaton::core::interop::ethereum::eth_contract;
 using automaton::core::interop::ethereum::eth_getBalance;
+using automaton::core::interop::ethereum::eth_transaction;
+using automaton::core::interop::ethereum::eth_getTransactionCount;
+using automaton::core::interop::ethereum::encode;
 using automaton::core::io::bin2hex;
-using automaton::core::io::dec2hex;
-using automaton::core::io::hex2dec;
 
-static std::shared_ptr<eth_contract> getContract(status* resStatus) {
-  const auto contract = AutomatonContractData::getInstance()->getContract();
-  if (contract == nullptr)
-    *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
-
-  return contract;
-}
-
-DEXManager::DEXManager(Config* config) {
-  m_ethBalance = "Undefined";
-  m_autoBalance = "Undefined";
-
-  m_model = std::make_shared<OrdersModel>();
-
-  m_privateKey = config->get_string("private_key");
-  m_ethAddress = config->get_string("eth_address");
-  m_ethAddressAlias = config->get_string("account_alias");
+DEXManager::DEXManager(Account::Ptr accountData)
+    : m_model(std::make_shared<OrdersModel>())
+    , m_accountData(accountData) {
+  m_contractData = m_accountData->getContractData();
 }
 
 DEXManager::~DEXManager() {
@@ -58,15 +51,7 @@ std::shared_ptr<OrdersModel> DEXManager::getModel() {
   return m_model;
 }
 
-std::string DEXManager::getEthBalance() {
-  return m_ethBalance;
-}
-
-std::string DEXManager::getAutoBalance() {
-  return m_autoBalance;
-}
-
-static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resStatus) {
+static uint64 getNumOrders(AutomatonContractData::Ptr contract, status* resStatus) {
   *resStatus = contract->call("getOrdersLength", "");
   if (!resStatus->is_ok())
     return 0;
@@ -76,17 +61,18 @@ static uint64 getNumOrders(std::shared_ptr<eth_contract> contract, status* resSt
   return ordersLength;
 }
 
-static std::string ethBalance(const std::string& m_ethAddress
-                              , status* resStatus) {
-  *resStatus = eth_getBalance(AutomatonContractData::getInstance()->getUrl(), m_ethAddress);
+static std::string getEthBalance(AutomatonContractData::Ptr contract,
+                                 const std::string& m_ethAddress,
+                                 status* resStatus) {
+  *resStatus = eth_getBalance(contract->getUrl(), m_ethAddress);
   BigInteger balance;
   balance.parseString(resStatus->msg, 16);
   return balance.toString(10).toStdString();
 }
 
-static std::string autoBalance(std::shared_ptr<eth_contract> contract
-    , const std::string& m_ethAddress
-    , status* resStatus) {
+static std::string getAutoBalance(AutomatonContractData::Ptr contract,
+                                  const std::string& m_ethAddress,
+                                  status* resStatus) {
   json jInput;
   jInput.push_back(m_ethAddress.substr(2));
   *resStatus = contract->call("balanceOf", jInput.dump());
@@ -95,33 +81,31 @@ static std::string autoBalance(std::shared_ptr<eth_contract> contract
 }
 
 bool DEXManager::fetchOrders() {
-  Array<Order::Ptr> orders;
-  AsyncTask task([&](AsyncTask* task) {
+  TasksManager::launchTask([&](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract(&s);
+    auto ethBalance = getEthBalance(m_contractData, m_accountData->getAddress(), &s);
     if (!s.is_ok())
       return false;
 
-    m_ethBalance = ethBalance(m_ethAddress, &s);
+    auto autoBalance = getAutoBalance(m_contractData, m_accountData->getAddress(), &s);
     if (!s.is_ok())
       return false;
 
-    m_autoBalance = autoBalance(contract, m_ethAddress, &s);
+    m_accountData->setBalance(ethBalance, autoBalance);
+
+    m_model->clear(NotificationType::dontSendNotification);
+
+    const auto numOfOrders = getNumOrders(m_contractData, &s);
     if (!s.is_ok())
       return false;
 
-    m_model->clear(false);
-
-    const auto numOfOrders = getNumOrders(contract, &s);
-    if (!s.is_ok())
-      return false;
-
-    for (int i = 1; i <= numOfOrders; ++i) {
+    Array<Order::Ptr> orders;
+    for (size_t i = 1; i <= numOfOrders; ++i) {
       json jInput;
       jInput.push_back(i);
 
-      s = contract->call("getOrder", jInput.dump());
+      s = m_contractData->call("getOrder", jInput.dump());
 
       if (!s.is_ok())
         return false;
@@ -129,26 +113,100 @@ bool DEXManager::fetchOrders() {
       auto order = std::make_shared<Order>(String(s.msg));
       orders.add(order);
     }
+    m_model->clear(NotificationType::dontSendNotification);
+    m_model->addItems(orders, NotificationType::sendNotificationAsync);
 
     return true;
-  }, "Fetching orders...");
+  }, [=](AsyncTask* task) {
+  }, "Fetching orders...", m_accountData);
 
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      m_model->clear(false);
-      m_model->addItems(orders, true);
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "ERROR",
-                                       String("(") + String(s.code) + String(") :") + s.msg);
+  return true;
+}
+
+bool DEXManager::createSellOrder(const String& amountAUTO, const String& amountETH) {
+  const auto orderName = "(" + Utils::fromWei(CoinUnit::AUTO, amountAUTO) + " AUTO -> "
+                          + Utils::fromWei(CoinUnit::ether, amountETH) + " ETH)";
+  const auto topicName = "Create sell order + " + orderName;
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+
+    task->setProgress(0.1);
+
+    json jSellOrder;
+    jSellOrder.push_back(amountAUTO.toStdString());
+    jSellOrder.push_back(amountETH.toStdString());
+
+    task->setProgress(0.5);
+
+    s = m_contractData->call("sell", jSellOrder.dump(), m_accountData->getPrivateKey());
+    if (!s.is_ok())
+      return false;
+
+    DBG("Call result: " << s.msg << "\n");
+    task->setProgress(1.0);
+
+    task->setStatusMessage("Sell Order " + orderName + " successfully created");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
+}
+
+bool DEXManager::createBuyOrder(const String& amountAUTO, const String& amountETH) {
+  const auto orderName = "(" + Utils::fromWei(CoinUnit::ether, amountETH) + " ETH -> "
+                          + Utils::fromWei(CoinUnit::AUTO, amountAUTO) + " AUTO)";
+  const auto topicName = "Create buy order + " + orderName;
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+
+    task->setProgress(0.1);
+
+    json jBuyOrder;
+    jBuyOrder.push_back(amountAUTO.toStdString());
+
+    json jSignature;
+    jSignature.push_back("uint256");
+
+    std::stringstream txData;
+    txData << "d96a094a" << bin2hex(encode(jSignature.dump(), jBuyOrder.dump()));
+
+    s = eth_getTransactionCount(m_contractData->getUrl(), m_accountData->getAddress());
+    auto nonce = s.is_ok() ? s.msg : "0";
+    if (!s.is_ok())
+      return false;
+
+    if (nonce.substr(0, 2) == "0x") {
+      nonce = nonce.substr(2);
     }
-  } else {
-    AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                     "Fetching orders canceled!",
-                                     "Current orders data may be broken.");
-  }
+    task->setProgress(0.5);
 
-  return false;
+    BigInteger intAmountETH;
+    intAmountETH.parseString(amountETH, 10);
+    const String hexAmountETH = intAmountETH.toString(16);
+
+    eth_transaction transaction;
+    transaction.nonce = nonce;
+    transaction.gas_price = "1388";  // 5 000
+    transaction.gas_limit = "5B8D80";  // 6M
+    transaction.to = m_contractData->getAddress().substr(2);
+    transaction.value = hexAmountETH.toStdString();
+    transaction.data = txData.str();
+    transaction.chain_id = "01";
+    s = m_contractData->call("buy", transaction.sign_tx(m_accountData->getPrivateKey()));
+
+    if (!s.is_ok())
+      return false;
+
+    DBG("Call result: " << s.msg << "\n");
+    task->setProgress(1.0);
+
+    task->setStatusMessage("Buy Order " + orderName + " successfully created");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
 }

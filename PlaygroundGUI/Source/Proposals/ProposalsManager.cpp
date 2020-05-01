@@ -21,8 +21,10 @@
 #include <functional>
 
 #include "ProposalsManager.h"
-#include "../Utils/AsyncTask.h"
-#include "../Data/AutomatonContractData.h"
+#include "Utils/AsyncTask.h"
+#include "Utils/TasksManager.h"
+#include "Data/AutomatonContractData.h"
+
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
 #include "automaton/core/interop/ethereum/eth_transaction.h"
 #include "automaton/core/interop/ethereum/eth_helper_functions.h"
@@ -34,127 +36,148 @@ using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
-static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus);
-static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 proposalId, status* resStatus);
-static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract, uint64 numOfSlots, status* resStatus);
-static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus);
-static void voteWithSlot(std::shared_ptr<eth_contract> contract,
+static uint64 getNumSlots(AutomatonContractData::Ptr contract, status* resStatus);
+static uint64 getNumSlotsPaid(AutomatonContractData::Ptr contract, uint64 proposalId, status* resStatus);
+static std::vector<std::string> getOwners(AutomatonContractData::Ptr contract, uint64 numOfSlots, status* resStatus);
+static uint64 getLastProposalId(AutomatonContractData::Ptr contract, status* resStatus);
+static void voteWithSlot(AutomatonContractData::Ptr contract,
                          uint64 id, uint64 slot, uint64 choice,
+                         const std::string& privateKey,
                          status* resStatus);
 
-static std::shared_ptr<eth_contract> getContract(status* resStatus) {
-  const auto cd = AutomatonContractData::getInstance();
-  const auto contract = eth_contract::get_contract(cd->getAddress());
-  if (contract == nullptr)
-    *resStatus = status::internal("Contract is NULL. Read appropriate contract data first.");
-
-  return contract;
-}
-
-ProposalsManager::ProposalsManager(Config* config)
-  : m_model(std::make_shared<ProposalsModel>()) {
-  m_privateKey = config->get_string("private_key");
-  m_ethAddress = config->get_string("eth_address");
-  m_ethAddressAlias = config->get_string("account_alias");
+ProposalsManager::ProposalsManager(Account::Ptr accountData)
+  : m_model(std::make_shared<ProposalsModel>())
+  , m_accountData(accountData) {
+  m_contractData = m_accountData->getContractData();
 }
 
 ProposalsManager::~ProposalsManager() {
 }
 
 bool ProposalsManager::fetchProposals() {
-  Array<Proposal> proposals;
-  AsyncTask task([&](AsyncTask* task) {
+  TasksManager::launchTask([&](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract(&s);
+    m_model->clear(NotificationType::dontSendNotification);
+
+    const auto lastProposalId = getLastProposalId(m_contractData, &s);
     if (!s.is_ok())
       return false;
 
-    m_model->clear(false);
-
-    const auto lastProposalId = getLastProposalId(contract, &s);
-    if (!s.is_ok())
-      return false;
+    task->setStatusMessage("Fetching proposals...");
 
     // ballotBoxIDs initial value is 99, and the first proposal is at 100
     static const uint32_t PROPOSAL_START_ID = 100;
+    Array<Proposal::Ptr> proposals;
+
     for (int i = PROPOSAL_START_ID; i <= lastProposalId; ++i) {
       json jInput;
       jInput.push_back(i);
       std::string params = jInput.dump();
 
-      s = contract->call("getProposal", params);
+      s = m_contractData->call("getProposalInfo", params);
 
       if (!s.is_ok())
         return false;
 
-      Proposal proposal(i, String(s.msg));
+      const String proposalInfoJson = s.msg;
 
-      s = contract->call("calcVoteDifference", params);
+      s = m_contractData->call("getProposalData", params);
+
+      if (!s.is_ok())
+        return false;
+
+      const String proposalDataJson = s.msg;
+      auto proposal = std::make_shared<Proposal>(i, proposalInfoJson, proposalDataJson);
+
+      s = m_contractData->call("calcVoteDifference", params);
       if (!s.is_ok())
         return false;
 
       json j_output = json::parse(s.msg);
       const int approvalRating = std::stoi((*j_output.begin()).get<std::string>());
-      proposal.setApprovalRating(approvalRating);
+      proposal->setApprovalRating(approvalRating);
 
-      const auto numSlotsPaid = getNumSlotsPaid(contract, i, &s);
+      const auto numSlotsPaid = getNumSlotsPaid(m_contractData, i, &s);
       if (!s.is_ok())
         return false;
 
-      proposal.setNumSlotsPaid(numSlotsPaid);
-      const auto cd = AutomatonContractData::getInstance();
-      const bool areAllSlotsPaid = (numSlotsPaid == cd->getSlotsNumber());
-      proposal.setAllSlotsPaid(areAllSlotsPaid);
+      proposal->setNumSlotsPaid(numSlotsPaid);
+      const bool areAllSlotsPaid = (numSlotsPaid == m_accountData->getContractData()->getSlotsNumber());
+      proposal->setAllSlotsPaid(areAllSlotsPaid);
       if (!areAllSlotsPaid)
-        proposal.setStatus(Proposal::Status::PrepayingGas);
+        proposal->setStatus(Proposal::Status::PrepayingGas);
 
       // TODO(Kirill): set all aliases for all accounts we have
-      if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal.getCreator()))
-        proposal.setCreatorAlias(getEthAddressAlias());
+      if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal->getCreator()))
+        proposal->setCreatorAlias(getEthAddressAlias());
 
-      addProposal(proposal, false);
+      proposals.add(proposal);
     }
+
+    m_model->addItems(proposals, NotificationType::sendNotificationAsync);
+    task->setStatusMessage("Fetched " + String(m_model->size()) + " proposals");
 
     return true;
-  }, "Fetching proposals...");
+  }, [=](AsyncTask* task) {
+  }, "Fetching proposals..."
+   , m_accountData);
 
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      notifyProposalsUpdated();
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-      AlertWindow::WarningIcon,
-      "Fetching proposals canceled!",
-      "Current proposals data may be broken.");
-  }
-
-  return false;
+  return true;
 }
 
-void ProposalsManager::addProposal(const Proposal& proposal, bool sendNotification) {
-  m_model->addItem(std::make_shared<Proposal>(proposal), sendNotification);
+bool ProposalsManager::fetchProposalVotes(Proposal::Ptr proposal) {
+  if (!proposal)
+    return false;
+
+  const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Fetch votes";
+  TasksManager::launchTask([&, proposal](AsyncTask* task) {
+    auto& s = task->m_status;
+    const int numOfSlots = m_accountData->getContractData()->getSlotsNumber();
+    task->setStatusMessage("Fetching " + String(numOfSlots) + " votes for proposal "
+                           + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
+
+    Array<uint64> slots;
+    for (int i = 0; i < numOfSlots; ++i) {
+      json jInput;
+      jInput.push_back(proposal->getId());
+      jInput.push_back(i);
+      std::string params = jInput.dump();
+
+      s = m_contractData->call("getVote", params);
+
+      if (!s.is_ok())
+        return false;
+
+      json j_output = json::parse(s.msg);
+      uint64 slotVote = static_cast<uint64>(String((*j_output.begin()).get<std::string>()).getLargeIntValue());
+      slots.add(slotVote);
+      task->setProgress(i / static_cast<double>(numOfSlots));
+    }
+
+    proposal->setSlots(slots, NotificationType::sendNotification);
+    task->setStatusMessage("Fetched " + String(numOfSlots) + " votes for proposal "
+                           + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
+}
+
+void ProposalsManager::addProposal(Proposal::Ptr proposal, NotificationType notification) {
+  m_model->addItem(proposal, notification);
 }
 
 bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& contributor) {
-  AsyncTask task([=](AsyncTask* task) {
+  const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Create proposal";
+  TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
-
-    const auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
 
     task->setProgress(0.1);
 
-    const auto lastProposalId = getLastProposalId(contract, &s);
+    const auto lastProposalId = getLastProposalId(m_contractData, &s);
     proposal->setId(lastProposalId + 1);
     task->setProgress(0.25);
 
@@ -166,13 +189,13 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     jProposal.push_back(proposal->getTitle().toStdString());
     jProposal.push_back("google.com");
     jProposal.push_back("BA5EC0DE");
-    jProposal.push_back(proposal->getLengthDays());
-    jProposal.push_back(proposal->getNumPeriods());
-    jProposal.push_back(proposal->getBudget().toStdString());
+    jProposal.push_back(proposal->getBudgetPeriodLength());
+    jProposal.push_back(proposal->getNumPeriodsLeft());
+    jProposal.push_back(proposal->getBudgetPerPeriod().toStdString());
 
     task->setProgress(0.5);
 
-    s = contract->call("createProposal", jProposal.dump(), m_privateKey);
+    s = m_contractData->call("createProposal", jProposal.dump(), m_accountData->getPrivateKey());
     if (!s.is_ok())
       return false;
 
@@ -180,32 +203,20 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     proposal->setStatus(Proposal::Status::Started);
     task->setProgress(1.0);
 
+    task->setStatusMessage("Proposal \"" + proposal->getTitle() + "\" successfully created");
+
     return true;
-  }, "Creating proposal...");
+  }, [=](AsyncTask* task) {
+    proposal->notifyChanged();
+  }, topicName, m_accountData);
 
-
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      m_model->addItem(proposal);
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-      AlertWindow::WarningIcon,
-      "Canceled!",
-      "Operation aborted.");
-  }
-
-  return false;
+  return true;
 }
 
 bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
+  if (!proposal)
+    return false;
+
   if (proposal->getId() <= 0) {
     AlertWindow::showMessageBoxAsync(
       AlertWindow::WarningIcon,
@@ -213,13 +224,9 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
       "The proposal is not valid");
   }
 
-  AsyncTask task([=](AsyncTask* task) {
+  const auto topicName = "(" + String(proposal->getId()) + ") " + "Pay for gas";
+  TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
-
-    const auto cd = AutomatonContractData::getInstance();
-    const auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
 
     task->setProgress(0.1);
 
@@ -228,44 +235,28 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     jInput.push_back(slotsToPay);
 
     task->setProgress(0.5);
-    s = contract->call("payForGas", jInput.dump(), m_privateKey);
+    task->setStatusMessage("Pay gas for " + String(slotsToPay) + " slots");
+    s = m_contractData->call("payForGas", jInput.dump(), m_accountData->getPrivateKey());
 
     if (!s.is_ok())
       return false;
 
+    task->setStatusMessage("Successfully paid gas for " + String(slotsToPay) + " slots");
     task->setProgress(1.0);
 
     return true;
-  }, "Paying for gas....");
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
 
-
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-     AlertWindow::WarningIcon,
-     "Canceled!",
-     "Operation aborted.");
-  }
-
-  return false;
+  return true;
 }
 
 void ProposalsManager::notifyProposalsUpdated() {
-  m_model->notifyModelChanged();
+  m_model->notifyModelChanged(NotificationType::sendNotificationAsync);
 }
 
-static void voteWithSlot(std::shared_ptr<eth_contract> contract,
+static void voteWithSlot(AutomatonContractData::Ptr contract,
                          uint64 id, uint64 slot, uint64 choice,
-                         const std::string& ethAddress,
                          const std::string& privateKey,
                          status* resStatus) {
   json jInput;
@@ -276,7 +267,7 @@ static void voteWithSlot(std::shared_ptr<eth_contract> contract,
   *resStatus = contract->call("castVote",  jInput.dump(), privateKey);
 }
 
-static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resStatus) {
+static uint64 getNumSlots(AutomatonContractData::Ptr contract, status* resStatus) {
   auto s = contract->call("numSlots", "");
   *resStatus = s;
   if (!s.is_ok()) {
@@ -285,11 +276,11 @@ static uint64 getNumSlots(std::shared_ptr<eth_contract> contract, status* resSta
   }
 
   json j_output = json::parse(s.msg);
-  const uint64 slots_number = std::stoul((*j_output.begin()).get<std::string>());
+  const uint64 slots_number = String((*j_output.begin()).get<std::string>()).getLargeIntValue();
   return slots_number;
 }
 
-static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 proposalId, status* resStatus) {
+static uint64 getNumSlotsPaid(AutomatonContractData::Ptr contract, uint64 proposalId, status* resStatus) {
   json j_input;
   j_input.push_back(proposalId);
   const std::string params = j_input.dump();
@@ -305,11 +296,11 @@ static uint64 getNumSlotsPaid(std::shared_ptr<eth_contract> contract, uint64 pro
     return 0;
   }
 
-  const uint64 numSlotsPaid = std::stoul(ballotBoxJson[2].get<std::string>());
+  const uint64 numSlotsPaid = String(ballotBoxJson[2].get<std::string>()).getLargeIntValue();
   return numSlotsPaid;
 }
 
-static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract,
+static std::vector<std::string> getOwners(AutomatonContractData::Ptr contract,
                                           uint64 numOfSlots,
                                           status* resStatus) {
   json j_input;
@@ -329,7 +320,7 @@ static std::vector<std::string> getOwners(std::shared_ptr<eth_contract> contract
   return owners;
 }
 
-static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* resStatus) {
+static uint64 getLastProposalId(AutomatonContractData::Ptr contract, status* resStatus) {
   auto s = contract->call("proposalsData", "");
   *resStatus = s;
   if (!s.is_ok())
@@ -337,7 +328,7 @@ static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* 
 
   const json proposalsDataJson = json::parse(s.msg);
   if (proposalsDataJson.size() > 3) {
-    const uint64 lastProposalId = std::stoul(proposalsDataJson[3].get<std::string>());
+    const uint64 lastProposalId = String(proposalsDataJson[3].get<std::string>()).getLargeIntValue();
     return lastProposalId;
   }
 
@@ -345,6 +336,9 @@ static uint64 getLastProposalId(std::shared_ptr<eth_contract> contract, status* 
 }
 
 bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
+  if (!proposal)
+    return false;
+
   if (proposal->getId() <= 0) {
     AlertWindow::showMessageBoxAsync(
       AlertWindow::WarningIcon,
@@ -352,34 +346,37 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
       "The proposal is not valid");
   }
 
-  AsyncTask task([=](AsyncTask* task) {
+  // TODO(Kirill) fetch choices names
+  const auto choiceName = choice == 1 ? "YES" : choice == 2 ? "NO" : "Unspecified";
+  const auto topicName = "(" + String(proposal->getId()) + ") " + "Vote " + choiceName;
+  TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
-    auto contract = getContract(&s);
-    if (!s.is_ok())
-      return false;
+    task->setProgress(0.01);
 
-    task->setProgress(0.1);
-
-    const auto numOfSlots = getNumSlots(contract, &s);
+    const auto numOfSlots = getNumSlots(m_contractData, &s);
 
     if (!s.is_ok())
       return false;
 
-    const auto owners = getOwners(contract, numOfSlots, &s);
+    const auto owners = getOwners(m_contractData, numOfSlots, &s);
 
     if (!s.is_ok())
       return false;
 
-    const auto cd = AutomatonContractData::getInstance();
-    const String callAddress = m_ethAddress.substr(2);
+    const String callAddress = m_accountData->getAddress().substr(2);
 
+    uint64 numOwnedSlots = 0;
     bool isOwnerForAnySlot = false;
     for (uint64 slot = 0; slot < owners.size(); ++slot) {
       String owner = owners[slot];
       if (owner.equalsIgnoreCase(callAddress)) {
         isOwnerForAnySlot = true;
-        voteWithSlot(contract, proposal->getId(), slot, choice, m_ethAddress, m_privateKey, &s);
+        ++numOwnedSlots;
+
+        task->setStatusMessage("Voting for slot " + String(slot) + "...");
+        voteWithSlot(m_contractData, proposal->getId(), slot,
+            choice, m_accountData->getPrivateKey(), &s);
 
         if (!s.is_ok() || task->threadShouldExit())
           return false;
@@ -392,27 +389,49 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
       s = status::internal("You own no single slot. Voting is impossible");
       return false;
     }
+    task->setStatusMessage("Successfully voted for " + String(numOwnedSlots) + " slots!");
 
     return true;
-  }, "Voting....");
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
 
+  return true;
+}
 
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "ERROR",
-        String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
+bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardAmount) {
+  if (!proposal)
+    return false;
+
+  if (proposal->getId() <= 0) {
     AlertWindow::showMessageBoxAsync(
       AlertWindow::WarningIcon,
-      "Canceled!",
-      "Operation aborted.");
+      "ERROR",
+      "The proposal is not valid");
   }
+  const auto topicName = "(" + String(proposal->getId()) + ") " + "Claim reward";
 
-  return false;
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+
+    task->setProgress(0.1);
+    task->setStatusMessage("Claiming reward...");
+
+    json jInput;
+    jInput.push_back(proposal->getId());
+    jInput.push_back(rewardAmount.toStdString());
+
+    s = m_contractData->call("claimReward", jInput.dump(), m_accountData->getPrivateKey());
+    DBG("Call result: " << s.msg << "\n");
+
+    if (!s.is_ok())
+      return false;
+
+    task->setProgress(1.0);
+    task->setStatusMessage("Claiming reward...success!");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
 }

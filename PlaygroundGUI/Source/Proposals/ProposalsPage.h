@@ -22,8 +22,10 @@
 #include <JuceHeader.h>
 #include "ProposalsModel.h"
 #include "CreateProposalComponent.h"
+#include "Login/Account.h"
 
 class ProposalsManager;
+class ProposalDetailsComponent;
 
 class ProposalsPage : public Component
                     , public AbstractListModelBase::Listener
@@ -32,7 +34,7 @@ class ProposalsPage : public Component
                     , private ComboBox::Listener
                     , private TableListBoxModel {
  public:
-  ProposalsPage(ProposalsManager* proposalsManager);
+  ProposalsPage(Account::Ptr accountData);
   ~ProposalsPage();
 
   void setModel(std::shared_ptr<ProposalsModel> model);
@@ -49,7 +51,8 @@ class ProposalsPage : public Component
 
   void buttonClicked(Button* buttonThatWasClicked) override;
   void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-  void updateButtons();
+  void updateButtonsForSelectedProposal(Proposal::Ptr selectedProposal);
+  void openProposalDetails(Proposal::Ptr proposal);
 
   // TableListBoxModel
   // ==============================================================================
@@ -77,7 +80,9 @@ class ProposalsPage : public Component
                           int width, int height,
                           bool rowIsSelected) override;
   void selectedRowsChanged(int lastRowSelected) override;
+  void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) override;
   // ==============================================================================
+  TooltipWindow m_tooltipWindow;
 
   std::unique_ptr<TableListBox> m_proposalsListBox;
   std::unique_ptr<TextButton> m_createProposalBtn;
@@ -86,11 +91,15 @@ class ProposalsPage : public Component
   std::unique_ptr<TextButton> m_FilterBtn;
   std::unique_ptr<TextButton> m_voteYesBtn;
   std::unique_ptr<TextButton> m_voteNoBtn;
+  std::unique_ptr<TextButton> m_claimRewardBtn;
   std::unique_ptr<TextButton> m_fetchProposalsBtn;
   std::unique_ptr<ComboBox> m_filterByStatusComboBox;
 
   std::unique_ptr<CreateProposalComponent> m_createProposalView;
+  std::unique_ptr<ProposalDetailsComponent> m_proposalDetailslView;
   std::shared_ptr<ProposalsProxyModel> m_proxyModel;
+
+  Account::Ptr m_accountData;
   ProposalsManager* m_proposalsManager;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProposalsPage);

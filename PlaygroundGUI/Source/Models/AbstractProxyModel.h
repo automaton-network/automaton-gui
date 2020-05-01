@@ -58,7 +58,7 @@ class AbstractProxyModel : public AbstractListModel<T>
 
       if (withSorting())
         m_proxyArray.sort(*this, true);
-      this->notifyModelChanged();
+      this->notifyModelChanged(NotificationType::sendNotification);
     }
   }
 
@@ -94,7 +94,7 @@ class AbstractProxyModel : public AbstractListModel<T>
       filterChanged();
     } else {
       m_proxyArray.clear();
-      this->notifyModelChanged();
+      this->notifyModelChanged(NotificationType::sendNotification);
     }
   }
 

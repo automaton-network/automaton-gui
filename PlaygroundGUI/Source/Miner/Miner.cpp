@@ -22,6 +22,7 @@
 #include "Miner.h"
 #include "../Data/AutomatonContractData.h"
 #include "Utils/Utils.h"
+#include "Utils/TasksManager.h"
 
 #include "automaton/core/crypto/cryptopp/Keccak_256_cryptopp.h"
 #include "automaton/core/interop/ethereum/eth_contract_curl.h"
@@ -64,52 +65,45 @@ static std::string get_pub_key_x(const unsigned char* priv_key) {
   return std::string(reinterpret_cast<char*>(pub_key_serialized+1), 32);
 }
 
-class MinerThread: public Thread {
- public:
-  uint64 keysMined;
-  int64 startTime;
+void Miner::addMinerThread() {
+  auto miner = TasksManager::launchTask([=](AsyncTask* task) {
+    uint64 keysMined = 0;
+    int64 startTime;
 
-  Miner* owner;
-
-  MinerThread(Miner* _owner) : Thread("Miner Thread"), keysMined(0), owner(_owner) {
-  }
-
-  void run() override {
-    keysMined = 0;
     startTime = Time::getCurrentTime().toMilliseconds();
 
     unsigned char mask[32];
     unsigned char difficulty[32];
     unsigned char pk[32];
 
-    memcpy(mask, owner->getMask(), 32);
-    memcpy(difficulty, owner->getDifficulty(), 32);
+    memcpy(mask, getMask(), 32);
+    memcpy(difficulty, getDifficulty(), 32);
 
-    while (!threadShouldExit()) {
+    while (!task->threadShouldExit()) {
       unsigned int keys_generated = mine_key(mask, difficulty, pk, 1000);
-      if (owner) {
-        owner->processMinedKey(std::string(reinterpret_cast<const char*>(pk), 32), keys_generated);
-      }
-      // wait(20);
+      processMinedKey(std::string(reinterpret_cast<const char*>(pk), 32), keys_generated);
     }
-  }
-};
 
-void Miner::addMinerThread() {
-  Thread * miner = new MinerThread(this);
-  miner->startThread();
+    return true;
+  }, nullptr, "Miner Thread", m_accountData, false);
+
   miners.add(miner);
 }
 
 void Miner::stopMining() {
-  for (int i = 0; i < miners.size(); i++) {
-    miners[i]->stopThread(3000);
+  for (int i = 0; i < miners.size(); ++i) {
+    miners[i]->signalThreadShouldExit();
   }
-  miners.clear(true);
+
+  for (int i = 0; i < miners.size(); ++i) {
+    miners[i]->waitForThreadToExit(-1);
+  }
+
+  miners.clear();
 }
 
 void Miner::processMinedKey(std::string _pk, int keys_generated) {
-  auto cd = AutomatonContractData::getInstance();
+  auto cd = m_accountData->getContractData();
   ScopedLock lock(cd->m_criticalSection);
 
   total_keys_generated += abs(keys_generated);
@@ -138,8 +132,9 @@ void Miner::processMinedKey(std::string _pk, int keys_generated) {
 class TableSlots: public TableListBox, TableListBoxModel {
  public:
   Miner* owner;
+  AutomatonContractData::Ptr contractData;
 
-  TableSlots(Miner * _owner) : owner(_owner) {
+  TableSlots(Miner * _owner, AutomatonContractData::Ptr _contractData) : owner(_owner), contractData(_contractData) {
     // Create our table component and add it to this component..
     // addAndMakeVisible(table);
     setModel(this);
@@ -184,9 +179,8 @@ class TableSlots: public TableListBox, TableListBoxModel {
 
   // This is overloaded from TableListBoxModel, and must return the total number of rows in our table
   int getNumRows() override {
-    auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->m_criticalSection);
-    return static_cast<int>(cd->m_slots.size());
+    ScopedLock lock(contractData->m_criticalSection);
+    return static_cast<int>(contractData->m_slots.size());
   }
 
   void selectedRowsChanged(int) override {
@@ -207,8 +201,7 @@ class TableSlots: public TableListBox, TableListBoxModel {
   // components.
   void paintCell(Graphics& g, int rowNumber, int columnId,
                 int width, int height, bool /*rowIsSelected*/) override {
-    auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->m_criticalSection);
+    ScopedLock lock(contractData->m_criticalSection);
 
     g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
     g.setFont(font);
@@ -224,11 +217,11 @@ class TableSlots: public TableListBox, TableListBoxModel {
         break;
       }
       case 2: {
-        text = bin2hex(cd->m_slots[rowNumber].difficulty);
+        text = bin2hex(contractData->m_slots[rowNumber].difficulty);
         break;
       }
       case 3: {
-        text = "0x" + cd->m_slots[rowNumber].owner;
+        text = "0x" + contractData->m_slots[rowNumber].owner;
         break;
       }
       case 4: {
@@ -287,9 +280,9 @@ static String sepitoa(uint64 n, bool lz = false) {
 }
 
 //==============================================================================
-Miner::Miner(Config* config) {
-  private_key = config->get_string("private_key");
-  eth_address = config->get_string("eth_address");
+Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
+  private_key = m_accountData->getPrivateKey();
+  eth_address = m_accountData->getAddress();
 
   int y = 0;
 
@@ -337,7 +330,6 @@ Miner::Miner(Config* config) {
   y += 50;
   TB("Add Miner", 120, y, 80, 24);
   TB("Stop Miners", 220, y, 80, 24);
-  TB("Claim", 120, y + 30, 80, 24);
   txtMinerInfo = TXT("MINFO", 320, y, 400, 80);
   txtMinerInfo->setText("Not running.");
   txtMinerInfo->setReadOnly(true);
@@ -348,7 +340,7 @@ Miner::Miner(Config* config) {
   LBL("Claim Slot Parameters:", 650, y, 300, 24);
 
   y += 30;
-  tblSlots = new TableSlots(this);
+  tblSlots = new TableSlots(this, m_accountData->getContractData());
   tblSlots->setBounds(20, y, 600, 300);
   addComponent(tblSlots);
   txtClaim = TXT("CLAIM", 650, y, 600, 300);
@@ -382,7 +374,7 @@ Miner::Miner(Config* config) {
 }
 
 void Miner::updateContractData() {
-  auto cd = AutomatonContractData::getInstance();
+  auto cd = m_accountData->getContractData();
   ScopedLock lock(cd->m_criticalSection);
   setSlotsNumber(cd->m_slotsNumber);
   setMaskHex(cd->m_mask);
@@ -390,6 +382,7 @@ void Miner::updateContractData() {
 }
 
 Miner::~Miner() {
+  stopMining();
 }
 
 // TODO(asen): Fix this.
@@ -464,8 +457,6 @@ void Miner::buttonClicked(Button* btn) {
     addMinerThread();
   } else if (txt == "Stop Miners") {
     stopMining();
-  } else if (txt == "Claim") {
-    createSignature();
   }
   repaint();
 }
@@ -532,67 +523,46 @@ void Miner::createSignature() {
 */
 }
 
-class ClaimSlotThread: public ThreadWithProgressWindow {
- public:
-  std::string private_key;
-  std::string mined_key;
-  std::string address;
-  std::string bin_address;
-  status s;
-
-  ClaimSlotThread(std::string _private_key, std::string _mined_key):
-      ThreadWithProgressWindow("Claim Slot Thread", true, true),
-      private_key(_private_key),
-      mined_key(_mined_key),
-      s(status::ok()) {
-    address = Utils::gen_ethereum_address(private_key);
-    bin_address = hex2bin(std::string(24, '0') + address.substr(2));
-  }
-
-  void run() override {
-    auto cd = AutomatonContractData::getInstance();
-    ScopedLock lock(cd->m_criticalSection);
-
-    auto contract = eth_contract::get_contract(cd->m_contractAddress);
-    if (contract == nullptr) {
-      s = status::internal("Contract is NULL!");
-      return;
-    }
-
-    setStatusMessage("Generating signature...");
-
-    // Generate signature.
-    std::string pub_key = gen_pub_key(reinterpret_cast<const unsigned char *>(mined_key.c_str()));
-    std::string sig = sign(
-        reinterpret_cast<const unsigned char *>(mined_key.c_str()),
-        reinterpret_cast<const unsigned char *>(bin_address.c_str()));
-
-    int32_t v = sig[64];
-    json jInput;
-    jInput.push_back(bin2hex(pub_key.substr(0, 32)));  // public key X
-    jInput.push_back(bin2hex(pub_key.substr(32, 32)));  // public key Y
-    jInput.push_back(std::to_string(v));
-    jInput.push_back(bin2hex(sig.substr(0, 32)));  // R
-    jInput.push_back(bin2hex(sig.substr(32, 32)));  // S
-
-    setStatusMessage("Claiming slot...");
-    s = contract->call("claimSlot", jInput.dump(), private_key);
-    if (!s.is_ok()) {
-      return;
-    }
-  }
-};
-
 void Miner::claimMinedSlots() {
   if (mined_slots.size() > 0) {
     auto ms = mined_slots.back();
     mined_slots.pop_back();
-    ClaimSlotThread t(private_key, ms.private_key);
-    if (!t.runThread(9)) {
-      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                       "Claim slot failed!",
-                                       t.s.msg);
-    }
+
+    auto mined_key = ms.private_key;
+
+    TasksManager::launchTask([=](AsyncTask* task) {
+      auto& s = task->m_status;
+
+      task->setStatusMessage("Generating signature...");
+
+      const auto address = Utils::gen_ethereum_address(private_key);
+      const auto bin_address = hex2bin(std::string(24, '0') + address.substr(2));
+
+      // Generate signature.
+      std::string pub_key = gen_pub_key(reinterpret_cast<const unsigned char *>(mined_key.c_str()));
+      std::string sig = sign(
+          reinterpret_cast<const unsigned char *>(mined_key.c_str()),
+          reinterpret_cast<const unsigned char *>(bin_address.c_str()));
+
+      int32_t v = sig[64];
+      json jInput;
+      jInput.push_back(bin2hex(pub_key.substr(0, 32)));  // public key X
+      jInput.push_back(bin2hex(pub_key.substr(32, 32)));  // public key Y
+      jInput.push_back(std::to_string(v));
+      jInput.push_back(bin2hex(sig.substr(0, 32)));  // R
+      jInput.push_back(bin2hex(sig.substr(32, 32)));  // S
+
+      task->setStatusMessage("Claiming slot...");
+      s = m_accountData->getContractData()->call("claimSlot", jInput.dump(), private_key);
+
+      if (!s.is_ok()) {
+        return false;
+      }
+
+      task->setStatusMessage("Claiming slot...success!");
+      return true;
+    }, [=](AsyncTask* task) {
+    }, "Claiming slot", m_accountData);
   }
 }
 

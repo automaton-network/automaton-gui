@@ -28,8 +28,9 @@ class ProposalsModel : public AbstractListModel<Proposal::Ptr> {
   Proposal::Ptr getAt(int index) override;
   Proposal::Ptr& getReferenceAt(int index) override;
 
-  void addItem(Proposal::Ptr item, bool sendNotification = true);
-  void clear(bool sendNotification = true);
+  void addItem(Proposal::Ptr item, NotificationType notification);
+  void addItems(Array<Proposal::Ptr> items, NotificationType notification);
+  void clear(NotificationType notification);
 
  private:
   Array<Proposal::Ptr> m_items;

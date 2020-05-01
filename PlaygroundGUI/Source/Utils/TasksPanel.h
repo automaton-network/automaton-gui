@@ -18,20 +18,32 @@
  */
 
 #pragma once
-
+#include <Login/Account.h>
 #include "JuceHeader.h"
+#include "../Models/AbstractListModel.h"
 
-enum class CoinUnit {Gwei = 9, ether = 18, AUTO = 18};
+class TasksProxyModel;
+class TaskComponent;
+class TaskStatusBar;
 
-class Utils {
+class TasksPanel : public Component
+                 , public AbstractListModelBase::Listener {
  public:
-  static std::string gen_ethereum_address(const std::string& privkey_hex);
-  static std::unique_ptr<Drawable> loadSVG(const String& xmlData);
-  static String fromWei(CoinUnit unitTo, const String& value);
-  static String toWei(CoinUnit unitTo, const String& value);
+  TasksPanel(Account::Ptr accountData);
+  ~TasksPanel();
 
-  static bool isZeroTime(const Time& time);
+  Component* getStatusBarComponent() const noexcept;
 
-  static const String numericalIntegerAllowed;
-  static const String numericalFloatAllowed;
+  void resized() override;
+  void paint(Graphics& g) override;
+  void mouseUp(const MouseEvent& e) override;
+
+  // AbstractListModelBase::Listener
+  void modelChanged(AbstractListModelBase* base) override;
+
+ private:
+  std::shared_ptr<TasksProxyModel> m_tasksProxyModel;
+  std::unique_ptr<TaskStatusBar> m_statusBar;
+
+  OwnedArray<TaskComponent> m_tasksComponents;
 };

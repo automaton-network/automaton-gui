@@ -28,6 +28,8 @@
 #include "DEX/DEXPage.h"
 #include "DEX/DEXManager.h"
 #include "MainComponent.h"
+#include "Utils/TasksPanel.h"
+#include "Data/AutomatonContractData.h"
 
 class DemoBlank: public Component {
  public:
@@ -45,25 +47,25 @@ class DemoBlank: public Component {
 };
 
 
-DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
-  m_proposalsManager = std::make_unique<ProposalsManager>(m_config);
-  m_dexManager = std::make_unique<DEXManager>(m_config);
-  m_proposalsManager->fetchProposals();
-  m_dexManager->fetchOrders();
+DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData(accountData) {
+  accountData->initManagers();
+
+  m_accountData->getProposalsManager()->fetchProposals();
+  m_accountData->getDexManager()->fetchOrders();
 
   m_tabbedComponent.reset(new TabbedComponent(TabbedButtonBar::TabsAtTop));
   addAndMakeVisible(m_tabbedComponent.get());
   m_tabbedComponent->setTabBarDepth(37);
 //  m_tabbedComponent->addTab(TRANS("Network"), Colour(0xff404040),
 //                            new NetworkView(m_proposalsManager.get()), true);
-  m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(m_config), true);
+  m_tabbedComponent->addTab(TRANS("Miner"), Colour(0xff404040), new Miner(m_accountData), true);
   // m_tabbedComponent->addTab(TRANS("Demo Miner"), Colour(0xff404040), new DemoMiner(), true);
 
-  auto proposalsPage = new ProposalsPage(m_proposalsManager.get());
+  auto proposalsPage = new ProposalsPage(m_accountData);
   m_tabbedComponent->addTab(TRANS("Proposals"), Colour(0xff404040), proposalsPage, true);
   m_tabbedComponent->addTab(TRANS("Proposals Actions"), Colour(0xff404040),
-                            new ProposalsActionsPage(m_proposalsManager.get()), true);
-  m_tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(m_dexManager.get()), true);
+                            new ProposalsActionsPage(m_accountData->getProposalsManager()), true);
+  m_tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(m_accountData), true);
 
   // m_tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   // m_tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
@@ -72,10 +74,19 @@ DemosMainComponent::DemosMainComponent(Config* config) : m_config(config) {
   // tabbedComponent->addTab(TRANS("Network Simulation"), Colour(0xff404040), new DemoSimNet(), true);
   m_tabbedComponent->setCurrentTabIndex(0);
 
+  m_tasksPanel = std::make_unique<TasksPanel>(accountData);
+  addAndMakeVisible(m_tasksPanel->getStatusBarComponent());
+  addChildComponent(m_tasksPanel.get());
+
+  m_refreshButton = std::make_unique<TextButton>("Refresh");
+  m_refreshButton->addListener(this);
+  addAndMakeVisible(m_refreshButton.get());
+
   setSize(1024, 768);
 }
 
 DemosMainComponent::~DemosMainComponent() {
+  m_accountData->clearManagers();
   m_tabbedComponent = nullptr;
 }
 
@@ -85,9 +96,20 @@ void DemosMainComponent::paint(Graphics& g) {
 }
 
 void DemosMainComponent::resized() {
-  // auto b = getLocalBounds();
-  // auto height = LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight();
-  // menuBar->setBounds(b.removeFromTop(height));
+  auto bounds = getLocalBounds();
+  const auto statusBarBounds = bounds.removeFromBottom(25);
 
-  m_tabbedComponent->setBounds(8, 8, getWidth() - 16, getHeight() - 16);
+  m_refreshButton->setBounds(getLocalBounds().reduced(10).removeFromRight(80).removeFromTop(25));
+  m_tasksPanel->setBounds(bounds.withWidth(300));
+  m_tabbedComponent->setBounds(8, 8,
+                               bounds.getWidth() - 16, getLocalBounds().getHeight() - 8 - statusBarBounds.getHeight());
+  m_tasksPanel->getStatusBarComponent()->setBounds(statusBarBounds);
+}
+
+void DemosMainComponent::buttonClicked(Button* button) {
+  if (m_refreshButton.get() == button) {
+    m_accountData->getContractData()->readContract();
+    m_accountData->getProposalsManager()->fetchProposals();
+    m_accountData->getDexManager()->fetchOrders();
+  }
 }

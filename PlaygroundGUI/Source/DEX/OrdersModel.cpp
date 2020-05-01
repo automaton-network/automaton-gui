@@ -32,24 +32,19 @@ Order::Ptr& OrdersModel::getReferenceAt(int index) {
   return m_items.getReference(index);
 }
 
-void OrdersModel::addItem(Order::Ptr item, bool sendNotification) {
+void OrdersModel::addItem(Order::Ptr item, NotificationType notification) {
   m_items.add(item);
-
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }
 
-void OrdersModel::addItems(Array<Order::Ptr> items, bool sendNotification) {
+void OrdersModel::addItems(Array<Order::Ptr> items, NotificationType notification) {
   m_items.addArray(items);
-
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }
 
-void OrdersModel::clear(bool sendNotification) {
+void OrdersModel::clear(NotificationType notification) {
   m_items.clearQuick();
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }
 
 bool OrdersProxyModel::isAccept(const Order::Ptr& item) {

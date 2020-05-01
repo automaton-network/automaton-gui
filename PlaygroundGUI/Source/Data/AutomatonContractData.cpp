@@ -18,7 +18,7 @@
  */
 
 #include  "AutomatonContractData.h"
-#include "../Utils/AsyncTask.h"
+#include "../Utils/TasksManager.h"
 
 #include <secp256k1_recovery.h>
 #include <secp256k1.h>
@@ -41,25 +41,18 @@ using automaton::core::io::hex2bin;
 using automaton::core::io::hex2dec;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
 
-JUCE_IMPLEMENT_SINGLETON(AutomatonContractData)
-
-AutomatonContractData::AutomatonContractData() {
+AutomatonContractData::AutomatonContractData(const Config& _config) {
+  loadAbi();
+  config  = _config;
+  m_ethUrl = config.get_string("eth_url");
+  m_contractAddress = config.get_string("contract_address");
+  m_mask = config.get_string("mask");
+  m_minDifficulty = config.get_string("min_difficulty");
+  m_slotsNumber = static_cast<uint32_t>(config.get_number("slots_number"));
+  m_slotsClaimed = static_cast<uint32_t>(config.get_number("slots_claimed"));
 }
 
 AutomatonContractData::~AutomatonContractData() {
-  clearSingletonInstance();
-}
-
-void AutomatonContractData::init(Config* _config) {
-  config  = _config;
-  loadAbi();
-
-  m_ethUrl = config->get_string("eth_url");
-  m_contractAddress = config->get_string("contract_address");
-  m_mask = config->get_string("mask");
-  m_minDifficulty = config->get_string("min_difficulty");
-  m_slotsNumber = static_cast<uint32_t>(config->get_number("slots_number"));
-  m_slotsClaimed = static_cast<uint32_t>(config->get_number("slots_claimed"));
 }
 
 void AutomatonContractData::setData(const std::string& _eth_url,
@@ -78,23 +71,19 @@ void AutomatonContractData::setData(const std::string& _eth_url,
   m_slotsClaimed = _slots_claimed;
   m_slots = _slots;
 
-  config->set_string("eth_url", m_ethUrl);
-  config->set_string("contract_address", m_contractAddress);
-  config->set_string("mask", m_mask);
-  config->set_string("min_difficulty", m_minDifficulty);
-  config->set_number("slots_number", m_slotsNumber);
-  config->set_number("slots_claimed", m_slotsClaimed);
+  config.set_string("eth_url", m_ethUrl);
+  config.set_string("contract_address", m_contractAddress);
+  config.set_string("mask", m_mask);
+  config.set_string("min_difficulty", m_minDifficulty);
+  config.set_number("slots_number", m_slotsNumber);
+  config.set_number("slots_claimed", m_slotsClaimed);
 }
 
-bool AutomatonContractData::readContract(const std::string& url,
-                                         const std::string& contractAddress) {
-  uint32_t slotsNumber;
-  uint32_t slotsClaimed;
-  std::vector<ValidatorSlot> validatorSlots;
-  std::string mask;
-  std::string minDifficulty;
+bool AutomatonContractData::readContract() {
+  const std::string& url = m_ethUrl;
+  const std::string& contractAddress = m_contractAddress;
 
-  AsyncTask task([&](AsyncTask* task){
+  auto result = TasksManager::launchTask([&](TaskWithProgressWindow* task){
     auto& s = task->m_status;
     eth_contract::register_contract(url, contractAddress, getAbi());
     auto contract = eth_contract::get_contract(contractAddress);
@@ -116,7 +105,8 @@ bool AutomatonContractData::readContract(const std::string& url,
       return false;
     }
     json j_output = json::parse(s.msg);
-    slotsNumber = std::stoul((*j_output.begin()).get<std::string>());
+    auto slotsNumber = String(((*j_output.begin()).get<std::string>())).getIntValue();
+    std::vector<ValidatorSlot> validatorSlots;
     validatorSlots.resize(slotsNumber);
 
     uint32_t step = 1024;
@@ -184,50 +174,42 @@ bool AutomatonContractData::readContract(const std::string& url,
 
     s = contract->call("mask", "");
     j_output = json::parse(s.msg);
-    mask = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
+    auto mask = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     task->setStatusMessage("Mask: " + mask);
 
     s = contract->call("minDifficulty", "");
     j_output = json::parse(s.msg);
-    minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
+    auto minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     task->setStatusMessage("MinDifficulty: " + minDifficulty);
 
     s = contract->call("numTakeOvers", "");
     j_output = json::parse(s.msg);
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
-    slotsClaimed = std::stoul(slots_claimed_string);
+    auto slotsClaimed = String(slots_claimed_string).getLargeIntValue();
     task->setStatusMessage("Number of slot claims: " + slots_claimed_string);
     task->setProgress(1.0);
 
     s = status::ok();
+    setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, validatorSlots);
+
     return true;
-  }, "Reading Contract...");
+  }, nullptr, "Reading Contract...");
 
-  if (task.runThread()) {
-    auto& s = task.m_status;
-    if (s.is_ok()) {
-      setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, validatorSlots);
-
-      AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon,
-                                       "Operation successful!",
-                                       "Contract data loaded successfully and settings updated");
-      return true;
-    } else {
-      AlertWindow::showMessageBoxAsync(
-          AlertWindow::WarningIcon,
-          "ERROR",
-          String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "Canceled!",
-        "Operation aborted.");
-  }
+  return result;
 }
 
 std::shared_ptr<eth_contract> AutomatonContractData::getContract() {
   return eth_contract::get_contract(getAddress());
+}
+
+status AutomatonContractData::call(const std::string& f,
+                                   const std::string& params,
+                                   const std::string& privateKey) {
+  ScopedLock sl(m_criticalSection);
+  if (auto contract = getContract())
+    return getContract()->call(f, params, privateKey);
+
+  return status::internal("Contract is NULL.");
 }
 
 std::string AutomatonContractData::getAbi() {
@@ -274,4 +256,13 @@ uint32_t AutomatonContractData::getSlotsNumber() const noexcept {
 uint32_t AutomatonContractData::getSlotsClaimed() const noexcept {
   ScopedLock sl(m_criticalSection);
   return m_slotsClaimed;
+}
+
+std::vector<ValidatorSlot> AutomatonContractData::getSlots() const {
+  ScopedLock sl(m_criticalSection);
+  return m_slots;
+}
+
+Config& AutomatonContractData::getConfig() {
+  return config;
 }

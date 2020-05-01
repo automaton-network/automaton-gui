@@ -20,26 +20,30 @@
 
 #include "AccountsModel.h"
 
-Account::Account() {
+AccountConfig::AccountConfig() {
 }
 
-Account::Account(const String& address) {
+AccountConfig::AccountConfig(const String& address) {
   m_address = address;
 }
 
-const String& Account::getAddress() const noexcept {
+const String& AccountConfig::getAddress() const noexcept {
   return m_address;
 }
 
-String Account::getAlias() const noexcept {
+String AccountConfig::getPrivateKey() const noexcept {
+  return m_config.get_string("private_key");
+}
+
+String AccountConfig::getAlias() const noexcept {
   return m_config.get_string("account_alias");
 }
 
-Config& Account::getConfig() noexcept {
+Config& AccountConfig::getConfig() noexcept {
   return m_config;
 }
 
-bool Account::operator==(const Account& other) const noexcept {
+bool AccountConfig::operator==(const AccountConfig& other) const noexcept {
   return m_address == other.m_address;
 }
 
@@ -47,24 +51,20 @@ int AccountsModel::size() const {
   return m_accounts.size();
 }
 
-Account AccountsModel::getAt(int index) {
+AccountConfig AccountsModel::getAt(int index) {
   return m_accounts[index];
 }
 
-Account& AccountsModel::getReferenceAt(int index) {
+AccountConfig& AccountsModel::getReferenceAt(int index) {
   return m_accounts.getReference(index);
 }
 
-void AccountsModel::addItem(const Account& account, bool sendNotification) {
+void AccountsModel::addItem(const AccountConfig& account, NotificationType notification) {
   m_accounts.addIfNotAlreadyThere(account);
-
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }
 
-void AccountsModel::removeItem(const Account& account, bool sendNotification) {
+void AccountsModel::removeItem(const AccountConfig& account, NotificationType notification) {
   m_accounts.removeFirstMatchingValue(account);
-
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }

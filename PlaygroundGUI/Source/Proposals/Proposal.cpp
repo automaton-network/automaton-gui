@@ -18,6 +18,7 @@
  */
 
 #include "Proposal.h"
+#include "Utils/Utils.h"
 
 #include <json.hpp>
 #include <string>
@@ -27,46 +28,57 @@ using json = nlohmann::json;
 
 Proposal::Proposal()
   : m_id(0)
+  , m_numPeriodsLeft(0)
+  , m_budgetPeriodLength(0)
+  , m_initialPeriod(0)
+  , m_contestPeriod(0)
+  , m_budgetPerPeriod(String(0))
   , m_amountSpent(String(0))
-  , m_budget(String(0))
-  , m_numPeriods(0)
   , m_targetBonus(String(0))
   , m_approvalRating(0)
-  , m_lengthDays(0)
   , m_timeLeft(0)
   , m_numSlotsPaid(0)
+  , m_areAllSlotsPaid(false)
   , m_status(Proposal::Status::Uninitialized) {
 }
 
-Proposal::Proposal(uint32_t id, const String& jsonString)
+Proposal::Proposal(uint32_t id, const String& infoJsonString, const String& dataJsonString)
   : m_id(0)
+  , m_numPeriodsLeft(0)
+  , m_budgetPeriodLength(0)
+  , m_initialPeriod(0)
+  , m_contestPeriod(0)
+  , m_budgetPerPeriod(String(0))
   , m_amountSpent(String(0))
-  , m_budget(String(0))
-  , m_numPeriods(0)
   , m_targetBonus(String(0))
   , m_approvalRating(0)
-  , m_lengthDays(0)
   , m_timeLeft(0)
+  , m_numSlotsPaid(0)
+  , m_areAllSlotsPaid(false)
   , m_status(Proposal::Status::Uninitialized) {
     setId(id);
 
-    json json_proposal = json::parse(jsonString.toStdString());
+    json json_proposal_info = json::parse(infoJsonString.toStdString());
+    json json_proposal_data = json::parse(dataJsonString.toStdString());
     // TODO(Kirill): add json error handling
 
-    setCreator(json_proposal.at(0).get<std::string>());
-    setTitle(json_proposal.at(1).get<std::string>());
-    setDocumentLink(json_proposal.at(2).get<std::string>());
-    setDocumentHash(json_proposal.at(3).get<std::string>());
-    setLengthDays(std::stoul(json_proposal.at(4).get<std::string>()));
-    setNumPeriods(std::stoul(json_proposal.at(5).get<std::string>()));
-    setBudget(json_proposal.at(6).get<std::string>());
-    // TODO(Kirill)
-    // setNextPaymentDate(json_proposal.at(7.get<uint64_t>()));
+    // Set "info" part
+    setCreator(json_proposal_info.at(0).get<std::string>());
+    setTitle(json_proposal_info.at(1).get<std::string>());
+    setDocumentLink(json_proposal_info.at(2).get<std::string>());
+    setDocumentHash(json_proposal_info.at(3).get<std::string>());
+    // divide by timeUnitInSeconds
+    setBudgetPeriodLength(std::stoul(json_proposal_info.at(4).get<std::string>()) / 24 / 60 / 60);
+    setBudgetPerPeriod(json_proposal_info.at(5).get<std::string>());
+    setInitialPeriod(std::stoul(json_proposal_info.at(6).get<std::string>()));
+    setContestPeriod(std::stoul(json_proposal_info.at(7).get<std::string>()));
 
-    setStatus(static_cast<Proposal::Status>(std::stoul(json_proposal.at(8).get<std::string>())));
-    // TODO(Kirill)
-    // setInitialEndDate(json_proposal.at(9).get<uint64_t>());
-    // setContestEndDate(json_proposal.at(10).get<uint64_t>());
+    // Set "data" part
+    setNumPeriodsLeft(std::stoul(json_proposal_data.at(0).get<std::string>()));
+    setNextPaymentDate(std::stoul(json_proposal_data.at(1).get<std::string>()));
+    setStatus(static_cast<Proposal::Status>(std::stoul(json_proposal_data.at(2).get<std::string>())));
+    setInitialVotingEndDate(std::stoul(json_proposal_data.at(3).get<std::string>()));
+    setInitialContestEndDate(std::stoul(json_proposal_data.at(4).get<std::string>()));
 }
 
 String Proposal::getStatusStr(Proposal::Status status) {
@@ -94,9 +106,53 @@ static float getPercentage(const String& dividend, const String& divisor) {
 }
 
 float Proposal::getSpentPrecent() const {
-  return getPercentage(m_amountSpent, m_budget);
+  return getPercentage(m_amountSpent, m_budgetPerPeriod);
 }
 
 float Proposal::getBounusPrecent() const {
-  return getPercentage(m_targetBonus, m_budget);
+  return getPercentage(m_targetBonus, m_budgetPerPeriod);
+}
+
+bool Proposal::isRewardClaimable() const noexcept {
+  // TODO(Kirill) need to think which statuses are eligible for claiming (perhaps, Accepted, Completed as well)
+  // Temporarily enable claiming reward button at "Started" state as well. That's because proposal state is updated
+  // in smart contract only before each vote. So the proposal can have 100% approval rate but still remain in
+  // "Started" state until some action that calls updateProposalState() smart-contract function is performed.
+  const auto initialVotingEndDate = getInitialVotingEndDate();
+  const auto initialVotingEnded = Utils::isZeroTime(initialVotingEndDate) == false
+                                  && initialVotingEndDate.toMilliseconds() < Time::getCurrentTime().toMilliseconds();
+  const bool isClaimingActive = initialVotingEnded
+                                && (getStatus() == Proposal::Status::Accepted
+                                    || getStatus() == Proposal::Status::Contested
+                                    || getStatus() == Proposal::Status::Started);
+  return isClaimingActive;
+}
+
+void Proposal::setSlots(const Array<uint64>& slots, NotificationType notify) {
+  m_slots = slots;
+
+  if (notify != NotificationType::dontSendNotification)
+    notifyChanged();
+}
+
+void Proposal::setInitialVotingEndDate(uint64 dateUnix) {
+  m_initialVotingEndDate = Time(dateUnix * 1000);
+}
+
+void Proposal::setInitialContestEndDate(uint64 dateUnix) {
+  m_initialContestEndDate = Time(dateUnix * 1000);
+}
+
+void Proposal::setNextPaymentDate(uint64 dateUnix) {
+  m_nextPaymentDate = Time(dateUnix * 1000);
+}
+
+bool Proposal::hasActiveStatus() const noexcept {
+  return getStatus() == Proposal::Status::Started
+         || getStatus() == Proposal::Status::Accepted
+         || getStatus() == Proposal::Status::Contested;
+}
+
+bool Proposal::hasInactiveStatus() const noexcept {
+  return !hasActiveStatus();
 }

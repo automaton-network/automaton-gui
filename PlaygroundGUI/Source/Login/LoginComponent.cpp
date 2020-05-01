@@ -26,18 +26,17 @@
 
 class AccountWindow : public DocumentWindow {
  public:
-  AccountWindow(String title, String accountAddress, Config* accountConfig)
+  AccountWindow(String title, Account::Ptr accountData)
       : DocumentWindow(title,
                     Desktop::getInstance()
                     .getDefaultLookAndFeel()
                     .findColour(ResizableWindow::backgroundColourId),
                     DocumentWindow::allButtons)
-      , m_accountAddress(accountAddress)
-      , m_accountConfig(accountConfig) {
+      , m_accountAddress(accountData->getAddress()) {
     LookAndFeel::setDefaultLookAndFeel(&m_lnf);
 
     setUsingNativeTitleBar(false);
-    setContentOwned(new DemosMainComponent(m_accountConfig), true);
+    setContentOwned(new DemosMainComponent(accountData), true);
     setTitleBarButtonsRequired(closeButton | minimiseButton | maximiseButton, false);
 
     setFullScreen(false);
@@ -62,15 +61,19 @@ class AccountWindow : public DocumentWindow {
  private:
   LookAndFeel_V4 m_lnf;
   String m_accountAddress;
-  Config* m_accountConfig;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AccountWindow)
 };
 
+static const Array<RPCConfig> RPC_DEFAULT_LIST = {RPCConfig("http://127.0.0.1:7545", "Localhost 7545"),
+                                                  RPCConfig("http://127.0.0.1:8545", "Localhost 8545")};
+
 //==============================================================================
 LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile) {
-  m_model = std::make_shared<AccountsModel>();
-  m_model->addListener(this);
+  m_rpcList = RPC_DEFAULT_LIST;
+  m_accountsModel = std::make_shared<AccountsModel>();
+  m_accountsModel->addListener(this);
+
   m_accountsTable = std::make_unique<TableListBox>();
   m_accountsTable->setRowHeight(32);
   m_accountsTable->setRowSelectedOnMouseDown(true);
@@ -84,13 +87,39 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
   tableHeader.addColumn(translate("Alias"), 1, 50);
   tableHeader.addColumn(translate("Address"), 2, 300);
 
+  m_selectedRPC = m_configFile->get_string("selectedRPC", "");
+  m_selectedContract = m_configFile->get_string("selectedContract", "");
+
+  auto rpcJson = m_configFile->get_json("rpcList");
+  for (const auto& el : rpcJson.items()) {
+    m_rpcList.addIfNotAlreadyThere(RPCConfig(el.key(), el.value()));
+  }
+
+  auto contractsJson = m_configFile->get_json("contracts");
+  for (const auto& el : contractsJson.items()) {
+    Config config;
+    config.restoreFrom_json(el.value());
+    auto contract = std::make_shared<AutomatonContractData>(config);
+    m_contracts[contract->getUrl()].add(contract);
+  }
+
 
   auto accountsJson = m_configFile->get_json("accounts");
   for (const auto& el : accountsJson.items()) {
-    Account account(el.key());
+    AccountConfig account(el.key());
     account.getConfig().restoreFrom_json(el.value());
-    m_model->addItem(account, false);
+    m_accountsModel->addItem(account, NotificationType::dontSendNotification);
   }
+
+  m_rpcComboBox = std::make_unique<ComboBox>();
+  initRPCComboBox(m_rpcList);
+  m_rpcComboBox->addListener(this);
+  addAndMakeVisible(m_rpcComboBox.get());
+
+  m_contractComboBox = std::make_unique<ComboBox>();
+  initContractsComboBox(getCurrentContracts());
+  m_contractComboBox->addListener(this);
+  addAndMakeVisible(m_contractComboBox.get());
 
   m_importPrivateKeyBtn = std::make_unique<TextButton>("Import");
   addAndMakeVisible(m_importPrivateKeyBtn.get());
@@ -103,35 +132,37 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
 
   m_rpcLabel = std::make_unique<Label>("m_rpcLabel", "Ethereum RPC:");
   addAndMakeVisible(m_rpcLabel.get());
-  m_rpcEditor = std::make_unique<TextEditor>("m_rpcEditor");
-  addAndMakeVisible(m_rpcEditor.get());
-
   m_contractAddrLabel = std::make_unique<Label>("m_contractAddrLabel", "Contract Address: ");
   addAndMakeVisible(m_contractAddrLabel.get());
-  m_contractAddrEditor = std::make_unique<TextEditor>("m_contractAddrEditor");
-  m_contractAddrEditor->setInputRestrictions(42, "0123456789abcdefABCDEFx");
-  addAndMakeVisible(m_contractAddrEditor.get());
-
-  m_readContractBtn = std::make_unique<TextButton>("Login");
-  m_readContractBtn->addListener(this);
-  addAndMakeVisible(m_readContractBtn.get());
-
-  auto cd = AutomatonContractData::getInstance();
-  m_rpcEditor->setText(cd->getUrl());
-  m_contractAddrEditor->setText(cd->getAddress());
-  switchLoginState(true);
 
   setSize(350, 600);
 }
 
 LoginComponent::~LoginComponent() {
+  json contracts;
+  for (auto& iter : m_contracts) {
+    for (auto& item : iter.second)
+      contracts[iter.first.toStdString() + item->getAddress()] = item->getConfig().to_json();
+  }
+  m_configFile->set_json("contracts", contracts);
+
   json accounts;
-  for (int i = 0; i < m_model->size(); ++i) {
-    auto& item = m_model->getReferenceAt(i);
+  for (int i = 0; i < m_accountsModel->size(); ++i) {
+    auto& item = m_accountsModel->getReferenceAt(i);
     accounts[item.getAddress().toStdString()] = item.getConfig().to_json();
   }
-
   m_configFile->set_json("accounts", accounts);
+
+  json rpcList;
+  for (int i = 0; i < m_rpcList.size(); ++i) {
+    auto item = m_rpcList[i];
+    rpcList[item.m_url] = item.m_alias;
+  }
+  m_configFile->set_json("rpcList", rpcList);
+
+  m_configFile->set_string("selectedRPC", m_selectedRPC);
+  m_configFile->set_string("selectedContract", m_selectedContract);
+
   m_configFile->save_to_local_file();
 }
 
@@ -144,34 +175,32 @@ void LoginComponent::resized() {
   auto logoBounds = bounds.removeFromTop(39);
   m_logo->setBounds(logoBounds.withSizeKeepingCentre(231, 39));
 
-  auto configBounds = bounds;
-  configBounds.removeFromTop(20);
-  auto rpcBounds = configBounds.removeFromTop(20);
+  bounds.removeFromTop(20);
+  auto rpcBounds = bounds.removeFromTop(20);
   m_rpcLabel->setBounds(rpcBounds.removeFromLeft(100));
-  m_rpcEditor->setBounds(rpcBounds);
-  configBounds.removeFromTop(20);
-  auto addrBounds = configBounds.removeFromTop(20);
+  m_rpcComboBox->setBounds(rpcBounds);
+  bounds.removeFromTop(20);
+  auto addrBounds = bounds.removeFromTop(20);
   m_contractAddrLabel->setBounds(addrBounds.removeFromLeft(100));
-  m_contractAddrEditor->setBounds(addrBounds);
-  configBounds.removeFromTop(40);
-  m_readContractBtn->setBounds(configBounds.removeFromTop(40).withSizeKeepingCentre(120, 40));
+  m_contractComboBox->setBounds(addrBounds);
 
-  bounds.removeFromTop(40);
-  m_accountsTable->setBounds(bounds.removeFromTop(250));
-  bounds.removeFromTop(40);
+  bounds.removeFromTop(20);
+  m_accountsTable->setBounds(bounds.removeFromTop(200));
+  bounds.removeFromTop(20);
   auto btnBounds = bounds.removeFromTop(40);
-  // m_importPrivateKeyBtn->setBounds(btnBounds.withSizeKeepingCentre(120, 40));
-
-  // Temporarily display refresh button on the same screen after switching view
-  if (m_importPrivateKeyBtn->isVisible()) {
-      const auto btnWidth = 120;
-      m_importPrivateKeyBtn->setBounds(btnBounds.removeFromLeft(btnWidth));
-      m_readContractBtn->setBounds(btnBounds.removeFromRight(btnWidth));
-  }
+  m_importPrivateKeyBtn->setBounds(btnBounds);
 }
 
 void LoginComponent::buttonClicked(Button* btn) {
   if (btn == m_importPrivateKeyBtn.get()) {
+    auto currentContract = getCurrentContract();
+    if (currentContract == nullptr) {
+      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                       "Invalid contract!",
+                                       "Select valid RPC!");
+      return;
+    }
+
     AlertWindow w("Import Private Key",
                   "Enter your private key and it will be imported.",
                   AlertWindow::QuestionIcon);
@@ -197,17 +226,12 @@ void LoginComponent::buttonClicked(Button* btn) {
       const auto accountAlias = w.getTextEditorContents("alias");
 
       auto eth_address_hex = Utils::gen_ethereum_address(privkeyHex.toStdString());
-      Account account(eth_address_hex);
+      AccountConfig account(eth_address_hex);
       account.getConfig().set_string("private_key", privkeyHex.toStdString());
       account.getConfig().set_string("eth_address", eth_address_hex);
       account.getConfig().set_string("account_alias", accountAlias.toStdString());
-      m_model->addItem(account, true);
+      m_accountsModel->addItem(account, NotificationType::sendNotification);
     }
-  } else if (btn == m_readContractBtn.get()) {
-    bool res = AutomatonContractData::getInstance()->readContract(m_rpcEditor->getText().toStdString(),
-                                                                  m_contractAddrEditor->getText().toStdString());
-    if (res)
-      switchLoginState(false);
   }
 }
 
@@ -232,33 +256,95 @@ void LoginComponent::modelChanged(AbstractListModelBase* base) {
   m_accountsTable->repaint();
 }
 
-void LoginComponent::openAccount(Account* account) {
-  if (auto accountWindow = getWindowByAddress(account->getAddress())) {
+void LoginComponent::openAccount(AccountConfig* accountConfig) {
+  if (auto accountWindow = getWindowByAddress(accountConfig->getAddress())) {
     accountWindow->toFront(true);
   } else {
-    accountWindow = new AccountWindow("Account " + account->getAlias(), account->getAddress(), &account->getConfig());
-    accountWindow->addComponentListener(this);
-    m_accountWindows.add(accountWindow);
+    if (auto currentContract = getCurrentContract()) {
+      if (currentContract->readContract()) {
+        accountWindow = new AccountWindow("Account " + accountConfig->getAlias(),
+                                          std::make_shared<Account>(accountConfig, currentContract));
+        accountWindow->addComponentListener(this);
+        m_accountWindows.add(accountWindow);
+      }
+    } else {
+      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                       "Invalid contract!",
+                                       "Select valid Contract and RPC!");
+    }
   }
 }
 
-void LoginComponent::removeAccount(const Account& account) {
-  m_accountWindows.removeObject(getWindowByAddress(account.getAddress()), true);
-  m_model->removeItem(account);
+void LoginComponent::removeAccount(const AccountConfig& accountConfig) {
+  m_accountWindows.removeObject(getWindowByAddress(accountConfig.getAddress()), true);
+  m_accountsModel->removeItem(accountConfig, NotificationType::sendNotification);
+}
+
+void LoginComponent::comboBoxChanged(ComboBox* comboBoxThatHasChanged) {
+  if (comboBoxThatHasChanged == m_rpcComboBox.get()) {
+    if (m_rpcComboBox->getSelectedItemIndex() == m_rpcComboBox->getNumItems() - 1) {
+      AlertWindow w("Add Custom RPC",
+                    "Enter RPC Info.",
+                    AlertWindow::QuestionIcon);
+
+      w.addTextEditor("rpc", "", "Ethereum RPC:", false);
+      w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+      w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+      m_rpcComboBox->setSelectedId(-1, NotificationType::dontSendNotification);
+
+      if (w.runModalLoop() == 1) {
+        auto rpc = w.getTextEditorContents("rpc");
+        addRPC(rpc);
+      }
+    } else {
+      m_selectedRPC = getCurrentRPC().toStdString();
+    }
+    initContractsComboBox(getCurrentContracts());
+  } else if (comboBoxThatHasChanged == m_contractComboBox.get()) {
+    if (m_contractComboBox->getSelectedItemIndex() == m_contractComboBox->getNumItems() - 1) {
+      const auto rpc = getCurrentRPC();
+      if (rpc.isEmpty()) {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                         "Invalid contract!",
+                                         "Select valid RPC!");
+        m_contractComboBox->setSelectedId(-1, NotificationType::dontSendNotification);
+      } else {
+        AlertWindow w("Add contract",
+                      "Enter contract Info.",
+                      AlertWindow::QuestionIcon);
+
+        w.addTextEditor("contract", "", "Contract Address: ", false);
+        w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+        w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+        if (w.runModalLoop() == 1) {
+          auto contractAddr = w.getTextEditorContents("contract");
+          Config contractConfig;
+          contractConfig.set_string("eth_url", getCurrentRPC().toStdString());
+          contractConfig.set_string("contract_address", contractAddr.toStdString());
+          addContract(contractConfig);
+        }
+      }
+    } else {
+      m_selectedContract = getCurrentContract()->getAddress();
+    }
+    initContractsComboBox(getCurrentContracts());
+  }
 }
 
 // TableListBoxModel
 //==============================================================================
 
 int LoginComponent::getNumRows() {
-  return m_model->size();
+  return m_accountsModel->size();
 }
 
 void LoginComponent::paintCell(Graphics& g,
                                int rowNumber, int columnId,
                                int width, int height,
                                bool rowIsSelected) {
-  auto item = m_model->getAt(rowNumber);
+  auto item = m_accountsModel->getAt(rowNumber);
   g.setColour(Colours::white);
 
   switch (columnId) {
@@ -290,11 +376,11 @@ void LoginComponent::cellClicked(int rowNumber, int columnId, const MouseEvent& 
     if (e.mods.isRightButtonDown()) {
     PopupMenu menu;
     menu.addItem("Open", [=] {
-      openAccount(&m_model->getReferenceAt(rowNumber));
+      openAccount(&m_accountsModel->getReferenceAt(rowNumber));
     });
 
     menu.addItem("Remove", [=] {
-      removeAccount(m_model->getReferenceAt(rowNumber));
+      removeAccount(m_accountsModel->getReferenceAt(rowNumber));
     });
 
     menu.showAt(m_accountsTable->getCellComponent(columnId, rowNumber));
@@ -303,22 +389,69 @@ void LoginComponent::cellClicked(int rowNumber, int columnId, const MouseEvent& 
 
 void LoginComponent::cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) {
   if (e.mods.isLeftButtonDown()) {
-    openAccount(&m_model->getReferenceAt(rowNumber));
+    openAccount(&m_accountsModel->getReferenceAt(rowNumber));
   }
 }
 
-void LoginComponent::switchLoginState(bool isNetworkConfig) {
-  m_accountsTable->setVisible(!isNetworkConfig);
-  m_importPrivateKeyBtn->setVisible(!isNetworkConfig);
-  m_rpcLabel->setVisible(isNetworkConfig);
-  m_rpcEditor->setVisible(isNetworkConfig);
-  m_contractAddrLabel->setVisible(isNetworkConfig);
-  m_contractAddrEditor->setVisible(isNetworkConfig);
-  // m_readContractBtn->setVisible(isNetworkConfig);
+void LoginComponent::initContractsComboBox(const Array<std::shared_ptr<AutomatonContractData>>& contracts) {
+  m_contractComboBox->clear(NotificationType::dontSendNotification);
+  for (auto& contract : contracts) {
+    m_contractComboBox->addItem(contract->getAddress(), m_contractComboBox->getNumItems() + 1);
 
-  // Temporarily always display read contract button after switching view
-  m_readContractBtn->setVisible(true);
-  if (!isNetworkConfig)
-    m_readContractBtn->setButtonText("Refresh");
-  resized();
+    if (contract->getAddress() == m_selectedContract)
+      m_contractComboBox->setSelectedItemIndex(m_contractComboBox->getNumItems() - 1,
+                                               NotificationType::dontSendNotification);
+  }
+  m_contractComboBox->addSeparator();
+  m_contractComboBox->addItem("Add contract", m_contractComboBox->getNumItems() + 1);
+}
+
+void LoginComponent::initRPCComboBox(const Array<RPCConfig>& rpcList) {
+  m_rpcComboBox->clear(NotificationType::dontSendNotification);
+  for (auto& rpc : rpcList) {
+    m_rpcComboBox->addItem(rpc.m_alias, m_rpcComboBox->getNumItems() + 1);
+
+    if (rpc.m_url == m_selectedRPC)
+      m_rpcComboBox->setSelectedItemIndex(m_rpcComboBox->getNumItems() - 1, NotificationType::dontSendNotification);
+  }
+  m_rpcComboBox->addSeparator();
+  m_rpcComboBox->addItem("Add Custom RPC", m_rpcComboBox->getNumItems() + 1);
+}
+
+String LoginComponent::getCurrentRPC() {
+  return m_rpcList[m_rpcComboBox->getSelectedItemIndex()].m_url;
+}
+
+Array<std::shared_ptr<AutomatonContractData>> LoginComponent::getCurrentContracts() {
+  const auto rpc = getCurrentRPC();
+  if (rpc.isNotEmpty()) {
+    return m_contracts[rpc];
+  }
+
+  return Array<std::shared_ptr<AutomatonContractData>>();
+}
+
+std::shared_ptr<AutomatonContractData> LoginComponent::getCurrentContract() {
+  if (m_rpcComboBox->getSelectedItemIndex() >= 0) {
+    const auto rpc = getCurrentRPC();
+    if (rpc.isNotEmpty()) {
+      return m_contracts[rpc][m_contractComboBox->getSelectedItemIndex()];
+    }
+  }
+
+  return nullptr;
+}
+
+void LoginComponent::addContract(const Config& config) {
+  auto contract = std::make_shared<AutomatonContractData>(config);
+  const auto rpc = getCurrentRPC();
+  if (rpc.isEmpty())
+    return;
+
+  m_contracts[contract->getUrl()].add(contract);
+}
+
+void LoginComponent::addRPC(const String& rpc) {
+  m_rpcList.addIfNotAlreadyThere(RPCConfig(rpc.toStdString(), rpc.toStdString()));
+  initRPCComboBox(m_rpcList);
 }

@@ -30,9 +30,9 @@ class OrdersModel : public AbstractListModel<Order::Ptr> {
   Order::Ptr getAt(int index) override;
   Order::Ptr& getReferenceAt(int index) override;
 
-  void addItem(Order::Ptr item, bool sendNotification = true);
-  void addItems(Array<Order::Ptr> items, bool sendNotification = true);
-  void clear(bool sendNotification = true);
+  void addItem(Order::Ptr item, NotificationType notification);
+  void addItems(Array<Order::Ptr> items, NotificationType notification);
+  void clear(NotificationType notification);
 
  private:
   Array<Order::Ptr> m_items;

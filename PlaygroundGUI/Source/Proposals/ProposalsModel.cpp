@@ -31,17 +31,19 @@ Proposal::Ptr& ProposalsModel::getReferenceAt(int index) {
   return m_items.getReference(index);
 }
 
-void ProposalsModel::addItem(Proposal::Ptr item, bool sendNotification) {
+void ProposalsModel::addItem(Proposal::Ptr item, NotificationType notification) {
   m_items.add(item);
-
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }
 
-void ProposalsModel::clear(bool sendNotification) {
+void ProposalsModel::addItems(Array<Proposal::Ptr> items, NotificationType notification) {
+  m_items.addArray(items);
+  notifyModelChanged(notification);
+}
+
+void ProposalsModel::clear(NotificationType notification) {
   m_items.clearQuick();
-  if (sendNotification)
-    notifyModelChanged();
+  notifyModelChanged(notification);
 }
 
 bool ProposalsProxyModel::isAccept(const Proposal::Ptr& item) {

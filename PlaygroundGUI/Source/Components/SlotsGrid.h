@@ -19,40 +19,25 @@
 
 #pragma once
 
-#include "../../JuceLibraryCode/JuceHeader.h"
-#include "../Components/FormMaker.h"
+#include "JuceHeader.h"
 
-#include "automaton/core/crypto/cryptopp/secure_random_cryptopp.h"
-#include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
-#include "automaton/core/io/io.h"
-
-class ProposalsManager;
-
-class NetworkView:
-  public FormMaker,
-  private Timer {
+class SlotsGrid : public Component,
+                  public Timer {
  public:
-  //==============================================================================
-  NetworkView();
-  ~NetworkView();
-
   void paint(Graphics& g) override;
-  void resized() override;
-
-  void update();
-
-  // Button::Listener overrides.
-  void buttonClicked(Button* btn) override;
-
-  // TextEditor::Listener overrides.
-  void textEditorTextChanged(TextEditor &) override;
-
+  void mouseMove(const MouseEvent& event) override;
+  void mouseExit(const MouseEvent& event) override;
   void timerCallback() override;
+  int getSlotIndex(const Point<float>& pos);
+
+  virtual void updateContent();
+  virtual Colour getSlotColour(int slotIndex, bool isHighlighted) = 0;
+  virtual int getNumOfSlots() = 0;
+  virtual Component* getPopupComponent(int slotIndex) = 0;
 
  private:
-  TextEditor* txtURL;
-  TextEditor* txtContractAddress;
-  TextEditor* txtEthAddress;
-
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NetworkView)
+  int m_numOfSlotsPerSide = 0;
+  int m_slotSize = 0;
+  int m_highlightedSlot = -1;
+  Component* m_popupComponent = nullptr;
 };

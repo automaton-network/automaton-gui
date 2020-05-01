@@ -21,7 +21,7 @@
 
 #include <JuceHeader.h>
 
-class AbstractListModelBase {
+class AbstractListModelBase : public AsyncUpdater {
  public:
   class Listener {
    public:
@@ -29,12 +29,22 @@ class AbstractListModelBase {
     virtual void modelChanged(AbstractListModelBase*) = 0;
   };
 
-  virtual ~AbstractListModelBase() {}
+  virtual ~AbstractListModelBase() {
+    cancelPendingUpdate();
+  }
 
   virtual int size() const = 0;
 
-  virtual void notifyModelChanged() {
+  void handleAsyncUpdate() {
     m_listeners.call(&Listener::modelChanged, this);
+  }
+
+  virtual void notifyModelChanged(NotificationType notification) {
+    if (notification != dontSendNotification)
+      triggerAsyncUpdate();
+
+    if (notification == sendNotification)
+      handleUpdateNowIfNeeded();
   }
 
   void addListener(Listener* listener) {

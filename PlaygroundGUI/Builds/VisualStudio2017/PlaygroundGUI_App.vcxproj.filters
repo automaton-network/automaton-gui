@@ -259,8 +259,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Utils\TasksManager.cpp">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Utils\TasksPanel.cpp">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Utils\Utils.cpp">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Login\Account.cpp">
+      <Filter>PlaygroundGUI\Source\Login</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Login\AccountsModel.cpp">
       <Filter>PlaygroundGUI\Source\Login</Filter>
@@ -279,6 +288,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\DEX\OrdersModel.cpp">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Proposals\ProposalDetailsComponent.cpp">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Proposals\Proposal.cpp">
       <Filter>PlaygroundGUI\Source\Proposals</Filter>
@@ -305,6 +317,9 @@
       <Filter>PlaygroundGUI\Source\Config</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Components\FormMaker.cpp">
+      <Filter>PlaygroundGUI\Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Components\SlotsGrid.cpp">
       <Filter>PlaygroundGUI\Source\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Components\ValidatorGrid.cpp">
@@ -1617,8 +1632,17 @@
     <ClInclude Include="..\..\Source\Utils\AsyncTask.h">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Utils\TasksManager.h">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Utils\TasksPanel.h">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Utils\Utils.h">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Login\Account.h">
+      <Filter>PlaygroundGUI\Source\Login</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Login\AccountsModel.h">
       <Filter>PlaygroundGUI\Source\Login</Filter>
@@ -1643,6 +1667,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\DEX\OrdersModel.h">
       <Filter>PlaygroundGUI\Source\DEX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Proposals\ProposalDetailsComponent.h">
+      <Filter>PlaygroundGUI\Source\Proposals</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Proposals\Proposal.h">
       <Filter>PlaygroundGUI\Source\Proposals</Filter>
@@ -1669,6 +1696,9 @@
       <Filter>PlaygroundGUI\Source\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Components\FormMaker.h">
+      <Filter>PlaygroundGUI\Source\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Components\SlotsGrid.h">
       <Filter>PlaygroundGUI\Source\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Components\ValidatorGrid.h">

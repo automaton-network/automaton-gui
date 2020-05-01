@@ -19,22 +19,21 @@
 
 #pragma once
 
+#include <Login/Account.h>
+#include <Utils/AsyncTask.h>
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "Components/FormMaker.h"
-#include "Config/Config.h"
 
 #include "automaton/core/crypto/cryptopp/secure_random_cryptopp.h"
 #include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
 #include "automaton/core/io/io.h"
-
-class Config;
 
 class Miner:
   public FormMaker,
   private Timer {
  public:
   //==============================================================================
-  Miner(Config* config);
+  Miner(Account::Ptr accountData);
   ~Miner();
 
   void paint(Graphics& g) override;
@@ -76,6 +75,8 @@ class Miner:
   void setMinerAddress(std::string _address);
 
  private:
+  Account::Ptr m_accountData;
+
   // Mining
   uint32 totalSlots = 1024;
   std::vector<mined_slot> mined_slots;
@@ -84,7 +85,7 @@ class Miner:
   unsigned int last_keys_generated = 0;
   unsigned int slots_claimed = 0;
   int64 last_time = 0;
-  OwnedArray<Thread> miners;
+  Array<AsyncTask::Ptr> miners;
   unsigned char mask[32];
   unsigned int min_difficulty;
   unsigned char difficulty[32];

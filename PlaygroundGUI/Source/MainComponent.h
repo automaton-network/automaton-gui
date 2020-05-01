@@ -20,26 +20,29 @@
 #pragma once
 
 #include <memory>
+#include <Login/Account.h>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
 class ProposalsManager;
 class DEXManager;
-class Config;
+class TasksPanel;
 
 class DemosMainComponent:
   public Component,
   public ApplicationCommandTarget,
-  public MenuBarModel {
+  public MenuBarModel,
+  public Button::Listener {
  public:
   enum CommandIDs {
   };
 
-  DemosMainComponent(Config* config);
+  DemosMainComponent(Account::Ptr accountData);
   ~DemosMainComponent();
 
   void paint(Graphics& g) override;
   void resized() override;
+  void buttonClicked(Button* button) override;
 
   StringArray getMenuBarNames() override {
     return { "Menu Position", "Outer Colour", "Inner Colour" };
@@ -71,9 +74,9 @@ class DemosMainComponent:
  private:
   std::unique_ptr<MenuBarComponent> m_menuBar;
   std::unique_ptr<TabbedComponent> m_tabbedComponent;
-  std::unique_ptr<ProposalsManager> m_proposalsManager;
-  std::unique_ptr<DEXManager> m_dexManager;
-  Config* m_config;
+  std::unique_ptr<TasksPanel> m_tasksPanel;
+  std::unique_ptr<TextButton> m_refreshButton;
+  Account::Ptr m_accountData;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemosMainComponent)
 };

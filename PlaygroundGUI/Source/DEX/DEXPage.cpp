@@ -20,7 +20,7 @@
 #include <JuceHeader.h>
 #include "DEXPage.h"
 #include "DEXManager.h"
-#include "../Utils/Utils.h"
+#include "Utils/Utils.h"
 
 static const String ETH_BALANCE_PREFIX_LABEL = "Eth Balance: ";
 static const String AUTO_BALANCE_PREFIX_LABEL = "AUTO Balance: ";
@@ -82,7 +82,9 @@ class OrdersUIModel : public TableListBoxModel {
   std::shared_ptr<AbstractListModel<Order::Ptr>> m_model;
 };
 
-DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
+DEXPage::DEXPage(Account::Ptr accountData) : m_accountData(accountData) {
+  m_dexManager = m_accountData->getDexManager();
+
   m_sellingProxyModel = std::make_shared<OrdersProxyModel>();
   m_sellingProxyModel->setFilter(OrderFilter::Sell);
   m_sellingProxyModel->setModel(m_dexManager->getModel());
@@ -98,12 +100,13 @@ DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   m_buyingUIModel->setModel(m_buyingProxyModel);
 
   m_ethBalanceLabel = std::make_unique<Label>("m_balanceLabel");
-  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + Utils::fromWei(EthUnit::ether, m_dexManager->getEthBalance())
-      + String(" ETH")
-      , NotificationType::dontSendNotification);
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::ether, m_accountData->getEthBalance()) + String(" ETH"),
+                             NotificationType::dontSendNotification);
   m_autoBalanceLabel = std::make_unique<Label>("m_autoBalanceLabel");
-  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
-      , NotificationType::dontSendNotification);
+  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::AUTO, m_accountData->getAutoBalance()) + String(" AUTO"),
+                              NotificationType::dontSendNotification);
 
 
   m_sellingLabel = std::make_unique<Label>("m_sellingLabel", "Selling:");
@@ -112,6 +115,12 @@ DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   m_buyingLabel = std::make_unique<Label>("m_buyingLabel", "Buying:");
   m_buyingLabel->setColour(Label::textColourId, Colours::green);
   m_buyingLabel->setFont(m_sellingLabel->getFont().withHeight(35));
+
+  m_createSellOrderBtn = std::make_unique<TextButton>(translate("Sell order"));
+  m_createSellOrderBtn->addListener(this);
+
+  m_createBuyOrderBtn = std::make_unique<TextButton>(translate("Buy order"));
+  m_createBuyOrderBtn->addListener(this);
 
   m_sellingTable = std::make_unique<TableListBox>();
   m_sellingTable->setModel(m_sellingUIModel.get());
@@ -133,6 +142,8 @@ DEXPage::DEXPage(DEXManager* dexManager) : m_dexManager(dexManager) {
   addAndMakeVisible(m_autoBalanceLabel.get());
   addAndMakeVisible(m_sellingLabel.get());
   addAndMakeVisible(m_buyingLabel.get());
+  addAndMakeVisible(m_createSellOrderBtn.get());
+  addAndMakeVisible(m_createBuyOrderBtn.get());
   addAndMakeVisible(m_sellingTable.get());
   addAndMakeVisible(m_buyingTable.get());
 }
@@ -144,7 +155,16 @@ void DEXPage::paint(Graphics& g) {
 }
 
 void DEXPage::resized() {
+  const int buttonsHeight = 50;
+  const int buttonsSpacing = 10;
+  const int buttonsWidth = (getLocalBounds().getWidth() - buttonsSpacing) / 2;
   auto bounds = getLocalBounds();
+  auto buttonsArea = bounds.removeFromBottom(buttonsHeight);
+  m_createSellOrderBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
+  buttonsArea.removeFromLeft(buttonsSpacing);
+  m_createBuyOrderBtn->setBounds(buttonsArea.removeFromLeft(buttonsWidth));
+  bounds.removeFromBottom(buttonsSpacing);
+
   auto labelsBounds = bounds.removeFromTop(30);
   m_ethBalanceLabel->setBounds(labelsBounds.removeFromLeft(getWidth() / 2));
   m_autoBalanceLabel->setBounds(labelsBounds);
@@ -160,11 +180,49 @@ void DEXPage::resized() {
   m_buyingTable->setBounds(buyingBounds);
 }
 
+void DEXPage::buttonClicked(Button* buttonThatWasClicked) {
+  if (buttonThatWasClicked == m_createSellOrderBtn.get()
+      || buttonThatWasClicked == m_createBuyOrderBtn.get()) {
+    const bool isSellOrder = buttonThatWasClicked == m_createSellOrderBtn.get();
+    AlertWindow w(isSellOrder ? "Create a sell order" : "Create a buy order",
+                  isSellOrder ? "Enter how many AUTO you want to sell to get ETH"
+                              : "Enter how many ETH you want to spend to buy AUTO",
+                  AlertWindow::QuestionIcon);
+
+    w.addTextEditor("amountAUTO", "", "Amount AUTO:", false);
+    w.addTextEditor("amountETH", "", "Amount ETH:", false);
+    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+    w.getTextEditor("amountAUTO")->setInputRestrictions(8, Utils::numericalFloatAllowed);
+    w.getTextEditor("amountETH")->setInputRestrictions(8, Utils::numericalFloatAllowed);
+
+    if (w.runModalLoop() == 1) {
+      const auto amountAUTO = w.getTextEditorContents("amountAUTO").getDoubleValue();
+      const auto amountETH = w.getTextEditorContents("amountETH").getDoubleValue();
+      if (amountAUTO > 0.0 && amountETH > 0.0) {
+        const auto amountAUTOWei = Utils::toWei(CoinUnit::AUTO, w.getTextEditorContents("amountAUTO"));
+        const auto amountETHWei = Utils::toWei(CoinUnit::ether, w.getTextEditorContents("amountETH"));
+        if (isSellOrder)
+          m_dexManager->createSellOrder(amountAUTOWei, amountETHWei);
+        else
+          m_dexManager->createBuyOrder(amountAUTOWei, amountETHWei);
+      } else {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                         "Invalid data",
+                                         "Enter correct AUTO and ETH amounts");
+      }
+    }
+  }
+}
+
 void DEXPage::modelChanged(AbstractListModelBase* model) {
-  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL + Utils::fromWei(EthUnit::ether, m_dexManager->getEthBalance())
-      , NotificationType::dontSendNotification);
-  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL + m_dexManager->getAutoBalance()
-      , NotificationType::dontSendNotification);
+  m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::ether, m_accountData->getEthBalance()) + String(" ETH"),
+                             NotificationType::dontSendNotification);
+  m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::AUTO, m_accountData->getAutoBalance()) + String(" AUTO"),
+                              NotificationType::dontSendNotification);
 
   if (model == m_sellingProxyModel.get()) {
     m_sellingTable->updateContent();

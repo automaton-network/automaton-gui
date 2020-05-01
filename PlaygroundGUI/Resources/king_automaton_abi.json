@@ -3,37 +3,57 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "nSlots",
+        "name": "_numSlots",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "minDifficultyBits",
+        "name": "_minDifficultyBits",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "predefinedMask",
+        "name": "_predefinedMask",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "initialDailySupply",
+        "name": "_initialDailySupply",
         "type": "uint256"
       },
       {
         "internalType": "int256",
-        "name": "approval_pct",
+        "name": "_approvalPct",
         "type": "int256"
       },
       {
         "internalType": "int256",
-        "name": "contest_pct",
+        "name": "_contestPct",
         "type": "int256"
       },
       {
         "internalType": "uint256",
-        "name": "treasury_limit_pct",
+        "name": "_treasuryLimitPct",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_proposalsInitialPeriod",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_proposalsContestPeriod",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_proposalsMinPeriodLen",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeUnitInSeconds",
         "type": "uint256"
       }
     ],
@@ -511,20 +531,6 @@
   },
   {
     "inputs": [],
-    "name": "minPeriodLen",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
     "name": "name",
     "outputs": [
       {
@@ -567,6 +573,20 @@
   },
   {
     "inputs": [],
+    "name": "proposalsContestPeriod",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
     "name": "proposalsData",
     "outputs": [
       {
@@ -596,12 +616,54 @@
   },
   {
     "inputs": [],
+    "name": "proposalsInitialPeriod",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "proposalsMinPeriodLen",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
     "name": "symbol",
     "outputs": [
       {
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "timeUnitInSeconds",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -802,7 +864,7 @@
         "type": "uint256"
       }
     ],
-    "name": "getProposal",
+    "name": "getProposalInfo",
     "outputs": [
       {
         "internalType": "address",
@@ -831,12 +893,37 @@
       },
       {
         "internalType": "uint256",
-        "name": "remainingPeriods",
+        "name": "budgetPerPeriod",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "budgetPerPeriod",
+        "name": "initialPeriod",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "contestPeriod",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getProposalData",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "remainingPeriods",
         "type": "uint256"
       },
       {
@@ -1452,4 +1539,4 @@
     "stateMutability": "nonpayable",
     "type": "function"
   }
-]
+  ]

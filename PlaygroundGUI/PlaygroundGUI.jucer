@@ -24,10 +24,17 @@
     <GROUP id="{CEE97623-2FD9-0F00-2BC4-1AF90751FA41}" name="Source">
       <GROUP id="{3E428D4F-158D-E689-F504-DD0848DE4278}" name="Utils">
         <FILE id="tHTUtX" name="AsyncTask.h" compile="0" resource="0" file="Source/Utils/AsyncTask.h"/>
+        <FILE id="MkUMG0" name="TasksManager.cpp" compile="1" resource="0"
+              file="Source/Utils/TasksManager.cpp"/>
+        <FILE id="wFnTmn" name="TasksManager.h" compile="0" resource="0" file="Source/Utils/TasksManager.h"/>
+        <FILE id="Mh1E6Q" name="TasksPanel.cpp" compile="1" resource="0" file="Source/Utils/TasksPanel.cpp"/>
+        <FILE id="No44Vv" name="TasksPanel.h" compile="0" resource="0" file="Source/Utils/TasksPanel.h"/>
         <FILE id="RtEFzK" name="Utils.cpp" compile="1" resource="0" file="Source/Utils/Utils.cpp"/>
         <FILE id="zMGIcA" name="Utils.h" compile="0" resource="0" file="Source/Utils/Utils.h"/>
       </GROUP>
       <GROUP id="{867F9B81-C019-9D46-209F-BBE27FD4A220}" name="Login">
+        <FILE id="SCBkHQ" name="Account.cpp" compile="1" resource="0" file="Source/Login/Account.cpp"/>
+        <FILE id="fBtg6y" name="Account.h" compile="0" resource="0" file="Source/Login/Account.h"/>
         <FILE id="SkQyNk" name="AccountsModel.cpp" compile="1" resource="0"
               file="Source/Login/AccountsModel.cpp"/>
         <FILE id="yEDkJr" name="AccountsModel.h" compile="0" resource="0" file="Source/Login/AccountsModel.h"/>
@@ -53,6 +60,10 @@
         <FILE id="GaasMi" name="OrdersModel.h" compile="0" resource="0" file="Source/DEX/OrdersModel.h"/>
       </GROUP>
       <GROUP id="{BEADF6D5-B88A-B1C3-2B00-06EE3D256D87}" name="Proposals">
+        <FILE id="QjIgEa" name="ProposalDetailsComponent.h" compile="0" resource="0"
+              file="Source/Proposals/ProposalDetailsComponent.h"/>
+        <FILE id="kUdIAn" name="ProposalDetailsComponent.cpp" compile="1" resource="0"
+              file="Source/Proposals/ProposalDetailsComponent.cpp"/>
         <FILE id="sYLkKA" name="Proposal.cpp" compile="1" resource="0" file="Source/Proposals/Proposal.cpp"/>
         <FILE id="hA94JD" name="Proposal.h" compile="0" resource="0" file="Source/Proposals/Proposal.h"/>
         <FILE id="oItQcN" name="ProposalsModel.cpp" compile="1" resource="0"
@@ -84,6 +95,8 @@
       <GROUP id="{D62FB906-6D23-F538-9E50-51D60BE97FA9}" name="Components">
         <FILE id="PjEPSz" name="FormMaker.cpp" compile="1" resource="0" file="Source/Components/FormMaker.cpp"/>
         <FILE id="TI8gpa" name="FormMaker.h" compile="0" resource="0" file="Source/Components/FormMaker.h"/>
+        <FILE id="fO3u2Y" name="SlotsGrid.cpp" compile="1" resource="0" file="Source/Components/SlotsGrid.cpp"/>
+        <FILE id="fj2djX" name="SlotsGrid.h" compile="0" resource="0" file="Source/Components/SlotsGrid.h"/>
         <FILE id="YkvQZA" name="ValidatorGrid.cpp" compile="1" resource="0"
               file="Source/Components/ValidatorGrid.cpp"/>
         <FILE id="bqQwuG" name="ValidatorGrid.h" compile="0" resource="0" file="Source/Components/ValidatorGrid.h"/>

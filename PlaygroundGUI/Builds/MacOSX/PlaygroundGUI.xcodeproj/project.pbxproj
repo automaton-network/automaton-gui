@@ -41,9 +41,21 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
+		0B490FE0296395CA08CE442B = {
+			isa = PBXBuildFile;
+			fileRef = 340CD4D56FDFE7CD6BBEBD50;
+		};
+		01CBC7278473FE18C0FE6558 = {
+			isa = PBXBuildFile;
+			fileRef = C4EEBAFDBAAB75BD83825F8E;
+		};
 		512118B6F16E9FE6A26E5333 = {
 			isa = PBXBuildFile;
 			fileRef = B0900C36AF07AFF88A422DF2;
+		};
+		E545BFA4899633DD9D12C7AE = {
+			isa = PBXBuildFile;
+			fileRef = 5FC2136BF897AB4739C21D10;
 		};
 		2BF750FDBC8DCF0149147F2E = {
 			isa = PBXBuildFile;
@@ -68,6 +80,10 @@
 		81315ABE1B5196E62FEAF085 = {
 			isa = PBXBuildFile;
 			fileRef = EDA72D64D0C8122D56A91779;
+		};
+		59AAE5A0E46CFEAD8DEEECDE = {
+			isa = PBXBuildFile;
+			fileRef = 342AE2B18CF907F9289C538F;
 		};
 		94F672D3BDA08865353B9C45 = {
 			isa = PBXBuildFile;
@@ -108,6 +124,10 @@
 		88D3B11922D089AF4E26BDC0 = {
 			isa = PBXBuildFile;
 			fileRef = EB48C8B94DF3F88534EF2E02;
+		};
+		ED3FADA2A1778903DF17D688 = {
+			isa = PBXBuildFile;
+			fileRef = 740572ACE23F45A42BC820FB;
 		};
 		680397493A45449A817BD319 = {
 			isa = PBXBuildFile;
@@ -327,6 +347,20 @@
 			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_core";
 			sourceTree = "SOURCE_ROOT";
 		};
+		340CD4D56FDFE7CD6BBEBD50 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = TasksManager.cpp;
+			path = ../../Source/Utils/TasksManager.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		342AE2B18CF907F9289C538F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ProposalDetailsComponent.cpp;
+			path = ../../Source/Proposals/ProposalDetailsComponent.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		3604DF6B545750B665E78AE0 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -411,6 +445,13 @@
 			path = ../../Source/Utils/AsyncTask.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		5FC2136BF897AB4739C21D10 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Account.cpp;
+			path = ../../Source/Login/Account.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		63E9BAEFD1CC58069F2AB51D = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -439,11 +480,25 @@
 			path = "../../Resources/default_config.json";
 			sourceTree = "SOURCE_ROOT";
 		};
+		6CAB651C4CF26AF67F72EACD = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = SlotsGrid.h;
+			path = ../../Source/Components/SlotsGrid.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		6E20455EDB2D36EF90214650 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = AccountsModel.h;
 			path = ../../Source/Login/AccountsModel.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		740572ACE23F45A42BC820FB = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = SlotsGrid.cpp;
+			path = ../../Source/Components/SlotsGrid.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		7CD743C8F4204EBC883A2C7F = {
@@ -593,6 +648,13 @@
 			path = ../../Source/Utils/Utils.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		B0C9B78D5FA95CB19E6291D7 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = TasksManager.h;
+			path = ../../Source/Utils/TasksManager.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		B4352990FE118BBD5B965E8F = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -605,6 +667,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = AutomatonContractData.cpp;
 			path = ../../Source/Data/AutomatonContractData.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		B8A150687955BD42A2977BD1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = TasksPanel.h;
+			path = ../../Source/Utils/TasksPanel.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		BA288CD361E5BFCC337628EB = {
@@ -633,6 +702,13 @@
 			lastKnownFileType = file.nib;
 			name = RecentFilesMenuTemplate.nib;
 			path = RecentFilesMenuTemplate.nib;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C4EEBAFDBAAB75BD83825F8E = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = TasksPanel.cpp;
+			path = ../../Source/Utils/TasksPanel.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C96D53B60D798069E2D6DDAA = {
@@ -682,6 +758,20 @@
 			lastKnownFileType = file;
 			name = "juce_gui_basics";
 			path = "../../../../automaton-core/src/local_third_party/JUCE/modules/juce_gui_basics";
+			sourceTree = "SOURCE_ROOT";
+		};
+		D966836DF41928929D3925A7 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ProposalDetailsComponent.h;
+			path = ../../Source/Proposals/ProposalDetailsComponent.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		E3F1E7626819B78F811DEA9F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Account.h;
+			path = ../../Source/Login/Account.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		E5B0838487DE7547C1C1E1A4 = {
@@ -786,6 +876,10 @@
 			isa = PBXGroup;
 			children = (
 				5DA8E9EC8390C21FB637ABF0,
+				340CD4D56FDFE7CD6BBEBD50,
+				B0C9B78D5FA95CB19E6291D7,
+				C4EEBAFDBAAB75BD83825F8E,
+				B8A150687955BD42A2977BD1,
 				B0900C36AF07AFF88A422DF2,
 				63E9BAEFD1CC58069F2AB51D,
 			);
@@ -795,6 +889,8 @@
 		A5F3935FE58429F9F2E04941 = {
 			isa = PBXGroup;
 			children = (
+				5FC2136BF897AB4739C21D10,
+				E3F1E7626819B78F811DEA9F,
 				417321119444057352E75D2E,
 				6E20455EDB2D36EF90214650,
 				983C39C12CA4D0F8F53A86E9,
@@ -830,6 +926,8 @@
 		C2050576413F623B249937CF = {
 			isa = PBXGroup;
 			children = (
+				D966836DF41928929D3925A7,
+				342AE2B18CF907F9289C538F,
 				999124BB54C7EFFB15C28C9A,
 				AC725974DA4D5A793B592A09,
 				D60BF1DB6AB1382EC05AFF91,
@@ -862,6 +960,8 @@
 			children = (
 				EB48C8B94DF3F88534EF2E02,
 				510F04B2A4332278F5F209C3,
+				740572ACE23F45A42BC820FB,
+				6CAB651C4CF26AF67F72EACD,
 				674BD8AB93DB872747B5BE69,
 				A13B15A0E08E44FD6C17A560,
 			);
@@ -1084,6 +1184,7 @@
 					"JucePlugin_Build_Standalone=0",
 					"JucePlugin_Build_Unity=0",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					"../../JuceLibraryCode",
@@ -1133,12 +1234,11 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1182,12 +1282,10 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1241,13 +1339,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B490FE0296395CA08CE442B,
+				01CBC7278473FE18C0FE6558,
 				512118B6F16E9FE6A26E5333,
+				E545BFA4899633DD9D12C7AE,
 				2BF750FDBC8DCF0149147F2E,
 				6A954FA3C51846B51AA555E4,
 				C793573B812E92F2E1F9A3F1,
 				5A3DA206190F057B44FDA6A4,
 				3FAABEF679539A4A35C12933,
 				81315ABE1B5196E62FEAF085,
+				59AAE5A0E46CFEAD8DEEECDE,
 				94F672D3BDA08865353B9C45,
 				B16A028E08A88B3CC4C157B1,
 				119F3E08EA0700D3227756D8,
@@ -1258,6 +1360,7 @@
 				A43EEE53B12550669E555382,
 				AE1A08B1BFB106256FE4F53E,
 				88D3B11922D089AF4E26BDC0,
+				ED3FADA2A1778903DF17D688,
 				680397493A45449A817BD319,
 				C04966EEAA0333308456359D,
 				9104E8F6687A7FD224B757A9,
