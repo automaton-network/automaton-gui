@@ -56,6 +56,7 @@ class ProposalDetailsComponent : public Component
   std::unique_ptr<TextButton> m_backBtn;
   std::unique_ptr<VoteSlotsGrid> m_slotsGrid;
 
+  std::unique_ptr<TextButton> m_payForGasBtn;
   std::unique_ptr<TextButton> m_voteYesBtn;
   std::unique_ptr<TextButton> m_voteNoBtn;
   std::unique_ptr<TextButton> m_unspecifiedBtn;

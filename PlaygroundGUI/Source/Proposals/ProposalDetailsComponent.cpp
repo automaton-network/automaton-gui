@@ -114,6 +114,8 @@ ProposalDetailsComponent::ProposalDetailsComponent(Account::Ptr accountData) : m
 
   m_title.setFont(m_title.getFont().withHeight(35));
 
+  m_payForGasBtn = std::make_unique<TextButton>(translate("Pay for Gas"));
+  m_payForGasBtn->addListener(this);
   m_voteYesBtn = std::make_unique<TextButton>(translate("Vote YES"));
   m_voteYesBtn->addListener(this);
   m_voteNoBtn = std::make_unique<TextButton>(translate("Vote NO"));
@@ -128,6 +130,7 @@ ProposalDetailsComponent::ProposalDetailsComponent(Account::Ptr accountData) : m
   addAndMakeVisible(m_linkToDocument.get());
   addAndMakeVisible(m_backBtn.get());
   addAndMakeVisible(m_slotsGrid.get());
+  addAndMakeVisible(m_payForGasBtn.get());
   addAndMakeVisible(m_voteYesBtn.get());
   addAndMakeVisible(m_voteNoBtn.get());
   addAndMakeVisible(m_unspecifiedBtn.get());
@@ -172,9 +175,9 @@ static String formatClaimString(Proposal::Ptr proposal) {
     String claimText;
     if (claimableInMs >= 0) {
       const RelativeTime claimableInRelativeTime(claimableInMs / 1000);
-      claimText = "Claimable in " + claimableInRelativeTime.getDescription();
+      claimText = "You can claim reward in " + claimableInRelativeTime.getDescription();
     } else {
-      claimText = "Claim now!";
+      claimText = "You can claim reward now!";
     }
     result << claimText;
   }
@@ -208,14 +211,17 @@ void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
 
 void ProposalDetailsComponent::updateButtonsForProposal() {
   const auto proposalStatus = m_proposal->getStatus();
+  m_payForGasBtn->setVisible(proposalStatus == Proposal::Status::PrepayingGas);
+  m_voteYesBtn->setVisible(proposalStatus != Proposal::Status::PrepayingGas);
+  m_voteNoBtn->setVisible(proposalStatus != Proposal::Status::PrepayingGas);
+  m_unspecifiedBtn->setVisible(proposalStatus != Proposal::Status::PrepayingGas);
 
   const bool isClaimingActive = m_proposal->isRewardClaimable();
   if (isClaimingActive)
     m_claimRewardBtn->setTooltip("Claim your reward now!");
   else
     m_claimRewardBtn->setTooltip("Proposal claiming is unavailable. Check proposal status, please");
-
-  m_claimRewardBtn->setEnabled(isClaimingActive);
+  m_claimRewardBtn->setVisible(isClaimingActive);
 }
 
 void ProposalDetailsComponent::paint(Graphics& g) {
@@ -232,13 +238,25 @@ void ProposalDetailsComponent::resized() {
 
   bounds.removeFromTop(30);
   auto buttonsBounds = bounds.removeFromTop(30);
-  m_voteYesBtn->setBounds(buttonsBounds.removeFromLeft(75));
-  buttonsBounds.removeFromLeft(5);
-  m_voteNoBtn->setBounds(buttonsBounds.removeFromLeft(75));
-  buttonsBounds.removeFromLeft(5);
-  m_unspecifiedBtn->setBounds(buttonsBounds.removeFromLeft(100));
-  buttonsBounds.removeFromLeft(5);
-  m_claimRewardBtn->setBounds(buttonsBounds.removeFromLeft(100));
+  if (m_payForGasBtn->isVisible()) {
+    m_payForGasBtn->setBounds(buttonsBounds.removeFromLeft(100));
+    buttonsBounds.removeFromLeft(5);
+  }
+  if (m_voteYesBtn->isVisible()) {
+    m_voteYesBtn->setBounds(buttonsBounds.removeFromLeft(75));
+    buttonsBounds.removeFromLeft(5);
+  }
+  if (m_voteNoBtn->isVisible()) {
+    m_voteNoBtn->setBounds(buttonsBounds.removeFromLeft(75));
+    buttonsBounds.removeFromLeft(5);
+  }
+  if (m_unspecifiedBtn->isVisible()) {
+    m_unspecifiedBtn->setBounds(buttonsBounds.removeFromLeft(100));
+    buttonsBounds.removeFromLeft(5);
+  }
+  if (m_unspecifiedBtn->isVisible()) {
+    m_claimRewardBtn->setBounds(buttonsBounds.removeFromLeft(100));
+  }
 
   const auto gridSize = jmin(getWidth() / 2, getHeight());
   const auto gridBounds = getLocalBounds().removeFromRight(getWidth() / 2)
@@ -297,4 +315,6 @@ void ProposalDetailsComponent::handleAsyncUpdate() {
 void ProposalDetailsComponent::updateVotesView() {
   m_accountData->getProposalsManager()->fetchProposalVotes(m_proposal);
   updateButtonsForProposal();
+  resized();
+  repaint();
 }
