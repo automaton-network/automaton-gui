@@ -207,6 +207,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
 
     return true;
   }, [=](AsyncTask* task) {
+    proposal->notifyChanged();
   }, topicName, m_accountData);
 
   return true;

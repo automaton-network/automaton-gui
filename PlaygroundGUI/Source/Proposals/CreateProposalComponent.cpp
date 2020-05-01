@@ -54,8 +54,11 @@ CreateProposalComponent::CreateProposalComponent() {
   m_cancelBtn = std::make_unique<TextButton>(translate("Cancel"));
   m_cancelBtn->addListener(this);
   addAndMakeVisible(m_cancelBtn.get());
+}
 
-  m_proposal = std::make_shared<Proposal>();
+CreateProposalComponent::~CreateProposalComponent() {
+  if (m_proposal != nullptr)
+    m_proposal->removeListener(this);
 }
 
 void CreateProposalComponent::paint(Graphics& g) {
@@ -138,6 +141,10 @@ void CreateProposalComponent::buttonClicked(Button* buttonThatWasClicked) {
     // if (!checkEmptiness(m_targetBonusEditor.get(), String("Enter target bonus for proposal, please"))) return;
     // Length days could be empty
 
+    if (m_proposal != nullptr)
+      m_proposal->removeListener(this);
+
+    m_proposal = std::make_shared<Proposal>();
     m_proposal->setTitle(m_titleEditor->getText());
     m_proposal->setBudgetPerPeriod(Utils::toWei(CoinUnit::AUTO, m_budgetEditor->getText()));
     m_proposal->setNumPeriodsLeft(static_cast<uint64>(m_numPeriodsEditor->getText().getLargeIntValue()));
@@ -145,6 +152,7 @@ void CreateProposalComponent::buttonClicked(Button* buttonThatWasClicked) {
     if (!m_lengthDaysEditor->isEmpty())
       m_proposal->setBudgetPeriodLength(static_cast<uint64>(m_lengthDaysEditor->getText().getLargeIntValue()));
 
+    m_proposal->addListener(this);
     m_listeners.call(&CreateProposalComponent::Listener::createProposalViewActionHappened,
                      this,
                      Action::ProposalCreated);
@@ -162,4 +170,19 @@ void CreateProposalComponent::textEditorTextChanged(TextEditor& editor) {
     const auto budgetPerPeriod = static_cast<uint64>(m_budgetEditor->getText().getLargeIntValue());
     m_totalBudgetEditor->setText(String(numPeriods * budgetPerPeriod));
   }
+}
+
+void CreateProposalComponent::proposalChanged() {
+  if (m_proposal != nullptr && !isVisible() && m_proposal->getStatus() != Proposal::Status::Uninitialized) {
+    clearFields();
+  }
+}
+
+void CreateProposalComponent::clearFields() {
+  m_titleEditor->clear();
+  m_budgetEditor->clear();
+  m_totalBudgetEditor->clear();
+  m_numPeriodsEditor->clear();
+  m_targetBonusEditor->clear();
+  m_lengthDaysEditor->clear();
 }
