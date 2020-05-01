@@ -18,6 +18,7 @@
  */
 
 #include "Proposal.h"
+#include "Utils/Utils.h"
 
 #include <json.hpp>
 #include <string>
@@ -117,9 +118,13 @@ bool Proposal::isRewardClaimable() const noexcept {
   // Temporarily enable claiming reward button at "Started" state as well. That's because proposal state is updated
   // in smart contract only before each vote. So the proposal can have 100% approval rate but still remain in
   // "Started" state until some action that calls updateProposalState() smart-contract function is performed.
-  const bool isClaimingActive = getStatus() == Proposal::Status::Accepted
-                                || getStatus() == Proposal::Status::Contested
-                                || getStatus() == Proposal::Status::Started;
+  const auto initialVotingEndDate = getInitialVotingEndDate();
+  const auto initialVotingEnded = Utils::isZeroTime(initialVotingEndDate) == false
+                                  && initialVotingEndDate.toMilliseconds() < Time::getCurrentTime().toMilliseconds();
+  const bool isClaimingActive = initialVotingEnded
+                                && (getStatus() == Proposal::Status::Accepted
+                                    || getStatus() == Proposal::Status::Contested
+                                    || getStatus() == Proposal::Status::Started);
   return isClaimingActive;
 }
 
