@@ -118,6 +118,7 @@ bool Proposal::isRewardClaimable() const noexcept {
   // in smart contract only before each vote. So the proposal can have 100% approval rate but still remain in
   // "Started" state until some action that calls updateProposalState() smart-contract function is performed.
   const bool isClaimingActive = getStatus() == Proposal::Status::Accepted
+                                || getStatus() == Proposal::Status::Contested
                                 || getStatus() == Proposal::Status::Started;
   return isClaimingActive;
 }
