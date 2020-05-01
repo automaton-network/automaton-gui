@@ -193,7 +193,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
                   AlertWindow::QuestionIcon);
 
     w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
-    w.getTextEditor("rewardAmount")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
+    w.getTextEditor("slotsToPay")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
     w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
     w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
@@ -253,11 +253,11 @@ void ProposalsPage::updateButtonsForSelectedProposal(Proposal::Ptr selectedPropo
     return;
 
   const auto proposalStatus = selectedProposal->getStatus();
-  const bool isRowSelected = m_proposalsListBox->getNumSelectedRows() > 0;
+  const bool isActiveStatus = selectedProposal->hasActiveStatus();
   m_payForGasBtn->setEnabled(proposalStatus == Proposal::Status::PrepayingGas);
   m_abandonProposalBtn->setEnabled(proposalStatus != Proposal::Status::PrepayingGas);
-  m_voteYesBtn->setEnabled(proposalStatus != Proposal::Status::PrepayingGas);
-  m_voteNoBtn->setEnabled(proposalStatus != Proposal::Status::PrepayingGas);
+  m_voteYesBtn->setEnabled(isActiveStatus);
+  m_voteNoBtn->setEnabled(isActiveStatus);
 
   const bool isClaimingActive = selectedProposal->isRewardClaimable();
   if (isClaimingActive)

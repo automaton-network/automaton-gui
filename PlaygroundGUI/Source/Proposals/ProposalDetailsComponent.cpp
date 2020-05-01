@@ -211,10 +211,11 @@ void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
 
 void ProposalDetailsComponent::updateButtonsForProposal() {
   const auto proposalStatus = m_proposal->getStatus();
+  const bool isActiveStatus = m_proposal->hasActiveStatus();
   m_payForGasBtn->setVisible(proposalStatus == Proposal::Status::PrepayingGas);
-  m_voteYesBtn->setVisible(proposalStatus != Proposal::Status::PrepayingGas);
-  m_voteNoBtn->setVisible(proposalStatus != Proposal::Status::PrepayingGas);
-  m_unspecifiedBtn->setVisible(proposalStatus != Proposal::Status::PrepayingGas);
+  m_voteYesBtn->setVisible(isActiveStatus);
+  m_voteNoBtn->setVisible(isActiveStatus);
+  m_unspecifiedBtn->setVisible(isActiveStatus);
 
   const bool isClaimingActive = m_proposal->isRewardClaimable();
   if (isClaimingActive)
@@ -300,6 +301,35 @@ void ProposalDetailsComponent::buttonClicked(Button* button) {
         AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
                                          "Invalid data",
                                          "Enter correct amount of reward to claim");
+      }
+    }
+  } else if (button == m_payForGasBtn.get()) {
+    const auto areAllSlotsPaid = m_proposal->areAllSlotsPaid();
+    if (areAllSlotsPaid)
+      return;
+
+    const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
+    const String slotsMsg = Proposal::getStatusStr(Proposal::Status::PrepayingGas) + " "
+                              + String(m_proposal->getNumSlotsPaid()) + String("/") + String(numSlots)
+                              + String(" are paid. ")
+                              + String("Enter num of slots to pay");
+    AlertWindow w("Pay for gas for " + m_proposal->getTitle() + " proposal",
+                  slotsMsg,
+                  AlertWindow::QuestionIcon);
+
+    w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
+    w.getTextEditor("slotsToPay")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
+    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+    if (w.runModalLoop() == 1) {
+      const auto slotsToPay = w.getTextEditorContents("slotsToPay").getLargeIntValue();
+      if (slotsToPay > 0) {
+        m_accountData->getProposalsManager()->payForGas(m_proposal, slotsToPay);
+      } else {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                         "Invalid data",
+                                         "Enter correct number of slots");
       }
     }
   }
