@@ -74,6 +74,8 @@ class Proposal {
   void setNextPaymentDate(uint64 dateUnix);
 
   bool isRewardClaimable() const noexcept;
+  bool hasActiveStatus() const noexcept;
+  bool hasInactiveStatus() const noexcept;
 
   uint64 getId() const noexcept                 { return m_id; }
   uint64 getNumPeriodsLeft() const  noexcept    { return m_numPeriodsLeft; }

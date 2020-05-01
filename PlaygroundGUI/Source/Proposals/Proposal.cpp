@@ -140,3 +140,13 @@ void Proposal::setInitialContestEndDate(uint64 dateUnix) {
 void Proposal::setNextPaymentDate(uint64 dateUnix) {
   m_nextPaymentDate = Time(dateUnix * 1000);
 }
+
+bool Proposal::hasActiveStatus() const noexcept {
+  return getStatus() == Proposal::Status::Started
+         || getStatus() == Proposal::Status::Accepted
+         || getStatus() == Proposal::Status::Contested;
+}
+
+bool Proposal::hasInactiveStatus() const noexcept {
+  return !hasActiveStatus();
+}
