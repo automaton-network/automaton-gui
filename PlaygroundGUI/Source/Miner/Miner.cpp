@@ -80,7 +80,7 @@ void Miner::addMinerThread() {
     memcpy(difficulty, getDifficulty(), 32);
 
     while (!task->threadShouldExit()) {
-      unsigned int keys_generated = mine_key(mask, difficulty, pk);
+      unsigned int keys_generated = mine_key(mask, difficulty, pk, 1000);
       processMinedKey(std::string(reinterpret_cast<const char*>(pk), 32), keys_generated);
     }
 
