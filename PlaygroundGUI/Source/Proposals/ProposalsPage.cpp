@@ -193,6 +193,7 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
                   AlertWindow::QuestionIcon);
 
     w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
+    w.getTextEditor("rewardAmount")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
     w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
     w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
@@ -217,10 +218,10 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
                   AlertWindow::QuestionIcon);
 
     w.addTextEditor("rewardAmount", "", "Reward Amount:", false);
+    w.getTextEditor("rewardAmount")->setInputRestrictions(8, Utils::numericalFloatAllowed);
     w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
     w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
-    w.getTextEditor("rewardAmount")->setInputRestrictions(8, "0123456789.");
 
     if (w.runModalLoop() == 1) {
       const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
