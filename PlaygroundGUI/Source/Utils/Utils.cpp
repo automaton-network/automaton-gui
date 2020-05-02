@@ -114,6 +114,59 @@ String Utils::toWei(CoinUnit unitTo, const String& value) {
   return (result * factor).toString(10);
 }
 
+String Utils::divideBigInt(const String& dividend, const String& divisor, uint64 precision) {
+  BigInteger a;
+  a.parseString(dividend, 10);
+  BigInteger b;
+  b.parseString(divisor, 10);
+
+  BigInteger reminder;
+  a.divideBy(b, reminder);
+
+  String decimals;
+  for (int i = 0; i < precision; ++i) {
+    reminder *= 10;
+    BigInteger reminder2;
+    reminder.divideBy(b, reminder2);
+    decimals += reminder.toString(10);
+    reminder = reminder2;
+
+    if (reminder2.isZero())
+      break;
+  }
+
+  if (decimals.isEmpty())
+    return a.toString(10);
+
+  return a.toString(10) + "." + decimals;
+}
+
 bool Utils::isZeroTime(const Time& time) {
   return time.toMilliseconds() == 0;
 }
+
+#if AUTOMATON_JUCE_UNIT_TESTS
+class UtilsTest : public UnitTest {
+ public:
+  UtilsTest() : UnitTest("Utils") {
+  }
+
+  void runTest() override {
+    beginTest("FromWei converter");
+    expect(Utils::fromWei(CoinUnit::ether, "123456789") == "0.000000000123456789");
+    expect(Utils::fromWei(CoinUnit::ether, "12345678900008") == "0.000012345678900008");
+
+    beginTest("ToWei converter");
+    expect(Utils::toWei(CoinUnit::ether, "0.000000000123456789") == "123456789");
+    expect(Utils::toWei(CoinUnit::ether, "0.000012345678900008") == "12345678900008");
+
+    beginTest("DivideBigInt");
+    expect(Utils::divideBigInt("17", "4", 10) == "4.25");
+    expect(Utils::divideBigInt("1000", "6", 10) == "166.6666666666");
+    expect(Utils::divideBigInt("123456789", "12345678900008", 10) == "0.0000099999");
+    expect(Utils::divideBigInt("12345678900008", "123456789", 10) == "100000.0000000648");
+  }
+};
+
+static UtilsTest test;
+#endif

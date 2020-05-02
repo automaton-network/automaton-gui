@@ -68,6 +68,11 @@ class PlaygroundGUIApplication: public JUCEApplication {
   void initialise(const String& commandLine) override {
     new LoggerTest();
 
+#if AUTOMATON_JUCE_UNIT_TESTS
+    UnitTestRunner testRunner;
+    testRunner.runAllTests();
+#endif
+
     curl_global_init(CURL_GLOBAL_ALL);
 
     m_fileLogger.reset(FileLogger::createDefaultAppLogger("automaton",
