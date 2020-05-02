@@ -31,15 +31,45 @@ Order::Order(uint64 id, const String& jsonString)
     : m_id(id) {
   json jsonData = json::parse(jsonString.toStdString());
 
-  BigInteger amountAUTO;
-  amountAUTO.parseString(jsonData.at(0).get<std::string>(), 10);
-  BigInteger amountETH;
-  amountETH.parseString(jsonData.at(1).get<std::string>(), 10);
+  const auto amountAUTOstr = jsonData.at(0).get<std::string>();
+  const auto amountETHstr = jsonData.at(1).get<std::string>();
 
-  m_auto = Utils::fromWei(CoinUnit::AUTO, amountAUTO.toString(10));
-  m_eth = Utils::fromWei(CoinUnit::ether, amountETH.toString(10));
-  m_price = String(m_eth.getDoubleValue() / m_auto.getDoubleValue());
+  m_auto = Utils::fromWei(CoinUnit::AUTO, amountAUTOstr);
+  m_eth = Utils::fromWei(CoinUnit::ether, amountETHstr);
+  m_price = Utils::divideBigInt(amountETHstr, amountAUTOstr, 10);
 
   m_owner = jsonData.at(2).get<std::string>();
   m_type = static_cast<Order::Type>(std::stoul(jsonData.at(3).get<std::string>()));
+}
+
+String Order::getOrderDescription(Type orderType,
+                                  const String& amountAUTO, const String& amountETH,
+                                  bool convertFromWei) {
+  String amountAUTOdescription;
+  String amountETHdescription;
+
+  if (convertFromWei) {
+    amountAUTOdescription = Utils::fromWei(CoinUnit::AUTO, amountAUTO);
+    amountETHdescription = Utils::fromWei(CoinUnit::ether, amountETH);
+  } else {
+    amountAUTOdescription = amountAUTO;
+    amountETHdescription = amountETH;
+  }
+
+  switch (orderType) {
+    case Type::Buy:
+      return "(" + amountETHdescription + " ETH -> " + amountAUTOdescription + " AUTO)";
+
+    case Type::Sell:
+      return "(" + amountAUTOdescription + " AUTO -> " + amountETHdescription + " ETH)";
+
+    // TODO (Kirill) add support for Auction type in future
+    case Type::Auction:
+    default:
+      return String("Invalid order");
+  }
+}
+
+String Order::getDescription() const noexcept {
+  return getOrderDescription(getType(), getAuto(), getEth(), false);
 }

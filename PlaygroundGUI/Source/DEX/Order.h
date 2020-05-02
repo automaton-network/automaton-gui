@@ -33,14 +33,20 @@ class Order {
 
   using Ptr = std::shared_ptr<Order>;
 
+  static String getOrderDescription(Type orderType,
+                                    const String& amountAUTO, const String& amountETH,
+                                    bool convertFromWei = false);
+
   Order(uint64 id, const String& jsonString);
 
   uint64 getId() const noexcept { return m_id; }
-  Type getType() const { return m_type; }
-  String getAuto() const { return m_auto; }
-  String getEth() const { return m_eth; }
-  String getPrice() const { return m_price; }
-  const String& getOwner() const { return m_owner; }
+  Type getType() const noexcept { return m_type; }
+  String getAuto() const noexcept   { return m_auto; }
+  String getEth() const noexcept    { return m_eth; }
+  String getPrice() const noexcept  { return m_price; }
+  String getOwner() const noexcept  { return m_owner; }
+
+  String getDescription() const noexcept;
 
   void setId(uint64 id) { m_id = id; }
 

@@ -35,6 +35,9 @@ class DEXManager {
   bool fetchOrders();
   bool createSellOrder(const String& amountAUTO, const String& amountETH);
   bool createBuyOrder(const String& amountAUTO, const String& amountETH);
+  bool cancelOrder(Order::Ptr order);
+  bool acquireBuyOrder(Order::Ptr order);
+  bool acquireSellOrder(Order::Ptr order);
 
 
  private:

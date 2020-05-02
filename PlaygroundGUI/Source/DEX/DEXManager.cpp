@@ -126,8 +126,7 @@ bool DEXManager::fetchOrders() {
 }
 
 bool DEXManager::createSellOrder(const String& amountAUTO, const String& amountETH) {
-  const auto orderName = "(" + Utils::fromWei(CoinUnit::AUTO, amountAUTO) + " AUTO -> "
-                          + Utils::fromWei(CoinUnit::ether, amountETH) + " ETH)";
+  const auto orderName = Order::getOrderDescription(Order::Type::Sell, amountAUTO, amountETH, true);
   const auto topicName = "Create sell order + " + orderName;
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
@@ -157,8 +156,7 @@ bool DEXManager::createSellOrder(const String& amountAUTO, const String& amountE
 }
 
 bool DEXManager::createBuyOrder(const String& amountAUTO, const String& amountETH) {
-  const auto orderName = "(" + Utils::fromWei(CoinUnit::ether, amountETH) + " ETH -> "
-                          + Utils::fromWei(CoinUnit::AUTO, amountAUTO) + " AUTO)";
+  const auto orderName = Order::getOrderDescription(Order::Type::Buy, amountAUTO, amountETH, true);
   const auto topicName = "Create buy order + " + orderName;
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
@@ -211,4 +209,37 @@ bool DEXManager::createBuyOrder(const String& amountAUTO, const String& amountET
   }, topicName, m_accountData);
 
   return true;
+}
+
+bool DEXManager::cancelOrder(Order::Ptr order) {
+  const auto topicName = "Cancel order + " + order->getDescription();
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+
+    task->setProgress(0.1);
+
+    json jCancelOrder;
+    jCancelOrder.push_back(order->getId());
+
+    s = m_contractData->call("cancelOrder", jCancelOrder.dump(), m_accountData->getPrivateKey());
+
+    if (!s.is_ok())
+      return false;
+
+    DBG("Call result: " << s.msg << "\n");
+    task->setProgress(1.0);
+
+    task->setStatusMessage("Order " + order->getDescription() + " successfully cancelled");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
+}
+
+bool DEXManager::acquireBuyOrder(Order::Ptr order) {
+}
+
+bool DEXManager::acquireSellOrder(Order::Ptr order) {
 }

@@ -34,15 +34,38 @@ class OrdersUIModel : public TableListBoxModel {
     , Owner
   };
 
-  OrdersUIModel() {
+  OrdersUIModel(Account::Ptr accountData)
+      : m_accountData(accountData) {
   }
 
-  void setModel(std::shared_ptr<AbstractListModel<Order::Ptr>> model) {
+  void setModel(std::shared_ptr<OrdersProxyModel> model) {
+    if (!model)
+      return;
+
     m_model = model;
   }
 
   int getNumRows() override {
     return m_model != nullptr ? m_model->size() : 0;
+  }
+
+  void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) {
+    if (e.mods.isLeftButtonDown()) {
+      auto order = m_model->getAt(rowNumber);
+      if (!order)
+        return;
+
+      AlertWindow w("Do you want to cancel your order?",
+                    order->getDescription(),
+                    AlertWindow::QuestionIcon);
+
+      w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+      w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+      if (w.runModalLoop() == 1) {
+        m_accountData->getDexManager()->cancelOrder(order);
+      }
+    }
   }
 
   void paintCell(Graphics& g,
@@ -83,8 +106,49 @@ class OrdersUIModel : public TableListBoxModel {
     g.fillRect(0, 0, width, height);
   }
 
+  void sortOrderChanged(int newSortColumnId, bool isForwards) override {
+    const int direction = isForwards ? -1 : 1;
+    std::function<int(Order*, Order*)> sorter;
+
+    switch (newSortColumnId) {
+      case Price: {
+        sorter = [=](Order* p1, Order* p2) {
+          return direction
+            * DefaultElementComparator<String>::compareElements(p1->getPrice(), p2->getPrice());
+        };
+        break;
+      }
+      case Auto: {
+        sorter = [=](Order* p1, Order* p2) {
+          return direction
+            * DefaultElementComparator<String>::compareElements(p1->getAuto(), p2->getAuto());
+        };
+        break;
+      }
+      case Eth: {
+        sorter = [=](Order* p1, Order* p2) {
+          return direction
+            * DefaultElementComparator<String>::compareElements(p1->getEth(), p2->getEth());
+        };
+        break;
+      }
+      case Owner: {
+        sorter = [=](Order* p1, Order* p2) {
+          return direction
+            * DefaultElementComparator<String>::compareElements(p1->getOwner(), p2->getOwner());
+        };
+        break;
+      }
+      default:
+      break;
+    }
+
+    m_model->setSorter(sorter);
+  }
+
  private:
-  std::shared_ptr<AbstractListModel<Order::Ptr>> m_model;
+  Account::Ptr m_accountData;
+  std::shared_ptr<OrdersProxyModel> m_model;
 };
 
 DEXPage::DEXPage(Account::Ptr accountData) : m_accountData(accountData) {
@@ -99,9 +163,9 @@ DEXPage::DEXPage(Account::Ptr accountData) : m_accountData(accountData) {
   m_buyingProxyModel->setModel(m_dexManager->getModel());
   m_buyingProxyModel->addListener(this);
 
-  m_sellingUIModel = std::make_unique<OrdersUIModel>();
+  m_sellingUIModel = std::make_unique<OrdersUIModel>(m_accountData);
   m_sellingUIModel->setModel(m_sellingProxyModel);
-  m_buyingUIModel = std::make_unique<OrdersUIModel>();
+  m_buyingUIModel = std::make_unique<OrdersUIModel>(m_accountData);
   m_buyingUIModel->setModel(m_buyingProxyModel);
 
   m_ethBalanceLabel = std::make_unique<Label>("m_balanceLabel");
