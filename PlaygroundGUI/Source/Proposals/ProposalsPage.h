@@ -43,7 +43,7 @@ class ProposalsPage : public Component
   void resized() override;
 
   // AbstractListModelBase::Listener
-  void modelChanged(AbstractListModelBase*);
+  void modelChanged(AbstractListModelBase*) override;
 
  private:
   void createProposalViewActionHappened(CreateProposalComponent* componentInWhichActionHappened,
