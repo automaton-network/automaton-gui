@@ -313,15 +313,13 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     }
     case Spent: {
       sorter = [=](Proposal* p1, Proposal* p2) {
-        return direction
-                * DefaultElementComparator<String>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
+        return direction * p1->getAmountSpent().compareNatural(p2->getAmountSpent());
       };
       break;
     }
     case Budget: {
       sorter = [=](Proposal* p1, Proposal* p2) {
-        return direction
-                * DefaultElementComparator<String>::compareElements(p1->getBudgetPerPeriod(), p2->getBudgetPerPeriod());
+        return direction * p1->getBudgetPerPeriod().compareNatural(p2->getBudgetPerPeriod());
       };
       break;
     }
@@ -342,8 +340,7 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     }
     case Bonus: {
       sorter = [=](Proposal* p1, Proposal* p2) {
-        return direction
-                * DefaultElementComparator<String>::compareElements(p1->getTargetBonus(), p2->getTargetBonus());
+        return direction * p1->getTargetBonus().compareNatural(p2->getTargetBonus());
       };
       break;
     }

@@ -113,29 +113,25 @@ class OrdersUIModel : public TableListBoxModel {
     switch (newSortColumnId) {
       case Price: {
         sorter = [=](Order* p1, Order* p2) {
-          return direction
-            * DefaultElementComparator<String>::compareElements(p1->getPrice(), p2->getPrice());
+          return direction * p1->getPrice().compareNatural(p2->getPrice());
         };
         break;
       }
       case Auto: {
         sorter = [=](Order* p1, Order* p2) {
-          return direction
-            * DefaultElementComparator<String>::compareElements(p1->getAuto(), p2->getAuto());
+          return direction * p1->getAuto().compareNatural(p2->getAuto());
         };
         break;
       }
       case Eth: {
         sorter = [=](Order* p1, Order* p2) {
-          return direction
-            * DefaultElementComparator<String>::compareElements(p1->getEth(), p2->getEth());
+          return direction * p1->getEth().compareNatural(p2->getEth());
         };
         break;
       }
       case Owner: {
         sorter = [=](Order* p1, Order* p2) {
-          return direction
-            * DefaultElementComparator<String>::compareElements(p1->getOwner(), p2->getOwner());
+          return direction * p1->getOwner().compareNatural(p2->getOwner());
         };
         break;
       }
