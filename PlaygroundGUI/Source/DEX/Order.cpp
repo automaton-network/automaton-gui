@@ -63,7 +63,7 @@ String Order::getOrderDescription(Type orderType,
     case Type::Sell:
       return "(" + amountAUTOdescription + " AUTO -> " + amountETHdescription + " ETH)";
 
-    // TODO (Kirill) add support for Auction type in future
+    // TODO(Kirill) add support for Auction type in future
     case Type::Auction:
     default:
       return String("Invalid order");
