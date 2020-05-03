@@ -86,7 +86,15 @@ std::string Account::getEthBalance() const noexcept {
   return m_ethBalance;
 }
 
+std::string Account::getDexEthBalance() const noexcept {
+  return m_dexEthBalance;
+}
+
 void Account::setBalance(const std::string& ethBalance, const std::string& autoBalance) {
   m_ethBalance = ethBalance;
   m_autoBalance = autoBalance;
+}
+
+void Account::setDexEthBalance(const std::string& dexEthBalance) {
+  m_dexEthBalance = dexEthBalance;
 }

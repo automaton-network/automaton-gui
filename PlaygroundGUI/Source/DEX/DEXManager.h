@@ -33,11 +33,13 @@ class DEXManager {
   std::shared_ptr<OrdersModel> getModel();
 
   bool fetchOrders();
-  bool createSellOrder(const String& amountAUTO, const String& amountETH);
-  bool createBuyOrder(const String& amountAUTO, const String& amountETH);
+  bool createSellOrder(const String& amountAUTO, const String& amountETHwei);
+  bool createBuyOrder(const String& amountAUTO, const String& amountETHwei);
   bool cancelOrder(Order::Ptr order);
   bool acquireBuyOrder(Order::Ptr order);
   bool acquireSellOrder(Order::Ptr order);
+  bool getDexEthBalance(const String& address);
+  bool withdrawEthFromDEX(const String& amountETHwei);
 
 
  private:

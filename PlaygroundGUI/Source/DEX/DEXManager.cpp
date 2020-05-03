@@ -70,6 +70,17 @@ static std::string getEthBalance(AutomatonContractData::Ptr contract,
   return balance.toString(10).toStdString();
 }
 
+static std::string fetchDexEthBalance(AutomatonContractData::Ptr contract,
+                                        const std::string& m_ethAddress,
+                                        status* resStatus) {
+  json jRequest;
+  jRequest.push_back(m_ethAddress.substr(2));
+
+  *resStatus = contract->call("getBalanceETH", jRequest.dump());
+  json j_output = json::parse(resStatus->msg);
+  return  (*j_output.begin()).get<std::string>();
+}
+
 static std::string getAutoBalance(AutomatonContractData::Ptr contract,
                                   const std::string& m_ethAddress,
                                   status* resStatus) {
@@ -88,11 +99,16 @@ bool DEXManager::fetchOrders() {
     if (!s.is_ok())
       return false;
 
+    auto dexEthBalance = fetchDexEthBalance(m_contractData, m_accountData->getAddress(), &s);
+    if (!s.is_ok())
+      return false;
+
     auto autoBalance = getAutoBalance(m_contractData, m_accountData->getAddress(), &s);
     if (!s.is_ok())
       return false;
 
     m_accountData->setBalance(ethBalance, autoBalance);
+    m_accountData->setDexEthBalance(dexEthBalance);
 
     m_model->clear(NotificationType::dontSendNotification);
 
@@ -125,8 +141,8 @@ bool DEXManager::fetchOrders() {
   return true;
 }
 
-bool DEXManager::createSellOrder(const String& amountAUTO, const String& amountETH) {
-  const auto orderName = Order::getOrderDescription(Order::Type::Sell, amountAUTO, amountETH, true);
+bool DEXManager::createSellOrder(const String& amountAUTOwei, const String& amountETHwei) {
+  const auto orderName = Order::getOrderDescription(Order::Type::Sell, amountAUTOwei, amountETHwei, true);
   const auto topicName = "Create sell order + " + orderName;
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
@@ -134,8 +150,8 @@ bool DEXManager::createSellOrder(const String& amountAUTO, const String& amountE
     task->setProgress(0.1);
 
     json jSellOrder;
-    jSellOrder.push_back(amountAUTO.toStdString());
-    jSellOrder.push_back(amountETH.toStdString());
+    jSellOrder.push_back(amountAUTOwei.toStdString());
+    jSellOrder.push_back(amountETHwei.toStdString());
 
     task->setProgress(0.5);
 
@@ -155,8 +171,8 @@ bool DEXManager::createSellOrder(const String& amountAUTO, const String& amountE
   return true;
 }
 
-bool DEXManager::createBuyOrder(const String& amountAUTO, const String& amountETH) {
-  const auto orderName = Order::getOrderDescription(Order::Type::Buy, amountAUTO, amountETH, true);
+bool DEXManager::createBuyOrder(const String& amountAUTOwei, const String& amountETHwei) {
+  const auto orderName = Order::getOrderDescription(Order::Type::Buy, amountAUTOwei, amountETHwei, true);
   const auto topicName = "Create buy order + " + orderName;
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
@@ -164,7 +180,7 @@ bool DEXManager::createBuyOrder(const String& amountAUTO, const String& amountET
     task->setProgress(0.1);
 
     json jBuyOrder;
-    jBuyOrder.push_back(amountAUTO.toStdString());
+    jBuyOrder.push_back(amountAUTOwei.toStdString());
 
     json jSignature;
     jSignature.push_back("uint256");
@@ -182,9 +198,9 @@ bool DEXManager::createBuyOrder(const String& amountAUTO, const String& amountET
     }
     task->setProgress(0.5);
 
-    BigInteger intAmountETH;
-    intAmountETH.parseString(amountETH, 10);
-    const String hexAmountETH = intAmountETH.toString(16);
+    BigInteger intAmountETHwei;
+    intAmountETHwei.parseString(amountETHwei, 10);
+    const String hexAmountETH = intAmountETHwei.toString(16);
 
     eth_transaction transaction;
     transaction.nonce = nonce;
@@ -239,7 +255,105 @@ bool DEXManager::cancelOrder(Order::Ptr order) {
 }
 
 bool DEXManager::acquireBuyOrder(Order::Ptr order) {
+  if (order->getType() != Order::Type::Buy) {
+    DBG("ERROR! You call acquireBuyOrder for Sell type order!");
+    return false;
+  }
+
+  const auto topicName = "Acquire order + " + order->getDescription();
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+
+    task->setProgress(0.1);
+
+    const auto autoWeiValue = Utils::toWei(CoinUnit::AUTO, order->getAuto()).toStdString();
+    const auto ethWeiValue = Utils::toWei(CoinUnit::ether, order->getEth()).toStdString();
+
+    json jOrder;
+    jOrder.push_back(order->getId());
+    jOrder.push_back(autoWeiValue);
+    jOrder.push_back(ethWeiValue);
+
+    // To acquire Buy order - call sellNow method
+    s = m_contractData->call("sellNow", jOrder.dump(), m_accountData->getPrivateKey());
+
+    if (!s.is_ok())
+      return false;
+
+    DBG("Call result: " << s.msg << "\n");
+    task->setProgress(1.0);
+
+    task->setStatusMessage("Order " + order->getDescription() + " successfully acquired!");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
 }
 
 bool DEXManager::acquireSellOrder(Order::Ptr order) {
+  if (order->getType() != Order::Type::Sell) {
+    DBG("ERROR! You call acquireSellOrder for Buy type order!");
+    return false;
+  }
+
+  const auto topicName = "Acquire order + " + order->getDescription();
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+
+    task->setProgress(0.1);
+
+    const auto autoWeiValue = Utils::toWei(CoinUnit::AUTO, order->getAuto()).toStdString();
+    const auto ethWeiValue = Utils::toWei(CoinUnit::ether, order->getEth()).toStdString();
+
+    json jOrder;
+    jOrder.push_back(order->getId());
+    jOrder.push_back(autoWeiValue);
+
+    // To acquire Sell order - call buyNow method
+    s = m_contractData->call("buyNow", jOrder.dump(), m_accountData->getPrivateKey(), ethWeiValue);
+
+    if (!s.is_ok())
+      return false;
+
+    DBG("Call result: " << s.msg << "\n");
+    task->setProgress(1.0);
+
+    task->setStatusMessage("Order " + order->getDescription() + " successfully acquired!");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
+}
+
+bool DEXManager::withdrawEthFromDEX(const String& amountETHwei) {
+  const auto amountETH = Utils::fromWei(CoinUnit::ether, amountETHwei);
+  const auto topicName = "Withdraw " + amountETH + " ETH from DEX.";
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+
+    task->setProgress(0.1);
+
+    json jInput;
+    jInput.push_back(amountETHwei.toStdString());
+
+    // To acquire Sell order - call buyNow method
+    s = m_contractData->call("withdraw", jInput.dump(), m_accountData->getPrivateKey());
+
+    if (!s.is_ok())
+      return false;
+
+    DBG("Call result: " << s.msg << "\n");
+    task->setProgress(1.0);
+
+    task->setStatusMessage("Successfully withdrawn " + amountETH + " from DEX!");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
 }
