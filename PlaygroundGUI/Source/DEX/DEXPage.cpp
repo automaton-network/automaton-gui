@@ -23,6 +23,7 @@
 #include "Utils/Utils.h"
 
 static const String ETH_BALANCE_PREFIX_LABEL = "Eth Balance: ";
+static const String DEX_ETH_BALANCE_PREFIX_LABEL = "Eth Balance (DEX): ";
 static const String AUTO_BALANCE_PREFIX_LABEL = "AUTO Balance: ";
 
 class OrdersUIModel : public TableListBoxModel {
@@ -55,15 +56,40 @@ class OrdersUIModel : public TableListBoxModel {
       if (!order)
         return;
 
-      AlertWindow w("Do you want to cancel your order?",
-                    order->getDescription(),
-                    AlertWindow::QuestionIcon);
+      // Cancel order if it's owner's order
+      if ("0x" + order->getOwner() == String(m_accountData->getAddress())) {
+        AlertWindow w("Do you want to cancel your order?",
+                      order->getDescription(),
+                      AlertWindow::QuestionIcon);
 
-      w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-      w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+        w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+        w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
-      if (w.runModalLoop() == 1) {
-        m_accountData->getDexManager()->cancelOrder(order);
+        if (w.runModalLoop() == 1) {
+          m_accountData->getDexManager()->cancelOrder(order);
+        }
+      } else if (order->getType() == Order::Type::Sell) {
+        AlertWindow w("Do you want to buy " + order->getAuto() + " AUTO",
+                      "for " + order->getEth() + " ETH?",
+                      AlertWindow::QuestionIcon);
+
+        w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+        w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+        if (w.runModalLoop() == 1) {
+          m_accountData->getDexManager()->acquireSellOrder(order);
+        }
+      } else if (order->getType() == Order::Type::Buy) {
+        AlertWindow w("Do you want to sell " + order->getAuto() + " AUTO",
+                      "for " + order->getEth() + " ETH?",
+                      AlertWindow::QuestionIcon);
+
+        w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+        w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+        if (w.runModalLoop() == 1) {
+          m_accountData->getDexManager()->acquireBuyOrder(order);
+        }
       }
     }
   }
@@ -168,6 +194,11 @@ DEXPage::DEXPage(Account::Ptr accountData) : m_accountData(accountData) {
   m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL
                                 + Utils::fromWei(CoinUnit::ether, m_accountData->getEthBalance()) + String(" ETH"),
                              NotificationType::dontSendNotification);
+  m_dexEthBalanceLabel = std::make_unique<Label>("m_balanceLabel");
+  m_dexEthBalanceLabel->setText(DEX_ETH_BALANCE_PREFIX_LABEL
+                                + Utils::fromWei(CoinUnit::ether, m_accountData->getDexEthBalance()) + String(" ETH"),
+                             NotificationType::dontSendNotification);
+  m_dexEthBalanceLabel->addMouseListener(this, false);
   m_autoBalanceLabel = std::make_unique<Label>("m_autoBalanceLabel");
   m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL
                                 + Utils::fromWei(CoinUnit::AUTO, m_accountData->getAutoBalance()) + String(" AUTO"),
@@ -206,6 +237,7 @@ DEXPage::DEXPage(Account::Ptr accountData) : m_accountData(accountData) {
   buyingHeader.addColumn(translate("Owner"), OrdersUIModel::Owner, 200);
 
   addAndMakeVisible(m_ethBalanceLabel.get());
+  addAndMakeVisible(m_dexEthBalanceLabel.get());
   addAndMakeVisible(m_autoBalanceLabel.get());
   addAndMakeVisible(m_sellingLabel.get());
   addAndMakeVisible(m_buyingLabel.get());
@@ -234,6 +266,7 @@ void DEXPage::resized() {
 
   auto labelsBounds = bounds.removeFromTop(30);
   m_ethBalanceLabel->setBounds(labelsBounds.removeFromLeft(getWidth() / 2));
+  m_dexEthBalanceLabel->setBounds(m_ethBalanceLabel->getBounds().translated(0, 20));
   m_autoBalanceLabel->setBounds(labelsBounds);
 
   auto tablesBounds = bounds;
@@ -283,10 +316,47 @@ void DEXPage::buttonClicked(Button* buttonThatWasClicked) {
   }
 }
 
+void DEXPage::mouseDoubleClick(const MouseEvent& e) {
+  if (e.originalComponent == m_dexEthBalanceLabel.get()) {
+    const auto dexEthBalance = Utils::fromWei(CoinUnit::ether, m_accountData->getDexEthBalance());
+    if (dexEthBalance.getDoubleValue() < 0.00000001)
+      return;
+
+    AlertWindow w("How many ETH do you want to withdraw from DEX?",
+                  "You have " + dexEthBalance + " ETH available.",
+                  AlertWindow::QuestionIcon);
+
+    w.addTextEditor("amountETH", "", "Amount ETH:", false);
+    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+
+    w.getTextEditor("amountETH")->setInputRestrictions(8, Utils::numericalFloatAllowed);
+
+    if (w.runModalLoop() == 1) {
+      const auto amountETH = w.getTextEditorContents("amountETH").getDoubleValue();
+      if (amountETH > dexEthBalance.getDoubleValue()) {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                  "Invalid data",
+                                  "Enter correct ETH amount. You have only " + dexEthBalance + " ETH available on DEX");
+      } else if (amountETH > 0.0) {
+        const auto amountETHwei = Utils::toWei(CoinUnit::ether, w.getTextEditorContents("amountETH"));
+        m_dexManager->withdrawEthFromDEX(amountETHwei);
+      } else {
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                         "Invalid data",
+                                         "Enter correct ETH amount");
+      }
+    }
+  }
+}
+
 void DEXPage::modelChanged(AbstractListModelBase* model) {
   m_ethBalanceLabel->setText(ETH_BALANCE_PREFIX_LABEL
-                                + Utils::fromWei(CoinUnit::ether, m_accountData->getEthBalance()) + String(" ETH"),
+                               + Utils::fromWei(CoinUnit::ether, m_accountData->getEthBalance()) + String(" ETH"),
                              NotificationType::dontSendNotification);
+  m_dexEthBalanceLabel->setText(DEX_ETH_BALANCE_PREFIX_LABEL
+                                  + Utils::fromWei(CoinUnit::ether, m_accountData->getDexEthBalance()) + String(" ETH"),
+                                NotificationType::dontSendNotification);
   m_autoBalanceLabel->setText(AUTO_BALANCE_PREFIX_LABEL
                                 + Utils::fromWei(CoinUnit::AUTO, m_accountData->getAutoBalance()) + String(" AUTO"),
                               NotificationType::dontSendNotification);

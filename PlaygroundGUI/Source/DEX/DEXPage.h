@@ -41,8 +41,11 @@ class DEXPage : public Component
   // AbstractListModelBase::Listener
   void modelChanged(AbstractListModelBase* model) override;
 
+  void mouseDoubleClick(const MouseEvent& e) override;
+
  private:
   std::unique_ptr<Label> m_ethBalanceLabel;
+  std::unique_ptr<Label> m_dexEthBalanceLabel;
   std::unique_ptr<Label> m_autoBalanceLabel;
   std::unique_ptr<OrdersUIModel> m_sellingUIModel;
   std::unique_ptr<OrdersUIModel> m_buyingUIModel;
