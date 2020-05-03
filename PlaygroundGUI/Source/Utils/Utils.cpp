@@ -145,6 +145,18 @@ bool Utils::isZeroTime(const Time& time) {
   return time.toMilliseconds() == 0;
 }
 
+String Utils::getNormalizedAddress(const String& address) {
+  if (address.length() < 2 || address.length() != 64 || address.length() != 66) {
+    DBG("Incorrect address size! Provided address of size " + address.length());
+    jassertfalse;
+    return String();
+  }
+
+  if (address.substring(0, 2) == "0x")
+    return address.substring(2);
+  return address;
+}
+
 #if AUTOMATON_JUCE_UNIT_TESTS
 class UtilsTest : public UnitTest {
  public:

@@ -32,6 +32,8 @@ class Utils {
   static String divideBigInt(const String& dividend, const String& divisor, uint64 precision);
 
   static bool isZeroTime(const Time& time);
+  // Return an address without "0x"
+  static String getNormalizedAddress(const String& address);
 
   static const String numericalIntegerAllowed;
   static const String numericalFloatAllowed;
