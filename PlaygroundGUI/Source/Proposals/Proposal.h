@@ -46,6 +46,7 @@ class Proposal {
 
   Proposal();
   Proposal(uint32_t id, const String& infoJsonString, const String& dataJsonString);
+  void setData(const String& infoJsonString, const String& dataJsonString);
 
   static String getStatusStr(Proposal::Status status);
 

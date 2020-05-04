@@ -31,7 +31,7 @@ class ProposalsManager {
 
   bool fetchProposals();
   bool fetchProposalVotes(Proposal::Ptr proposal);
-  void addProposal(Proposal::Ptr proposal, NotificationType notification);
+  bool updateProposal(Proposal::Ptr proposal);
   bool createProposal(Proposal::Ptr proposal, const String& contributor);
   bool payForGas(Proposal::Ptr proposal, uint64 slotsToPay);
   bool castVote(Proposal::Ptr proposal, uint64 choice);
@@ -39,8 +39,6 @@ class ProposalsManager {
 
   std::string getEthAddress() const noexcept { return m_accountData->getAddress(); }
   std::string getEthAddressAlias() const noexcept { return m_accountData->getAlias(); }
-
-  void notifyProposalsUpdated();
 
  private:
   std::shared_ptr<ProposalsModel> m_model;

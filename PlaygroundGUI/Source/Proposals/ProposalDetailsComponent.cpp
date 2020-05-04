@@ -138,6 +138,8 @@ ProposalDetailsComponent::ProposalDetailsComponent(Account::Ptr accountData) : m
 }
 
 ProposalDetailsComponent::~ProposalDetailsComponent() {
+  if (m_proposal != nullptr)
+    m_proposal->removeListener(this);
 }
 
 static String formatStatusString(Proposal::Ptr proposal, Account::Ptr accountData) {
@@ -186,27 +188,36 @@ static String formatClaimString(Proposal::Ptr proposal) {
 }
 
 void ProposalDetailsComponent::setProposal(Proposal::Ptr proposal) {
-  if (!proposal) {
+  if (proposal == nullptr) {
     setVisible(false);
     return;
   }
 
+  if (m_proposal != nullptr)
+    m_proposal->removeListener(this);
+
   m_proposal = proposal;
   m_proposal->addListener(this);
-  m_title.setText("Proposal " + proposal->getTitle(), NotificationType::dontSendNotification);
+
+  updateComponentForProposal();
+  updateVotesView();
+}
+
+void ProposalDetailsComponent::updateComponentForProposal() {
+  m_title.setText("Proposal " + m_proposal->getTitle(), NotificationType::dontSendNotification);
   const String rewardStr = "Reward per period: " +
-      Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod()) + String(" AUTO");
+      Utils::fromWei(CoinUnit::AUTO, m_proposal->getBudgetPerPeriod()) + String(" AUTO");
 
   const String periodsStr = "Periods left: " + String(m_proposal->getNumPeriodsLeft());
   m_proposalDetailsLabel.setText(rewardStr +
-                                 "\n\n" + periodsStr +
-                                 "\n\n" + formatStatusString(m_proposal, m_accountData) +
-                                 "\n\n" + formatClaimString(m_proposal), NotificationType::dontSendNotification);
+      "\n\n" + periodsStr +
+      "\n\n" + formatStatusString(m_proposal, m_accountData) +
+      "\n\n" + formatClaimString(m_proposal), NotificationType::dontSendNotification);
 
-  m_linkToDocument->setButtonText(proposal->getDocumentLink());
-  m_linkToDocument->setURL(URL(proposal->getDocumentLink()));
+  m_linkToDocument->setButtonText(m_proposal->getDocumentLink());
+  m_linkToDocument->setURL(URL(m_proposal->getDocumentLink()));
   m_slotsGrid->setSlots(m_proposal->getSlots(), m_accountData->getContractData()->getSlots());
-  updateVotesView();
+  updateButtonsForProposal();
 }
 
 void ProposalDetailsComponent::updateButtonsForProposal() {
@@ -339,7 +350,7 @@ void ProposalDetailsComponent::proposalChanged() {
 }
 
 void ProposalDetailsComponent::handleAsyncUpdate() {
-  m_slotsGrid->setSlots(m_proposal->getSlots(), m_accountData->getContractData()->getSlots());
+  updateComponentForProposal();
 }
 
 void ProposalDetailsComponent::updateVotesView() {

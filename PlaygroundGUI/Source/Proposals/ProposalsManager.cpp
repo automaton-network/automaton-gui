@@ -36,6 +36,10 @@ using automaton::core::io::bin2hex;
 using automaton::core::io::dec2hex;
 using automaton::core::io::hex2dec;
 
+static Proposal::Ptr createOrUpdateProposal(int64 id,
+                                            Proposal::Ptr proposalToUpdate,
+                                            Account::Ptr accountData,
+                                            AutomatonContractData::Ptr contract, status* resStatus);
 static uint64 getNumSlots(AutomatonContractData::Ptr contract, status* resStatus);
 static uint64 getNumSlotsPaid(AutomatonContractData::Ptr contract, uint64 proposalId, status* resStatus);
 static std::vector<std::string> getOwners(AutomatonContractData::Ptr contract, uint64 numOfSlots, status* resStatus);
@@ -52,6 +56,63 @@ ProposalsManager::ProposalsManager(Account::Ptr accountData)
 }
 
 ProposalsManager::~ProposalsManager() {
+}
+
+static Proposal::Ptr createOrUpdateProposal(int64 id,
+                                            Proposal::Ptr proposalToUpdate,
+                                            Account::Ptr accountData,
+                                            AutomatonContractData::Ptr contractData, status* resStatus) {
+  json jInput;
+  jInput.push_back(id);
+  std::string params = jInput.dump();
+
+  auto s = contractData->call("getProposalInfo", params);
+  *resStatus = s;
+  if (!s.is_ok())
+    return nullptr;
+
+  const String proposalInfoJson = s.msg;
+
+  s = contractData->call("getProposalData", params);
+  *resStatus = s;
+  if (!s.is_ok())
+    return nullptr;
+
+  const String proposalDataJson = s.msg;
+  auto proposal = proposalToUpdate;
+  if (proposal == nullptr) {
+    proposal = std::make_shared<Proposal>(id, proposalInfoJson, proposalDataJson);
+  } else {
+    proposal->setData(proposalInfoJson, proposalDataJson);
+  }
+
+  s = contractData->call("calcVoteDifference", params);
+  *resStatus = s;
+  if (!s.is_ok())
+    return nullptr;
+
+  json j_output = json::parse(s.msg);
+  const int approvalRating = std::stoi((*j_output.begin()).get<std::string>());
+  proposal->setApprovalRating(approvalRating);
+
+  const auto numSlotsPaid = getNumSlotsPaid(contractData, id, &s);
+  if (!s.is_ok())
+    return nullptr;
+
+  proposal->setNumSlotsPaid(numSlotsPaid);
+  const bool areAllSlotsPaid = (numSlotsPaid == contractData->getSlotsNumber());
+  proposal->setAllSlotsPaid(areAllSlotsPaid);
+  if (!areAllSlotsPaid)
+    proposal->setStatus(Proposal::Status::PrepayingGas);
+
+  // TODO(Kirill): set all aliases for all accounts we have
+  if (String(accountData->getAddress()).substring(2).equalsIgnoreCase(proposal->getCreator()))
+    proposal->setCreatorAlias(accountData->getAlias());
+
+  if (proposalToUpdate != nullptr)
+    proposal->notifyChanged();
+
+  return proposal;
 }
 
 bool ProposalsManager::fetchProposals() {
@@ -71,46 +132,9 @@ bool ProposalsManager::fetchProposals() {
     Array<Proposal::Ptr> proposals;
 
     for (int i = PROPOSAL_START_ID; i <= lastProposalId; ++i) {
-      json jInput;
-      jInput.push_back(i);
-      std::string params = jInput.dump();
-
-      s = m_contractData->call("getProposalInfo", params);
-
-      if (!s.is_ok())
+      auto proposal = createOrUpdateProposal(i, nullptr, m_accountData, m_contractData, &s);
+      if (proposal == nullptr)
         return false;
-
-      const String proposalInfoJson = s.msg;
-
-      s = m_contractData->call("getProposalData", params);
-
-      if (!s.is_ok())
-        return false;
-
-      const String proposalDataJson = s.msg;
-      auto proposal = std::make_shared<Proposal>(i, proposalInfoJson, proposalDataJson);
-
-      s = m_contractData->call("calcVoteDifference", params);
-      if (!s.is_ok())
-        return false;
-
-      json j_output = json::parse(s.msg);
-      const int approvalRating = std::stoi((*j_output.begin()).get<std::string>());
-      proposal->setApprovalRating(approvalRating);
-
-      const auto numSlotsPaid = getNumSlotsPaid(m_contractData, i, &s);
-      if (!s.is_ok())
-        return false;
-
-      proposal->setNumSlotsPaid(numSlotsPaid);
-      const bool areAllSlotsPaid = (numSlotsPaid == m_accountData->getContractData()->getSlotsNumber());
-      proposal->setAllSlotsPaid(areAllSlotsPaid);
-      if (!areAllSlotsPaid)
-        proposal->setStatus(Proposal::Status::PrepayingGas);
-
-      // TODO(Kirill): set all aliases for all accounts we have
-      if (String(getEthAddress()).substring(2).equalsIgnoreCase(proposal->getCreator()))
-        proposal->setCreatorAlias(getEthAddressAlias());
 
       proposals.add(proposal);
     }
@@ -166,8 +190,24 @@ bool ProposalsManager::fetchProposalVotes(Proposal::Ptr proposal) {
   return true;
 }
 
-void ProposalsManager::addProposal(Proposal::Ptr proposal, NotificationType notification) {
-  m_model->addItem(proposal, notification);
+bool ProposalsManager::updateProposal(Proposal::Ptr proposal) {
+  if (!proposal)
+    return false;
+
+  const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Update";
+  TasksManager::launchTask([=](AsyncTask* task) {
+    auto& s = task->m_status;
+    task->setStatusMessage("Updating proposal" + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
+
+    createOrUpdateProposal(proposal->getId(), proposal, m_accountData, m_contractData, &s);
+
+    task->setStatusMessage("Updated proposal" + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
+
+    return true;
+  }, [=](AsyncTask* task) {
+  }, topicName, m_accountData);
+
+  return true;
 }
 
 bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& contributor) {
@@ -246,13 +286,10 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
 
     return true;
   }, [=](AsyncTask* task) {
+    updateProposal(proposal);
   }, topicName, m_accountData);
 
   return true;
-}
-
-void ProposalsManager::notifyProposalsUpdated() {
-  m_model->notifyModelChanged(NotificationType::sendNotificationAsync);
 }
 
 static void voteWithSlot(AutomatonContractData::Ptr contract,
@@ -393,6 +430,7 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
 
     return true;
   }, [=](AsyncTask* task) {
+    updateProposal(proposal);
   }, topicName, m_accountData);
 
   return true;
@@ -431,6 +469,7 @@ bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardA
 
     return true;
   }, [=](AsyncTask* task) {
+    updateProposal(proposal);
   }, topicName, m_accountData);
 
   return true;
