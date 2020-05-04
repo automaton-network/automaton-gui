@@ -83,6 +83,12 @@ void Proposal::setData(const String& infoJsonString, const String& dataJsonStrin
   setStatus(static_cast<Proposal::Status>(std::stoul(json_proposal_data.at(2).get<std::string>())));
   setInitialVotingEndDate(std::stoul(json_proposal_data.at(3).get<std::string>()));
   setInitialContestEndDate(std::stoul(json_proposal_data.at(4).get<std::string>()));
+
+  m_votingHistory.clearQuick();
+  const auto& json_votingHistory = json_proposal_data.at(5);
+  for (int i = 0; i < json_votingHistory.size(); ++i) {
+    m_votingHistory.add(std::stoul(json_votingHistory[i].get<std::string>()));
+  }
 }
 
 String Proposal::getStatusStr(Proposal::Status status) {

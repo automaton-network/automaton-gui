@@ -125,6 +125,10 @@
 			isa = PBXBuildFile;
 			fileRef = EB48C8B94DF3F88534EF2E02;
 		};
+		8CAD089B9986EF4721192458 = {
+			isa = PBXBuildFile;
+			fileRef = A317B5F9EB5AAAD72278F791;
+		};
 		ED3FADA2A1778903DF17D688 = {
 			isa = PBXBuildFile;
 			fileRef = 740572ACE23F45A42BC820FB;
@@ -627,6 +631,13 @@
 			path = ../../Source/Data/AutomatonContractData.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		A317B5F9EB5AAAD72278F791 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = HistoricalChart.cpp;
+			path = ../../Source/Components/HistoricalChart.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		AC725974DA4D5A793B592A09 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -695,6 +706,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Miner.cpp;
 			path = ../../Source/Miner/Miner.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C0E78A20075876AFC5C4FB0C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = HistoricalChart.h;
+			path = ../../Source/Components/HistoricalChart.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C2F43D9037B8E387725FF91E = {
@@ -960,6 +978,8 @@
 			children = (
 				EB48C8B94DF3F88534EF2E02,
 				510F04B2A4332278F5F209C3,
+				A317B5F9EB5AAAD72278F791,
+				C0E78A20075876AFC5C4FB0C,
 				740572ACE23F45A42BC820FB,
 				6CAB651C4CF26AF67F72EACD,
 				674BD8AB93DB872747B5BE69,
@@ -1361,6 +1381,7 @@
 				A43EEE53B12550669E555382,
 				AE1A08B1BFB106256FE4F53E,
 				88D3B11922D089AF4E26BDC0,
+				8CAD089B9986EF4721192458,
 				ED3FADA2A1778903DF17D688,
 				680397493A45449A817BD319,
 				C04966EEAA0333308456359D,

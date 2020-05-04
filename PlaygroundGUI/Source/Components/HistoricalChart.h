@@ -38,6 +38,7 @@ class HistoricalChart : public Component {
   void setMargins(int leftMargin, int topMargin, int rightMargin, int bottomMargin);
   void scale(float scaleValue);
   void setSeries(const Array<Point<float>>& series);
+  void setSeries(const Array<Point<float>>& series, std::pair<Point<float>, Point<float>> minMaxByY);
 
  private:
   std::unique_ptr<ChartView> m_chartView;

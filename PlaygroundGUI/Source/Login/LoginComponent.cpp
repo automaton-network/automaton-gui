@@ -18,6 +18,7 @@
  */
 
 #include <JuceHeader.h>
+#include <Components/HistoricalChart.h>
 #include "LoginComponent.h"
 #include "../MainComponent.h"
 #include "../Utils/Utils.h"
@@ -67,6 +68,8 @@ class AccountWindow : public DocumentWindow {
 
 static const Array<RPCConfig> RPC_DEFAULT_LIST = {RPCConfig("http://127.0.0.1:7545", "Localhost 7545"),
                                                   RPCConfig("http://127.0.0.1:8545", "Localhost 8545")};
+
+HistoricalChart* hc;
 
 //==============================================================================
 LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile) {

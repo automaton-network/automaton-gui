@@ -162,6 +162,7 @@
     <ClCompile Include="..\..\Source\Proposals\ProposalsPage.cpp"/>
     <ClCompile Include="..\..\Source\Config\Config.cpp"/>
     <ClCompile Include="..\..\Source\Components\FormMaker.cpp"/>
+    <ClCompile Include="..\..\Source\Components\HistoricalChart.cpp"/>
     <ClCompile Include="..\..\Source\Components\SlotsGrid.cpp"/>
     <ClCompile Include="..\..\Source\Components\ValidatorGrid.cpp"/>
     <ClCompile Include="..\..\Source\Data\AutomatonContractData.cpp"/>
@@ -1380,6 +1381,7 @@
     <ClInclude Include="..\..\Source\Proposals\ProposalsPage.h"/>
     <ClInclude Include="..\..\Source\Config\Config.h"/>
     <ClInclude Include="..\..\Source\Components\FormMaker.h"/>
+    <ClInclude Include="..\..\Source\Components\HistoricalChart.h"/>
     <ClInclude Include="..\..\Source\Components\SlotsGrid.h"/>
     <ClInclude Include="..\..\Source\Components\ValidatorGrid.h"/>
     <ClInclude Include="..\..\Source\Data\AutomatonContractData.h"/>

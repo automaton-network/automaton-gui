@@ -28,16 +28,20 @@ class ChartView : public Component {
   }
 
   void paint(Graphics& g) override {
-    g.setColour(Colours::black);
+    g.setColour(Colours::yellow);
 
     Path path;
     const auto bounds = m_owner->m_margins.subtractedFrom(getLocalBounds()).toFloat();
-    const auto origin = m_owner->m_minMaxByX.first;
-    const float scalePathY = bounds.getHeight() / (m_owner->m_minMaxByY.second.y - origin.y);
-    const float scalePathX = bounds.getWidth() / (m_owner->m_minMaxByX.second.x - origin.x);
+    const auto moveY = m_owner->m_minMaxByY.first.y < 0 ? std::fabs(m_owner->m_minMaxByY.first.y) : 0;
+    const auto moveX = m_owner->m_minMaxByX.first.x < 0 ?
+        std::fabs(m_owner->m_minMaxByX.first.x) : -1 * m_owner->m_minMaxByX.first.x;
+
+    const float scalePathY = bounds.getHeight() / (m_owner->m_minMaxByY.second.y + moveY);
+    const float scalePathX = bounds.getWidth() / (m_owner->m_minMaxByX.second.x + moveX);
     const Point<float> margin(m_owner->m_margins.getLeft(), m_owner->m_margins.getBottom());
     auto scalePoint = [&](const Point<float>& point) {
-      return Point<float>((point.x - origin.x) * scalePathX, (point.y - origin.y) * scalePathY) + margin;
+      auto p = Point<float>((point.x + moveX) * scalePathX, (point.y + moveY) * scalePathY) + margin;
+      return p;
     };
 
     const auto firstPoint = scalePoint(m_owner->m_series[0]);
@@ -65,7 +69,6 @@ HistoricalChart::~HistoricalChart() {
 }
 
 void HistoricalChart::paint(Graphics& g) {
-  g.fillAll(Colours::white);
 }
 
 void HistoricalChart::resized() {
@@ -94,6 +97,20 @@ void HistoricalChart::setSeries(const Array<Point<float>>& series) {
       , [](const Point<float>& p1, const Point<float>& p2){
     return p1.x < p2.x;
   });
+  m_minMaxByX = {*minMaxByX.first, *minMaxByX.second};
+
+  resized();
+  repaint();
+}
+
+void HistoricalChart::setSeries(const Array<Point<float>>& series, std::pair<Point<float>, Point<float>> minMaxByY) {
+  m_series = series;
+  m_minMaxByY = minMaxByY;
+
+  auto minMaxByX = std::minmax_element(m_series.begin(), m_series.end()
+      , [](const Point<float>& p1, const Point<float>& p2){
+        return p1.x < p2.x;
+      });
   m_minMaxByX = {*minMaxByX.first, *minMaxByX.second};
 
   resized();
