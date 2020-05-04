@@ -5481,6 +5481,11 @@ static const unsigned char temp_binary_data_5[] =
 "      },\n"
 "      {\n"
 "        \"internalType\": \"uint256\",\n"
+"        \"name\": \"_numHistoryPeriods\",\n"
+"        \"type\": \"uint256\"\n"
+"      },\n"
+"      {\n"
+"        \"internalType\": \"uint256\",\n"
 "        \"name\": \"_timeUnitInSeconds\",\n"
 "        \"type\": \"uint256\"\n"
 "      }\n"
@@ -6036,6 +6041,16 @@ static const unsigned char temp_binary_data_5[] =
 "        \"internalType\": \"uint256\",\n"
 "        \"name\": \"ballotBoxIDs\",\n"
 "        \"type\": \"uint256\"\n"
+"      },\n"
+"      {\n"
+"        \"internalType\": \"uint256\",\n"
+"        \"name\": \"numHistoryPeriods\",\n"
+"        \"type\": \"uint256\"\n"
+"      },\n"
+"      {\n"
+"        \"internalType\": \"uint256\",\n"
+"        \"name\": \"minHistoryPeriod\",\n"
+"        \"type\": \"uint256\"\n"
 "      }\n"
 "    ],\n"
 "    \"stateMutability\": \"view\",\n"
@@ -6373,6 +6388,16 @@ static const unsigned char temp_binary_data_5[] =
 "        \"internalType\": \"uint256\",\n"
 "        \"name\": \"contestEndDate\",\n"
 "        \"type\": \"uint256\"\n"
+"      },\n"
+"      {\n"
+"        \"internalType\": \"uint256[]\",\n"
+"        \"name\": \"votingHistory\",\n"
+"        \"type\": \"uint256[]\"\n"
+"      },\n"
+"      {\n"
+"        \"internalType\": \"uint256\",\n"
+"        \"name\": \"historyStartIdx\",\n"
+"        \"type\": \"uint256\"\n"
 "      }\n"
 "    ],\n"
 "    \"stateMutability\": \"view\",\n"
@@ -6681,16 +6706,21 @@ static const unsigned char temp_binary_data_5[] =
 "      },\n"
 "      {\n"
 "        \"internalType\": \"uint256\",\n"
-"        \"name\": \"_idx\",\n"
+"        \"name\": \"_idx_start\",\n"
+"        \"type\": \"uint256\"\n"
+"      },\n"
+"      {\n"
+"        \"internalType\": \"uint256\",\n"
+"        \"name\": \"_length\",\n"
 "        \"type\": \"uint256\"\n"
 "      }\n"
 "    ],\n"
-"    \"name\": \"getVoteWord\",\n"
+"    \"name\": \"getVoteWords\",\n"
 "    \"outputs\": [\n"
 "      {\n"
-"        \"internalType\": \"uint256\",\n"
-"        \"name\": \"\",\n"
-"        \"type\": \"uint256\"\n"
+"        \"internalType\": \"uint256[]\",\n"
+"        \"name\": \"result\",\n"
+"        \"type\": \"uint256[]\"\n"
 "      }\n"
 "    ],\n"
 "    \"stateMutability\": \"view\",\n"
@@ -6967,7 +6997,7 @@ static const unsigned char temp_binary_data_5[] =
 "    \"stateMutability\": \"nonpayable\",\n"
 "    \"type\": \"function\"\n"
 "  }\n"
-"  ]\n";
+"]";
 
 const char* king_automaton_abi_json = (const char*) temp_binary_data_5;
 
@@ -6987,7 +7017,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0xbd53593a:  numBytes = 7070; return logo_white_on_transparent_8x8_svg;
         case 0x356357bc:  numBytes = 60500; return BIG_A_BLACK_CIRCLE_BACK_1000x1000_png;
         case 0xca3ab6c7:  numBytes = 294; return default_config_json;
-        case 0x8b891876:  numBytes = 29197; return king_automaton_abi_json;
+        case 0x8b891876:  numBytes = 29889; return king_automaton_abi_json;
         default: break;
     }
 

@@ -53,6 +53,11 @@
       },
       {
         "internalType": "uint256",
+        "name": "_numHistoryPeriods",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "_timeUnitInSeconds",
         "type": "uint256"
       }
@@ -608,6 +613,16 @@
         "internalType": "uint256",
         "name": "ballotBoxIDs",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numHistoryPeriods",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minHistoryPeriod",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -945,6 +960,16 @@
         "internalType": "uint256",
         "name": "contestEndDate",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "votingHistory",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "historyStartIdx",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1253,16 +1278,21 @@
       },
       {
         "internalType": "uint256",
-        "name": "_idx",
+        "name": "_idx_start",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_length",
         "type": "uint256"
       }
     ],
-    "name": "getVoteWord",
+    "name": "getVoteWords",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "result",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",
@@ -1539,4 +1569,4 @@
     "stateMutability": "nonpayable",
     "type": "function"
   }
-  ]
+]
