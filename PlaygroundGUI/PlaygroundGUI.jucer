@@ -95,6 +95,10 @@
       <GROUP id="{D62FB906-6D23-F538-9E50-51D60BE97FA9}" name="Components">
         <FILE id="PjEPSz" name="FormMaker.cpp" compile="1" resource="0" file="Source/Components/FormMaker.cpp"/>
         <FILE id="TI8gpa" name="FormMaker.h" compile="0" resource="0" file="Source/Components/FormMaker.h"/>
+        <FILE id="FEK7bk" name="HistoricalChart.cpp" compile="1" resource="0"
+              file="Source/Components/HistoricalChart.cpp"/>
+        <FILE id="RgL7Ic" name="HistoricalChart.h" compile="0" resource="0"
+              file="Source/Components/HistoricalChart.h"/>
         <FILE id="fO3u2Y" name="SlotsGrid.cpp" compile="1" resource="0" file="Source/Components/SlotsGrid.cpp"/>
         <FILE id="fj2djX" name="SlotsGrid.h" compile="0" resource="0" file="Source/Components/SlotsGrid.h"/>
         <FILE id="YkvQZA" name="ValidatorGrid.cpp" compile="1" resource="0"
