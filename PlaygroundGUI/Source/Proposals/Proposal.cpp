@@ -85,9 +85,26 @@ void Proposal::setData(const String& infoJsonString, const String& dataJsonStrin
   setInitialContestEndDate(std::stoul(json_proposal_data.at(4).get<std::string>()));
 
   m_votingHistory.clearQuick();
-  const auto& json_votingHistory = json_proposal_data.at(5);
-  for (int i = 0; i < json_votingHistory.size(); ++i) {
-    m_votingHistory.add(std::stoul(json_votingHistory[i].get<std::string>()));
+
+  const int historyStartIdx = std::stoi(json_proposal_data.at(6).get<std::string>());
+  const int wordSize = 32;  // 32 bytes
+
+  if (historyStartIdx > 1) {
+    const auto& json_votingHistoryWords = json_proposal_data.at(5);
+
+    for (int wordIndex = json_votingHistoryWords.size(); --wordIndex >= 0;) {
+      const int wordUpperLimit = (wordIndex + 1) * wordSize;
+      const int wordLowerLimit = jmax(wordUpperLimit - wordSize, historyStartIdx);
+      if (wordUpperLimit <=  wordLowerLimit)
+        break;
+
+      BigInteger wordValue;
+      wordValue.parseString(json_votingHistoryWords[wordIndex].get<std::string>(), 10);
+      for (int voteIndex = wordUpperLimit; --voteIndex >= wordLowerLimit;) {
+        const int offsetBits = (voteIndex % wordSize) * 8;
+        m_votingHistory.add(wordValue.getBitRangeAsInt(offsetBits, 8));
+      }
+    }
   }
 }
 

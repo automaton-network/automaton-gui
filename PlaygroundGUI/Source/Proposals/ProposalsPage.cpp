@@ -33,6 +33,7 @@ static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
     series.add(Point<float>(i + 1, votingHistory[i]));
   }
 
+  series.add(Point<float>(series.size(), proposal->getApprovalRating() + 100));
   return series;
 }
 
@@ -117,7 +118,8 @@ ProposalsPage::ProposalsPage(Account::Ptr accountData)
   m_filterByStatusComboBox->addItem(translate("Rejected"), static_cast<int>(ProposalFilter::Rejected));
   m_filterByStatusComboBox->addItem(translate("Contested"), static_cast<int>(ProposalFilter::Contested));
   m_filterByStatusComboBox->addItem(translate("Completed"), static_cast<int>(ProposalFilter::Completed));
-  m_filterByStatusComboBox->setSelectedId(static_cast<int>(ProposalFilter::All), NotificationType::dontSendNotification);
+  m_filterByStatusComboBox->setSelectedId(static_cast<int>(ProposalFilter::All),
+      NotificationType::dontSendNotification);
   m_filterByStatusComboBox->addListener(this);
 
   m_proxyModel = std::make_shared<ProposalsProxyModel>();

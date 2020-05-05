@@ -97,7 +97,7 @@ class Proposal {
   String getDocumentHash() const noexcept     { return m_documentHash; }
   Proposal::Status getStatus() const noexcept { return m_status; }
 
-  Array<uint64> getVotingHistory() { return m_votingHistory; }
+  Array<int> getVotingHistory() { return m_votingHistory; }
   Array<uint64> getSlots() const { return m_slots; }
 
   Time getInitialVotingEndDate() const noexcept     { return m_initialVotingEndDate; }
@@ -148,7 +148,7 @@ class Proposal {
 
   Proposal::Status m_status;
   Array<uint64> m_slots;
-  Array<uint64> m_votingHistory;
+  Array<int> m_votingHistory;
 
   ListenerList<Listener> m_listeners;
 };
