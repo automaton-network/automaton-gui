@@ -19,7 +19,8 @@
 
 #include "DebugPage.h"
 
-class TaskLogComponent : public Component, public Button::Listener {
+class TaskLogComponent : public Component
+                       , public Button::Listener {
  public:
   TaskLogComponent(): m_backBtn("Back") {
     m_backBtn.addListener(this);
@@ -29,6 +30,9 @@ class TaskLogComponent : public Component, public Button::Listener {
     m_logEditor.setScrollbarsShown(true);
     m_logEditor.setReadOnly(true);
     addAndMakeVisible(m_logEditor);
+
+    m_title.setFont(Font(15.f, Font::bold));
+    addAndMakeVisible(m_title);
   }
 
   void paint(Graphics& g) override {
@@ -37,6 +41,7 @@ class TaskLogComponent : public Component, public Button::Listener {
 
   void resized() override {
     auto bounds = getLocalBounds();
+    m_title.setBounds(bounds.removeFromTop(30));
     m_backBtn.setBounds(bounds.removeFromBottom(30).removeFromLeft(100));
     m_logEditor.setBounds(bounds);
   }
@@ -46,8 +51,28 @@ class TaskLogComponent : public Component, public Button::Listener {
       setVisible(false);
   }
 
+  String getTitle() const noexcept {
+    return m_title.getText();
+  }
+
+  String getText() const noexcept {
+    return m_logEditor.getText();
+  }
+
+  void setTitle(const String& title) {
+    m_title.setText(title, NotificationType::dontSendNotification);
+  }
+
+  void setText(const String& text) {
+    m_logEditor.setText(text, NotificationType::dontSendNotification);
+    m_logEditor.setCaretPosition(0);
+  }
+
+
+ private:
   TextButton m_backBtn;
   TextEditor m_logEditor;
+  Label m_title;
 };
 
 DebugPage::DebugPage() {
@@ -90,9 +115,11 @@ void DebugPage::paintListBoxItem(int rowNumber, Graphics& g, int width, int heig
 
 void DebugPage::listBoxItemDoubleClicked(int rowNumber, const MouseEvent&) {
   auto task = m_tasksModel->getAt(m_tasksModel->size() - rowNumber - 1);
-  m_taskLogComponent->m_logEditor.setText(task->getTaskLog().joinIntoString("\n--------------\n"),
-                                          NotificationType::dontSendNotification);
-  m_taskLogComponent->m_logEditor.setCaretPosition(0);
+  if (!task)
+    return;
+
+  m_taskLogComponent->setText(task->getTaskLog().joinIntoString("\n--------------\n"));
+  m_taskLogComponent->setTitle("#" + String(task->getTaskId()) + "  " + task->getTitle());
   m_taskLogComponent->setVisible(true);
 }
 void DebugPage::modelChanged(AbstractListModelBase*) {

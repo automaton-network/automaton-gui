@@ -72,7 +72,9 @@ class AsyncTask : public Thread
   void setStatusMessage(const String& newStatusMessage) {
     const ScopedLock sl(m_messageLock);
     m_message = newStatusMessage;
-    DBG(m_message);
+    m_taskLog.add(newStatusMessage);
+    Logger::writeToLog(newStatusMessage);
+
     m_listeners.call(&Listener::taskMessageChanged, shared_from_this());
   }
 

@@ -197,11 +197,11 @@ bool ProposalsManager::updateProposal(Proposal::Ptr proposal) {
   const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Update";
   TasksManager::launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
-    task->setStatusMessage("Updating proposal" + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
+    task->setStatusMessage("Updating proposal " + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
 
     createOrUpdateProposal(proposal->getId(), proposal, m_accountData, m_contractData, &s);
 
-    task->setStatusMessage("Updated proposal" + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
+    task->setStatusMessage("Updated proposal " + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
 
     return true;
   }, [=](AsyncTask* task) {
