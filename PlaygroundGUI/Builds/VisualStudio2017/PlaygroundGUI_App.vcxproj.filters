@@ -11,6 +11,9 @@
     <Filter Include="PlaygroundGUI\Resources">
       <UniqueIdentifier>{AE2B0A6C-5E8C-CDF5-BBA7-0BA1DA8C1FBD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PlaygroundGUI\Source\Debug">
+      <UniqueIdentifier>{A299294D-7071-AD4C-CD25-5E74E9B54C85}</UniqueIdentifier>
+    </Filter>
     <Filter Include="PlaygroundGUI\Source\Utils">
       <UniqueIdentifier>{5BA90E0C-E3EA-613A-C80F-3E02627758D5}</UniqueIdentifier>
     </Filter>
@@ -259,6 +262,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Debug\DebugPage.cpp">
+      <Filter>PlaygroundGUI\Source\Debug</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Utils\TasksManager.cpp">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClCompile>
@@ -1632,6 +1638,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Debug\DebugPage.h">
+      <Filter>PlaygroundGUI\Source\Debug</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Utils\AsyncTask.h">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClInclude>

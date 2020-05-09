@@ -53,11 +53,13 @@ class TasksManager : public DeletedAtShutdown {
 
   void addTask(AsyncTask::Ptr task, bool isQueued);
   void runQueuedTask();
-  std::shared_ptr<AsyncTaskModel> getModel();
+  std::shared_ptr<AsyncTaskModel> getActiveTasksModel();
+  std::shared_ptr<AsyncTaskModel> getTasksModel();
 
   JUCE_DECLARE_SINGLETON(TasksManager, true)
 
  private:
+  std::shared_ptr<AsyncTaskModel> m_activeTasksModel;
   std::shared_ptr<AsyncTaskModel> m_model;
   Array<AsyncTask::Ptr> m_queuedTasks;
   CriticalSection m_lock;

@@ -39,7 +39,8 @@ void AsyncTaskModel::removeItem(AsyncTask* item, NotificationType notification) 
 
 JUCE_IMPLEMENT_SINGLETON(TasksManager)
 
-TasksManager::TasksManager() : m_model(std::make_shared<AsyncTaskModel>()) {
+TasksManager::TasksManager() : m_activeTasksModel(std::make_shared<AsyncTaskModel>()),
+                               m_model(std::make_shared<AsyncTaskModel>()) {
 }
 
 TasksManager::~TasksManager() {
@@ -85,6 +86,7 @@ bool TasksManager::launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
 void TasksManager::addTask(AsyncTask::Ptr task, bool isQueued) {
   ScopedLock sl(m_lock);
   m_model->addItem(task, NotificationType::sendNotification);
+  m_activeTasksModel->addItem(task, NotificationType::sendNotification);
 
   if (isQueued) {
     m_queuedTasks.add(task);
@@ -92,7 +94,7 @@ void TasksManager::addTask(AsyncTask::Ptr task, bool isQueued) {
       runQueuedTask();
   } else {
     task->runThread([=](AsyncTask* task){
-      m_model->removeItem(task, NotificationType::sendNotification);
+      m_activeTasksModel->removeItem(task, NotificationType::sendNotification);
     });
   }
 }
@@ -100,13 +102,17 @@ void TasksManager::addTask(AsyncTask::Ptr task, bool isQueued) {
 void TasksManager::runQueuedTask() {
   if (auto task = m_queuedTasks.getFirst()) {
     task->runThread([=](AsyncTask* task){
-      m_model->removeItem(task, NotificationType::sendNotification);
+      m_activeTasksModel->removeItem(task, NotificationType::sendNotification);
       m_queuedTasks.removeIf([&](AsyncTask::Ptr itemPtr){return itemPtr.get() == task;});
       runQueuedTask();
     });
   }
 }
 
-std::shared_ptr<AsyncTaskModel> TasksManager::getModel() {
+std::shared_ptr<AsyncTaskModel> TasksManager::getActiveTasksModel() {
+  return m_activeTasksModel;
+}
+
+std::shared_ptr<AsyncTaskModel> TasksManager::getTasksModel() {
   return m_model;
 }

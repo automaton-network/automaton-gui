@@ -30,6 +30,7 @@
 #include "MainComponent.h"
 #include "Utils/TasksPanel.h"
 #include "Data/AutomatonContractData.h"
+#include "Debug/DebugPage.h"
 
 class DemoBlank: public Component {
  public:
@@ -66,6 +67,7 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
   m_tabbedComponent->addTab(TRANS("Proposals Actions"), Colour(0xff404040),
                             new ProposalsActionsPage(m_accountData->getProposalsManager()), true);
   m_tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(m_accountData), true);
+  m_tabbedComponent->addTab(TRANS("Debug"), Colour(0xff404040), new DebugPage(), true);
 
   // m_tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   // m_tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);

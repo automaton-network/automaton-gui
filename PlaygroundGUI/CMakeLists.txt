@@ -41,6 +41,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/JuceLibraryCode)
 file(
   GLOB PLAYGROUND_FILES
   Source/*.cpp
+  Source/Debug/*.cpp
   Source/Utils/*.cpp
   Source/Components/*.cpp
   Source/Config/*.cpp

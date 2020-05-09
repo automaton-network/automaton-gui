@@ -142,6 +142,7 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Debug\DebugPage.cpp"/>
     <ClCompile Include="..\..\Source\Utils\TasksManager.cpp"/>
     <ClCompile Include="..\..\Source\Utils\TasksPanel.cpp"/>
     <ClCompile Include="..\..\Source\Utils\Utils.cpp"/>
@@ -1358,6 +1359,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Debug\DebugPage.h"/>
     <ClInclude Include="..\..\Source\Utils\AsyncTask.h"/>
     <ClInclude Include="..\..\Source\Utils\TasksManager.h"/>
     <ClInclude Include="..\..\Source\Utils\TasksPanel.h"/>
