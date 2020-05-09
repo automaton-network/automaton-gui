@@ -23,7 +23,7 @@
 void SlotsGrid::paint(Graphics& g) {
   if (m_numOfSlotsPerSide != 0) {
     auto bounds = getLocalBounds();
-    m_slotSize = getWidth() / m_numOfSlotsPerSide;
+    m_slotSize = jmin(getWidth() / m_numOfSlotsPerSide, getHeight() / m_numOfSlotsPerSide);
 
     int slotIndex = 0;
     for (int i = 0; i < m_numOfSlotsPerSide; ++i) {

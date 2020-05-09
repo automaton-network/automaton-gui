@@ -32,6 +32,7 @@
 #include "automaton/tools/miner/miner.h"
 #include <secp256k1_recovery.h>
 #include <secp256k1.h>
+#include <Components/SlotsGrid.h>
 
 using automaton::core::common::status;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
@@ -64,6 +65,167 @@ static std::string get_pub_key_x(const unsigned char* priv_key) {
   secp256k1_context_destroy(context);
   return std::string(reinterpret_cast<char*>(pub_key_serialized+1), 32);
 }
+
+static Colour HSV(double h, double s, double v) {
+  double hh, p, q, t, ff;
+  int64 i;
+  double r, g, b;
+
+  if (s <= 0.0) {
+    r = v; g = v; b = v;
+    return Colour(uint8(r*255), uint8(g*255), uint8(b*255));
+  }
+
+  hh = h;
+  if (hh >= 360.0) hh = 0.0;
+  hh /= 60.0;
+  i = static_cast<int64>(hh);
+  ff = hh - i;
+  p = v * (1.0 - s);
+  q = v * (1.0 - (s * ff));
+  t = v * (1.0 - (s * (1.0 - ff)));
+
+  switch (i) {
+    case 0:
+      r = v; g = t; b = p;
+      break;
+    case 1:
+      r = q; g = v; b = p;
+      break;
+    case 2:
+      r = p; g = v; b = t;
+      break;
+    case 3:
+      r = p; g = q; b = v;
+      break;
+    case 4:
+      r = t; g = p; b = v;
+      break;
+    case 5:
+    default:
+      r = v; g = p; b = q;
+      break;
+  }
+  return Colour(uint8(r * 255), uint8(g * 255), uint8(b * 255));
+}
+
+static uint32_t leadingBits(const std::string& s) {
+  uint32_t result = 0;
+  for (uint32_t i = 0; i < s.size(); ++i) {
+    uint8_t x = s[i];
+    if (x == 0xFF) {
+      result += 8;
+    } else {
+      while (x & 0x80) {
+        result++;
+        x <<= 1;
+      }
+      break;
+    }
+  }
+  return result;
+}
+
+class ValidatorSlotsGrid : public SlotsGrid {
+ public:
+  ValidatorSlotsGrid() {
+  }
+
+  void setSlots(const std::vector<ValidatorSlot>& validatorSlots) {
+    m_minLeadingBits = 257;
+    m_maxLeadingBits = 0;
+
+    if (validatorSlots.size() != m_slots.size())
+      m_slots.resize(validatorSlots.size());
+
+    for (int i = 0; i < m_slots.size(); ++i) {
+      const auto& slot = validatorSlots[i];
+      if (slot.difficulty != m_slots[i].difficulty) {
+        m_slots[i].owner = slot.owner;
+        m_slots[i].difficulty = slot.difficulty;
+        m_slots[i].isMine = slot.owner == m_owner;
+        m_slots[i].bits = leadingBits(slot.difficulty);
+      }
+
+      if (m_slots[i].bits && m_slots[i].bits < m_minLeadingBits) {
+        m_minLeadingBits = m_slots[i].bits;
+      }
+      if (m_slots[i].bits > m_maxLeadingBits) {
+        m_maxLeadingBits = m_slots[i].bits;
+      }
+    }
+
+    updateContent();
+  }
+
+  Colour getSlotColour(int slotIndex, bool isHighlighted) override {
+    Colour slotColour;
+    if (m_slots[slotIndex].bits == 0) {
+      slotColour = Colours::black;
+    } else {
+      double lb;
+      if (m_maxLeadingBits != m_minLeadingBits) {
+        lb = 1.0 * (m_slots[slotIndex].bits - m_minLeadingBits) / (m_maxLeadingBits - m_minLeadingBits);
+      } else {
+        lb = 1.;
+      }
+      slotColour = HSV(m_slots[slotIndex].isMine ? 30 : 200, 1.0 - lb, 0.5 + 0.4 * lb);
+    }
+
+    if (isHighlighted)
+      slotColour = slotColour.contrasting(0.1f);
+
+    return slotColour;
+  }
+
+  int getNumOfSlots() override {
+    return static_cast<int>(m_slots.size());
+  }
+
+  Component* getPopupComponent(int slotIndex) override {
+    if (slotIndex < 0)
+      return nullptr;
+
+    const auto vote = m_slots[slotIndex];
+    String slotInfo;
+    slotInfo << "Slot: " << slotIndex << "\n" <<
+             "Owner: " << m_slots[slotIndex].owner << "\n" <<
+             "Difficulty:" << bin2hex(m_slots[slotIndex].difficulty) << "\n";
+
+    m_popup.m_label.setText(slotInfo, NotificationType::dontSendNotification);
+    m_popup.setSize(450, 100);
+    m_popup.setVisible(true);
+    return &m_popup;
+  }
+
+ private:
+  uint32 m_minLeadingBits = 257;
+  uint32 m_maxLeadingBits = 0;
+  std::string m_owner;
+
+  struct Slot {
+    std::string difficulty;
+    std::string owner;
+    bool isMine = false;
+    uint32_t bits = 0;
+  };
+  std::vector<Slot> m_slots;
+
+  class SlotPopup : public Component {
+   public:
+    SlotPopup() {
+      addAndMakeVisible(m_label);
+    }
+    void resized() override {
+      m_label.setBounds(getLocalBounds());
+    }
+    void paint(Graphics& g) override {
+      g.fillAll(Colour(0xff404040));
+    }
+
+    Label m_label;
+  } m_popup;
+};
 
 void Miner::addMinerThread() {
   auto miner = TasksManager::launchTask([=](AsyncTask* task) {
@@ -332,6 +494,9 @@ Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
   m_claimEditor->setReadOnly(true);
   addAndMakeVisible(m_claimEditor.get());
 
+  m_validatorSlotsGrid = std::make_unique<ValidatorSlotsGrid>();
+  addAndMakeVisible(m_validatorSlotsGrid.get());
+
   updateContractData();
 
   startTimer(1000);
@@ -340,6 +505,7 @@ Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
 void Miner::updateContractData() {
   auto cd = m_accountData->getContractData();
   ScopedLock lock(cd->m_criticalSection);
+  m_validatorSlotsGrid->setSlots(cd->m_slots);
   setSlotsNumber(cd->m_slotsNumber);
   setMaskHex(cd->m_mask);
   setMinDifficultyHex(cd->m_minDifficulty);
@@ -404,13 +570,6 @@ void Miner::initSlots() {
 }
 
 void Miner::textEditorTextChanged(TextEditor & txt) {
-  // if (txtMask == &txt) {
-  //   setMask(txtMask->getText().toStdString());
-  // }
-  // if (txtMinDifficulty == &txt) {
-  //   auto minDiff = jmax(0, jmin(48, txtMinDifficulty->getText().getIntValue()));
-  //   setMinDifficulty(minDiff);
-  // }
   if (m_slotsNumEditor.get() == &txt) {
     setSlotsNumber(m_slotsNumEditor->getText().getIntValue());
   }
@@ -435,22 +594,25 @@ void Miner::paint(Graphics& g) {
 void Miner::resized() {
   m_timeLabel->setBounds(getLocalBounds().removeFromTop(20));
 
-  auto bounds = getLocalBounds().reduced(20, 20);
-  bounds.removeFromTop(30);
-  auto rowBounds = bounds.removeFromTop(20);
+  auto bounds = getLocalBounds().reduced(10, 20);
+  auto detailsBounds = bounds.removeFromTop(200);
+  m_validatorSlotsGrid->setBounds(detailsBounds.removeFromRight(200));
+  detailsBounds.removeFromRight(10);
+  detailsBounds.removeFromTop(30);
+  auto rowBounds = detailsBounds.removeFromTop(20);
   m_slotsLabel->setBounds(rowBounds.removeFromLeft(100));
   m_slotsNumEditor->setBounds(rowBounds.removeFromLeft(100));
-  bounds.removeFromTop(10);
-  rowBounds = bounds.removeFromTop(20);
+  detailsBounds.removeFromTop(10);
+  rowBounds = detailsBounds.removeFromTop(20);
   m_maskHexLabel->setBounds(rowBounds.removeFromLeft(100));
   m_maskHexEditor->setBounds(rowBounds.removeFromLeft(500));
-  bounds.removeFromTop(10);
-  rowBounds = bounds.removeFromTop(20);
+  detailsBounds.removeFromTop(10);
+  rowBounds = detailsBounds.removeFromTop(20);
   m_minDifficultyHexLabel->setBounds(rowBounds.removeFromLeft(100));
   m_minDifficultyHexEditor->setBounds(rowBounds.removeFromLeft(500));
-  bounds.removeFromTop(15);
+  detailsBounds.removeFromTop(15);
 
-  auto infoBounds = bounds.removeFromTop(70);
+  auto infoBounds = detailsBounds.removeFromTop(70);
   infoBounds.removeFromLeft(100);
   auto buttonsBounds = infoBounds.removeFromLeft(200).removeFromTop(20);
   m_addMinerBtn->setBounds(buttonsBounds.removeFromLeft(80));

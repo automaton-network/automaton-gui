@@ -28,6 +28,8 @@
 #include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
 #include "automaton/core/io/io.h"
 
+class ValidatorSlotsGrid;
+
 class Miner : public Component,
               public Button::Listener,
               public TextEditor::Listener,
@@ -112,6 +114,7 @@ class Miner : public Component,
   std::unique_ptr<TextButton> m_stopMinerBtn;
 
   std::unique_ptr<TableListBox> m_tblSlots;
+  std::unique_ptr<ValidatorSlotsGrid> m_validatorSlotsGrid;
 
   void updateContractData();
   void claimMinedSlots();
