@@ -146,7 +146,7 @@ bool Utils::isZeroTime(const Time& time) {
 }
 
 String Utils::getNormalizedAddress(const String& address) {
-  if (address.length() < 2 || address.length() != 64 || address.length() != 66) {
+  if (address.length() < 2 || (address.length() != 40 && address.length() != 42)) {
     DBG("Incorrect address size! Provided address of size " + address.length());
     jassertfalse;
     return String();
