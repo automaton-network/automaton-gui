@@ -340,7 +340,7 @@ bool DEXManager::withdrawEthFromDEX(const String& amountETHwei) {
     json jInput;
     jInput.push_back(amountETHwei.toStdString());
 
-    // To acquire Sell order - call buyNow method
+    // We need to withdraw ETH from user's DEX inner ETH balance
     s = m_contractData->call("withdraw", jInput.dump(), m_accountData->getPrivateKey());
 
     if (!s.is_ok())
