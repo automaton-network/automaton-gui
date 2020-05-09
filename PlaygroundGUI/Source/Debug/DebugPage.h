@@ -22,6 +22,8 @@
 #include <Utils/TasksManager.h>
 #include "JuceHeader.h"
 
+class TaskLogComponent;
+
 class DebugPage : public Component,
                   public ListBoxModel,
                   public AbstractListModelBase::Listener {
@@ -38,5 +40,6 @@ class DebugPage : public Component,
 
  private:
   std::unique_ptr<ListBox> m_tasksListBox;
+  std::unique_ptr<TaskLogComponent> m_taskLogComponent;
   std::shared_ptr<AsyncTaskModel> m_tasksModel;
 };

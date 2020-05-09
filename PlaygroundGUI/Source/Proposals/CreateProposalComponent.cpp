@@ -62,8 +62,8 @@ CreateProposalComponent::~CreateProposalComponent() {
 }
 
 void CreateProposalComponent::paint(Graphics& g) {
-  g.setColour(Colour(0xff404040));
-  g.fillRect(getLocalBounds());
+    g.setColour(Colour(0xff404040));
+    g.fillRect(getLocalBounds());
 
   const auto spacing = 20;
   const auto textWidth = 130;
