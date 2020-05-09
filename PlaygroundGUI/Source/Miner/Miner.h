@@ -28,9 +28,10 @@
 #include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
 #include "automaton/core/io/io.h"
 
-class Miner:
-  public FormMaker,
-  private Timer {
+class Miner : public Component,
+              public Button::Listener,
+              public TextEditor::Listener,
+              private Timer {
  public:
   //==============================================================================
   Miner(Account::Ptr accountData);
@@ -60,7 +61,6 @@ class Miner:
 
   void addMinerThread();
   void stopMining();
-  void createSignature();
 
   size_t getMinedSlotsNumber() { return mined_slots.size(); }
   mined_slot& getMinedSlot(int _slot) { return mined_slots[_slot]; }
@@ -95,17 +95,23 @@ class Miner:
   std::string eth_address;
 
   // UI
-  TextEditor* txtRpcServer;
-  Button* btnContract;
-  TextEditor* txtContract;
-  // TextEditor* txtMask;
-  TextEditor* txtMaskHex;
-  TextEditor* txtMinerInfo;
-  // TextEditor* txtMinDifficulty;
-  TextEditor* txtMinDifficultyHex;
-  TextEditor* txtSlotsNum;
-  TableListBox* tblSlots;
-  TextEditor* txtClaim;
+  std::unique_ptr<Label> m_timeLabel;
+  std::unique_ptr<Label> m_slotsLabel;
+  std::unique_ptr<Label> m_maskHexLabel;
+  std::unique_ptr<Label> m_minDifficultyHexLabel;
+  std::unique_ptr<Label> m_validatorSlotsLabel;
+  std::unique_ptr<Label> m_claimSlotsLabel;
+
+  std::unique_ptr<TextEditor> m_slotsNumEditor;
+  std::unique_ptr<TextEditor> m_maskHexEditor;
+  std::unique_ptr<TextEditor> m_minDifficultyHexEditor;
+  std::unique_ptr<TextEditor> m_minerInfoEditor;
+  std::unique_ptr<TextEditor> m_claimEditor;
+
+  std::unique_ptr<TextButton> m_addMinerBtn;
+  std::unique_ptr<TextButton> m_stopMinerBtn;
+
+  std::unique_ptr<TableListBox> m_tblSlots;
 
   void updateContractData();
   void claimMinedSlots();

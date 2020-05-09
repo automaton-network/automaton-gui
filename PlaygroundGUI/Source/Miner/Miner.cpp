@@ -279,96 +279,60 @@ static String sepitoa(uint64 n, bool lz = false) {
   }
 }
 
+static std::unique_ptr<Label> createLabel(const String& text, Component* parent) {
+  auto label = std::make_unique<Label>("", text);
+  label->setColour(Label::textColourId, Colours::white);
+  parent->addAndMakeVisible(label.get());
+  return label;
+}
+
 //==============================================================================
 Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
   private_key = m_accountData->getPrivateKey();
   eth_address = m_accountData->getAddress();
 
-  int y = 0;
+  m_timeLabel = createLabel(String(__DATE__) + " " + String(__TIME__), this);
 
-  LBL(String(__DATE__) + " " + String(__TIME__), 0, 0, 140, 20);
+  m_slotsLabel = createLabel("Slots:", this);
+  m_slotsNumEditor = std::make_unique<TextEditor>("SLOTS");
+  m_slotsNumEditor->setInputRestrictions(5, "0123456789");
+  m_slotsNumEditor->setReadOnly(true);
+  addAndMakeVisible(m_slotsNumEditor.get());
 
-/*
-  y += 50;
-  LBL("RPC Server:", 20, y, 100, 24);
-  txtRpcServer = TXT("RPC", 120, y, 500, 24);
-  txtRpcServer->setText("HTTP://127.0.0.1:7545");
+  m_maskHexLabel = createLabel("Mask (Hex):", this);
+  m_maskHexEditor = std::make_unique<TextEditor>("MASKHEX");
+  m_maskHexEditor->setInputRestrictions(64, "0123456789abcdefABCDEF");
+  m_maskHexEditor->setReadOnly(true);
+  addAndMakeVisible(m_maskHexEditor.get());
 
-  y += 30;
-  LBL("Contract:" , 20, y, 100, 24);
-  txtContract = TXT("CONTR", 120, y, 500, 24);
-  txtContract->setText("0xdb95dbb1be9e82f8caaa90f0feacabb5e7fa36ab");
+  m_minDifficultyHexLabel = createLabel("Min Difficulty:", this);
+  m_minDifficultyHexEditor = std::make_unique<TextEditor>("MINDIFFHEX");
+  m_minDifficultyHexEditor->setReadOnly(true);
+  addAndMakeVisible(m_minDifficultyHexEditor.get());
 
-  y += 30;
-  btnContract = TB("Read Contract", 120, y, 120, 24);
-*/
+  m_addMinerBtn = std::make_unique<TextButton>("Add Miner");
+  addAndMakeVisible(m_addMinerBtn.get());
+  m_addMinerBtn->addListener(this);
+  m_stopMinerBtn = std::make_unique<TextButton>("Stop Miners");
+  addAndMakeVisible(m_stopMinerBtn.get());
+  m_stopMinerBtn->addListener(this);
 
-  y += 50;
-  LBL("Slots: ", 20, y, 100, 24);
-  txtSlotsNum = TXT("SLOTS", 120, y, 100, 24);
-  txtSlotsNum->setInputRestrictions(5, "0123456789");
-  txtSlotsNum->setReadOnly(true);
+  m_minerInfoEditor = std::make_unique<TextEditor>("MINFO");
+  m_minerInfoEditor->setText("Not running.");
+  m_minerInfoEditor->setReadOnly(true);
+  m_minerInfoEditor->setMultiLine(true);
+  addAndMakeVisible(m_minerInfoEditor.get());
 
-  // y += 30;
-  // LBL("Mask: ", 20, y, 100, 24);
-  // txtMask = TXT("MASK", 120, y, 600, 24);
-  // txtMask->setInputRestrictions(78, "0123456789");
+  m_validatorSlotsLabel = createLabel("Validator Slots: ", this);
+  m_tblSlots = std::make_unique<TableSlots>(this, m_accountData->getContractData());
+  addAndMakeVisible(m_tblSlots.get());
 
-  y += 30;
-  LBL("Mask (Hex):", 20, y, 100, 24);
-  txtMaskHex = TXT("MASKHEX", 120, y, 600, 24);
-  txtMaskHex->setInputRestrictions(64, "0123456789abcdefABCDEF");
-  txtMaskHex->setReadOnly(true);
-
-  y += 30;
-  LBL("Min Difficulty:", 20, y, 100, 24);
-  // txtMinDifficulty = TXT("MINDIFF", 120, y, 25, 24);
-  // txtMinDifficulty->setInputRestrictions(2, "0123456789");
-  txtMinDifficultyHex = TXT("MINDIFFHEX", 120, y, 600, 24);
-  txtMinDifficultyHex->setReadOnly(true);
-
-  y += 50;
-  TB("Add Miner", 120, y, 80, 24);
-  TB("Stop Miners", 220, y, 80, 24);
-  txtMinerInfo = TXT("MINFO", 320, y, 400, 80);
-  txtMinerInfo->setText("Not running.");
-  txtMinerInfo->setReadOnly(true);
-  txtMinerInfo->setMultiLine(true);
-
-  y += 100;
-  LBL("Validator Slots: ", 20, y, 300, 24);
-  LBL("Claim Slot Parameters:", 650, y, 300, 24);
-
-  y += 30;
-  tblSlots = new TableSlots(this, m_accountData->getContractData());
-  tblSlots->setBounds(20, y, 600, 300);
-  addComponent(tblSlots);
-  txtClaim = TXT("CLAIM", 650, y, 600, 300);
-  txtClaim->setReadOnly(true);
+  m_claimSlotsLabel = createLabel("Claim Slot Parameters:", this);
+  m_claimEditor = std::make_unique<TextEditor>("CLAIM");
+  m_claimEditor->setReadOnly(true);
+  addAndMakeVisible(m_claimEditor.get());
 
   updateContractData();
-
-  /*
-  CryptoPP::byte buf[1024] = {0};
-  CryptoPP::Integer n("53272589901149737477561849970166322707710816978043543010898806474236585144509");
-  n = -n - 1;
-  size_t min_size = n.MinEncodedSize(CryptoPP::Integer::SIGNED);
-  std::cout << min_size << std::endl;
-  n.Encode(buf, min_size, CryptoPP::Integer::SIGNED);
-  std::string bn(reinterpret_cast<char*>(buf), min_size);
-  // std::cout << bin2hex(bn) << std::endl;
-
-  y += 30;
-  LBL("Mined Keys: ", 20, y, 80, 24);
-  auto keys = TXT("KEYS", 100, y, 550, 400);
-  keys->setMultiLine(true);
-  keys->setReturnKeyStartsNewLine(true);
-  addr->setInputRestrictions(0, "0123456789abcdefABCDEF");
-
-  y += 410;
-  TB("Claim", 100, y, 80, 30);
-  TB("Start Miner", 200, y, 80, 30);
-  */
 
   startTimer(1000);
 }
@@ -400,13 +364,13 @@ void Miner::setMask(std::string _mask) {
 void Miner::setMaskHex(std::string _mask) {
   auto mask_bin = hex2bin(_mask);
   memcpy(mask, mask_bin.c_str(), sizeof(mask));
-  txtMaskHex->setText(_mask);
+  m_maskHexEditor->setText(_mask);
 }
 
 void Miner::setMinDifficultyHex(std::string _minDifficulty) {
   auto diff_bin = hex2bin(_minDifficulty);
   memcpy(difficulty, diff_bin.c_str(), sizeof(difficulty));
-  txtMinDifficultyHex->setText(_minDifficulty, false);
+  m_minDifficultyHexEditor->setText(_minDifficulty, false);
 }
 
 void Miner::setMinerAddress(std::string _address) {
@@ -424,9 +388,10 @@ void Miner::setMinerAddress(std::string _address) {
 void Miner::setSlotsNumber(int _slotsNum) {
   _slotsNum = jmax(0, jmin(65536, _slotsNum));
   totalSlots = _slotsNum;
-  txtSlotsNum->setText(String(totalSlots), false);
+  m_slotsNumEditor->setText(String(totalSlots), false);
   repaint();
-  tblSlots->updateContent();
+  m_tblSlots->updateContent();
+  m_tblSlots->repaint();
 }
 
 void Miner::initSlots() {
@@ -446,8 +411,8 @@ void Miner::textEditorTextChanged(TextEditor & txt) {
   //   auto minDiff = jmax(0, jmin(48, txtMinDifficulty->getText().getIntValue()));
   //   setMinDifficulty(minDiff);
   // }
-  if (txtSlotsNum == &txt) {
-    setSlotsNumber(txtSlotsNum->getText().getIntValue());
+  if (m_slotsNumEditor.get() == &txt) {
+    setSlotsNumber(m_slotsNumEditor->getText().getIntValue());
   }
 }
 
@@ -468,6 +433,39 @@ void Miner::paint(Graphics& g) {
 }
 
 void Miner::resized() {
+  m_timeLabel->setBounds(getLocalBounds().removeFromTop(20));
+
+  auto bounds = getLocalBounds().reduced(20, 20);
+  bounds.removeFromTop(30);
+  auto rowBounds = bounds.removeFromTop(20);
+  m_slotsLabel->setBounds(rowBounds.removeFromLeft(100));
+  m_slotsNumEditor->setBounds(rowBounds.removeFromLeft(100));
+  bounds.removeFromTop(10);
+  rowBounds = bounds.removeFromTop(20);
+  m_maskHexLabel->setBounds(rowBounds.removeFromLeft(100));
+  m_maskHexEditor->setBounds(rowBounds.removeFromLeft(500));
+  bounds.removeFromTop(10);
+  rowBounds = bounds.removeFromTop(20);
+  m_minDifficultyHexLabel->setBounds(rowBounds.removeFromLeft(100));
+  m_minDifficultyHexEditor->setBounds(rowBounds.removeFromLeft(500));
+  bounds.removeFromTop(15);
+
+  auto infoBounds = bounds.removeFromTop(70);
+  infoBounds.removeFromLeft(100);
+  auto buttonsBounds = infoBounds.removeFromLeft(200).removeFromTop(20);
+  m_addMinerBtn->setBounds(buttonsBounds.removeFromLeft(80));
+  buttonsBounds.removeFromLeft(10);
+  m_stopMinerBtn->setBounds(buttonsBounds.removeFromLeft(80));
+  m_minerInfoEditor->setBounds(infoBounds.removeFromLeft(300));
+
+  bounds.removeFromTop(10);
+  auto leftPart = bounds.removeFromLeft(500);
+  m_validatorSlotsLabel->setBounds(leftPart.removeFromTop(20));
+  m_tblSlots->setBounds(leftPart.removeFromLeft(500));
+
+  bounds.removeFromLeft(20);
+  m_claimSlotsLabel->setBounds(bounds.removeFromTop(20));
+  m_claimEditor->setBounds(bounds);
 }
 
 void Miner::update() {
@@ -475,7 +473,7 @@ void Miner::update() {
   auto delta = cur_time - last_time;
   auto delta_keys = total_keys_generated - last_keys_generated;
   if (total_keys_generated > 0) {
-    txtMinerInfo->setText(
+    m_minerInfoEditor->setText(
       "Total keys generated: " + String(total_keys_generated) + "\n" +
       "Mining power: " + String(delta_keys * 1000 / delta) + " keys/s\n" +
       "Mined unclaimed keys: " + String(mined_slots.size()) + "\n" +
@@ -483,44 +481,6 @@ void Miner::update() {
   }
   last_time = cur_time;
   last_keys_generated = total_keys_generated;
-}
-
-void Miner::createSignature() {
-/*
-  txtClaim->setText("");
-  int s = tblSlots->getSelectedRow();
-  if (s < 0 || s >= slots.size()) {
-    return;
-  }
-  auto& slot = slots[s];
-  std::string priv_key = slot.private_key;
-  if (priv_key.size() != 32) {
-    return;
-  }
-
-  std::string pub_key = gen_pub_key((unsigned char*)priv_key.c_str());
-  std::string sig =
-      sign(reinterpret_cast<const unsigned char*>(priv_key.c_str()),
-           reinterpret_cast<const unsigned char*>(slot.owner.c_str()));
-
-  std::stringstream ss;
-  ss
-      << "koh.claimSlot('0x" << bin2hex(pub_key.substr(0, 32))
-      << "', '0x" << bin2hex(pub_key.substr(32, 32))
-      << "', '0x" << bin2hex(sig.substr(64, 1))
-      << "', '0x" << bin2hex(sig.substr(0, 32))
-      << "', '0x" << bin2hex(sig.substr(32, 32))
-      << "')" << std::endl;
-
-  txtClaim->setText(
-    "Signature: \n"
-    "PubKeyX = 0x" + bin2hex(pub_key.substr(0, 32)) + " \n"
-    "PubKeyY = 0x" + bin2hex(pub_key.substr(32, 32)) + " \n"
-    "R = 0x" + bin2hex(sig.substr(0, 32)) + " \n"
-    "S = 0x" + bin2hex(sig.substr(32, 32)) + " \n"
-    "V = 0x" + bin2hex(sig.substr(64, 1)) + " \n"
-    + ss.str());
-*/
 }
 
 void Miner::claimMinedSlots() {
@@ -571,7 +531,4 @@ void Miner::timerCallback() {
   updateContractData();
   update();
   repaint();
-  for (auto c : components) {
-    c->repaint();
-  }
 }
