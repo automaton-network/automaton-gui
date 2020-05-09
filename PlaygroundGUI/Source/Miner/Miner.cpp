@@ -131,6 +131,10 @@ class ValidatorSlotsGrid : public SlotsGrid {
   ValidatorSlotsGrid() {
   }
 
+  void setCurrentAccountAddress(const String& accountOwnerAddress) {
+    m_owner = accountOwnerAddress.toStdString();
+  }
+
   void setSlots(const std::vector<ValidatorSlot>& validatorSlots) {
     m_minLeadingBits = 257;
     m_maxLeadingBits = 0;
@@ -169,7 +173,7 @@ class ValidatorSlotsGrid : public SlotsGrid {
       } else {
         lb = 1.;
       }
-      slotColour = HSV(m_slots[slotIndex].isMine ? 30 : 200, 1.0 - lb, 0.5 + 0.4 * lb);
+      slotColour = HSV(m_slots[slotIndex].isMine ? 122 : 200, 1.0 - lb, 0.5 + 0.4 * lb);
     }
 
     if (isHighlighted)
@@ -496,6 +500,7 @@ Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
   addAndMakeVisible(m_claimEditor.get());
 
   m_validatorSlotsGrid = std::make_unique<ValidatorSlotsGrid>();
+  m_validatorSlotsGrid->setCurrentAccountAddress(Utils::getNormalizedAddress(eth_address));
   addAndMakeVisible(m_validatorSlotsGrid.get());
 
   updateContractData();
