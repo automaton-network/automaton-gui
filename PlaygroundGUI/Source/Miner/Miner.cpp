@@ -453,6 +453,7 @@ Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
   private_key = m_accountData->getPrivateKey();
   eth_address = m_accountData->getAddress();
 
+  m_ownedSlotsNumEditor = createLabel("", this);
   m_timeLabel = createLabel(String(__DATE__) + " " + String(__TIME__), this);
 
   m_slotsLabel = createLabel("Slots:", this);
@@ -502,10 +503,25 @@ Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
   startTimer(1000);
 }
 
+void Miner::setNumOfOwnedSlots(const std::vector<ValidatorSlot>& validatorSlots) {
+  uint64 numOfOwnedSlots = 0;
+  const auto accountAddress = String(m_accountData->getAddress()).substring(2);
+
+  for (const auto& slot : validatorSlots) {
+    if (slot.owner == accountAddress) {
+      ++numOfOwnedSlots;
+    }
+  }
+
+  m_ownedSlotsNumEditor->setText("Owned slots: " + String(numOfOwnedSlots), NotificationType::dontSendNotification);
+}
+
 void Miner::updateContractData() {
   auto cd = m_accountData->getContractData();
   ScopedLock lock(cd->m_criticalSection);
   m_validatorSlotsGrid->setSlots(cd->m_slots);
+  setNumOfOwnedSlots(cd->m_slots);
+
   setSlotsNumber(cd->m_slotsNumber);
   setMaskHex(cd->m_mask);
   setMinDifficultyHex(cd->m_minDifficulty);
@@ -595,8 +611,10 @@ void Miner::resized() {
   m_timeLabel->setBounds(getLocalBounds().removeFromTop(20));
 
   auto bounds = getLocalBounds().reduced(10, 20);
-  auto detailsBounds = bounds.removeFromTop(200);
-  m_validatorSlotsGrid->setBounds(detailsBounds.removeFromRight(200));
+  auto detailsBounds = bounds.removeFromTop(220);
+  auto slotsBounds = detailsBounds.removeFromRight(200);
+  m_ownedSlotsNumEditor->setBounds(slotsBounds.removeFromTop(20));
+  m_validatorSlotsGrid->setBounds(slotsBounds);
   detailsBounds.removeFromRight(10);
   detailsBounds.removeFromTop(30);
   auto rowBounds = detailsBounds.removeFromTop(20);

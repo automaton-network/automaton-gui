@@ -21,6 +21,7 @@
 
 #include <Login/Account.h>
 #include <Utils/AsyncTask.h>
+#include <Data/AutomatonContractData.h>
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "Components/FormMaker.h"
 
@@ -97,6 +98,7 @@ class Miner : public Component,
   std::string eth_address;
 
   // UI
+  std::unique_ptr<Label> m_ownedSlotsNumEditor;
   std::unique_ptr<Label> m_timeLabel;
   std::unique_ptr<Label> m_slotsLabel;
   std::unique_ptr<Label> m_maskHexLabel;
@@ -116,6 +118,7 @@ class Miner : public Component,
   std::unique_ptr<TableListBox> m_tblSlots;
   std::unique_ptr<ValidatorSlotsGrid> m_validatorSlotsGrid;
 
+  void setNumOfOwnedSlots(const std::vector<ValidatorSlot>& validatorSlots);
   void updateContractData();
   void claimMinedSlots();
 
