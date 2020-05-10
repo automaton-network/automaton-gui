@@ -88,6 +88,7 @@ DebugPage::DebugPage() {
 }
 
 DebugPage::~DebugPage() {
+  m_tasksModel->removeListener(this);
 }
 
 void DebugPage::resized() {
