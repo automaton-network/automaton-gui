@@ -30,6 +30,7 @@
 #include "automaton/core/io/io.h"
 
 class ValidatorSlotsGrid;
+class ValidatorSlotsLegend;
 
 class Miner : public Component,
               public Button::Listener,
@@ -67,8 +68,8 @@ class Miner : public Component,
 
   size_t getMinedSlotsNumber() { return mined_slots.size(); }
   mined_slot& getMinedSlot(int _slot) { return mined_slots[_slot]; }
-  unsigned char * getMask() { return mask; }
-  unsigned char * getDifficulty() { return difficulty; }
+  unsigned char* getMask() { return mask; }
+  unsigned char* getDifficulty() { return difficulty; }
 
   // void setMinDifficulty(unsigned int _minDifficulty);
 
@@ -117,6 +118,7 @@ class Miner : public Component,
 
   std::unique_ptr<TableListBox> m_tblSlots;
   std::unique_ptr<ValidatorSlotsGrid> m_validatorSlotsGrid;
+  std::unique_ptr<ValidatorSlotsLegend> m_validatorSlotsLegend;
 
   void setNumOfOwnedSlots(const std::vector<ValidatorSlot>& validatorSlots);
   void updateContractData();

@@ -17,6 +17,7 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include <json.hpp>
 
 #include "Miner.h"
@@ -45,6 +46,9 @@ using automaton::tools::miner::gen_pub_key;
 using automaton::tools::miner::mine_key;
 using automaton::tools::miner::sign;
 
+
+static const int OWNER_SLOT_HUE = 122;
+static const int NON_OWNER_SLOT_HUE = 200;
 
 static std::string get_pub_key_x(const unsigned char* priv_key) {
   secp256k1_context* context = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
@@ -126,9 +130,23 @@ static uint32_t leadingBits(const std::string& s) {
   return result;
 }
 
+class ValidatorSlotsLegend : public Component {
+ public:
+  void paint(Graphics& g) override;
+  void setLeadingBitsRange(const Range<uint32> leadingBits);
+
+ private:
+  uint32 m_minLeadingBits = 257;
+  uint32 m_maxLeadingBits = 0;
+};
+
 class ValidatorSlotsGrid : public SlotsGrid {
  public:
   ValidatorSlotsGrid() {
+  }
+
+  Range<uint32> getLeadingBitsRange() const noexcept {
+    return { m_minLeadingBits, m_maxLeadingBits };
   }
 
   void setCurrentAccountAddress(const String& accountOwnerAddress) {
@@ -165,7 +183,7 @@ class ValidatorSlotsGrid : public SlotsGrid {
   Colour getSlotColour(int slotIndex, bool isHighlighted) override {
     Colour slotColour;
     if (m_slots[slotIndex].bits == 0) {
-      slotColour = Colours::black;
+      slotColour = Colours::black.withAlpha(0.5f);
     } else {
       double lb;
       if (m_maxLeadingBits != m_minLeadingBits) {
@@ -173,7 +191,7 @@ class ValidatorSlotsGrid : public SlotsGrid {
       } else {
         lb = 1.;
       }
-      slotColour = HSV(m_slots[slotIndex].isMine ? 122 : 200, 1.0 - lb, 0.5 + 0.4 * lb);
+      slotColour = HSV(m_slots[slotIndex].isMine ? OWNER_SLOT_HUE : NON_OWNER_SLOT_HUE, 1.0 - lb, 0.5 + 0.4 * lb);
     }
 
     if (isHighlighted)
@@ -194,7 +212,8 @@ class ValidatorSlotsGrid : public SlotsGrid {
     String slotInfo;
     slotInfo << "Slot: " << slotIndex << "\n" <<
              "Owner: " << m_slots[slotIndex].owner << "\n" <<
-             "Difficulty:" << bin2hex(m_slots[slotIndex].difficulty) << "\n";
+             "Difficulty:" << bin2hex(m_slots[slotIndex].difficulty) << "\n"
+             "Difficulty bits:" << String(m_slots[slotIndex].bits) << "\n";
 
     m_popup.m_label.setText(slotInfo, NotificationType::dontSendNotification);
     m_popup.setSize(450, 100);
@@ -230,6 +249,71 @@ class ValidatorSlotsGrid : public SlotsGrid {
     Label m_label;
   } m_popup;
 };
+
+void ValidatorSlotsLegend::paint(Graphics& g) {
+  auto bounds = getLocalBounds().reduced(22, 0);
+  const auto barBounds = bounds;
+  const auto spacing = 2;
+  const auto barHeight = static_cast<int>((barBounds.getHeight() - spacing) / 2);
+  auto ownerBarBounds = bounds.removeFromTop(barHeight);
+  bounds.removeFromTop(spacing);
+  auto nonOwnerBarBounds = bounds.removeFromTop(barHeight);
+
+  const auto bitsDiff = m_maxLeadingBits - m_minLeadingBits;
+
+  // If there are less than 1px to for each color segment, use gradient fill instead
+  const bool useGradientFill = bitsDiff > barBounds.getWidth();
+  if (bitsDiff == 0) {
+    g.setColour(Colours::white);
+    g.fillRect(ownerBarBounds);
+    g.fillRect(nonOwnerBarBounds);
+  } else if (useGradientFill) {
+    Colour minColourOwner = HSV(OWNER_SLOT_HUE, 1.0, 0.5);
+    Colour minColourNonOwner = HSV(NON_OWNER_SLOT_HUE, 1.0, 0.5);
+    Colour maxColour = Colours::white;
+    ColourGradient gradientOwner = ColourGradient::horizontal(minColourOwner, ownerBarBounds.getX(),
+                                                              maxColour, ownerBarBounds.getRight());
+    ColourGradient gradientNonOwner = ColourGradient::horizontal(minColourNonOwner, nonOwnerBarBounds.getX(),
+                                                                 maxColour, nonOwnerBarBounds.getRight());
+    const auto numPoints = bitsDiff;
+    for (size_t i = 1; i < numPoints; ++i) {
+      const auto lb = 1.0 * i / bitsDiff;
+      gradientNonOwner.addColour(i / numPoints, HSV(NON_OWNER_SLOT_HUE, 1.0 - lb, 0.5 + 0.4 * lb));
+      gradientOwner.addColour(i / numPoints, HSV(OWNER_SLOT_HUE, 1.0 - lb, 0.5 + 0.4 * lb));
+    }
+    gradientOwner.addColour(0.0, minColourOwner);
+    gradientOwner.addColour(1.0, maxColour);
+    gradientNonOwner.addColour(0.0, minColourNonOwner);
+    gradientNonOwner.addColour(1.0, maxColour);
+
+    g.setGradientFill(gradientOwner);
+    g.fillRect(ownerBarBounds);
+    g.setGradientFill(gradientNonOwner);
+    g.fillRect(nonOwnerBarBounds);
+  } else {
+    const auto numRects = bitsDiff + 1;
+    const auto stepBarWidth = jmax(1, static_cast<int>(std::ceil(barBounds.toFloat().getWidth() / numRects)));
+    for (size_t i = 0; i < numRects; ++i) {
+      const auto lb = 1.0 * i / bitsDiff;
+      // Owner
+      g.setColour(HSV(OWNER_SLOT_HUE, 1.0 - lb, 0.5 + 0.4 * lb));
+      g.fillRect(ownerBarBounds.removeFromLeft(stepBarWidth));
+      // Non owner
+      g.setColour(HSV(NON_OWNER_SLOT_HUE, 1.0 - lb, 0.5 + 0.4 * lb));
+      g.fillRect(nonOwnerBarBounds.removeFromLeft(stepBarWidth));
+    }
+  }
+
+  g.setColour(Colours::white);
+  g.drawText(String(m_minLeadingBits), getLocalBounds(), Justification::centredLeft);
+  g.drawText(String(m_maxLeadingBits), getLocalBounds(), Justification::centredRight);
+}
+
+void ValidatorSlotsLegend::setLeadingBitsRange(Range<uint32> leadingBitsRange) {
+  m_minLeadingBits = leadingBitsRange.getStart();
+  m_maxLeadingBits = leadingBitsRange.getEnd();
+  repaint();
+}
 
 void Miner::addMinerThread() {
   auto miner = TasksManager::launchTask([=](AsyncTask* task) {
@@ -503,6 +587,9 @@ Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
   m_validatorSlotsGrid->setCurrentAccountAddress(Utils::getNormalizedAddress(eth_address));
   addAndMakeVisible(m_validatorSlotsGrid.get());
 
+  m_validatorSlotsLegend = std::make_unique<ValidatorSlotsLegend>();
+  addAndMakeVisible(m_validatorSlotsLegend.get());
+
   updateContractData();
 
   startTimer(1000);
@@ -524,8 +611,10 @@ void Miner::setNumOfOwnedSlots(const std::vector<ValidatorSlot>& validatorSlots)
 void Miner::updateContractData() {
   auto cd = m_accountData->getContractData();
   ScopedLock lock(cd->m_criticalSection);
+
   m_validatorSlotsGrid->setSlots(cd->m_slots);
   setNumOfOwnedSlots(cd->m_slots);
+  m_validatorSlotsLegend->setLeadingBitsRange(m_validatorSlotsGrid->getLeadingBitsRange());
 
   setSlotsNumber(cd->m_slotsNumber);
   setMaskHex(cd->m_mask);
@@ -616,12 +705,15 @@ void Miner::resized() {
   m_timeLabel->setBounds(getLocalBounds().removeFromTop(20));
 
   auto bounds = getLocalBounds().reduced(10, 20);
-  auto detailsBounds = bounds.removeFromTop(220);
+  auto detailsBounds = bounds.removeFromTop(250);
   auto slotsBounds = detailsBounds.removeFromRight(200);
   m_ownedSlotsNumEditor->setBounds(slotsBounds.removeFromTop(20));
+  m_validatorSlotsLegend->setBounds(slotsBounds.removeFromBottom(30).withTrimmedRight(10));
   m_validatorSlotsGrid->setBounds(slotsBounds);
+
   detailsBounds.removeFromRight(10);
   detailsBounds.removeFromTop(30);
+
   auto rowBounds = detailsBounds.removeFromTop(20);
   m_slotsLabel->setBounds(rowBounds.removeFromLeft(100));
   m_slotsNumEditor->setBounds(rowBounds.removeFromLeft(100));
@@ -637,10 +729,11 @@ void Miner::resized() {
 
   auto infoBounds = detailsBounds.removeFromTop(70);
   infoBounds.removeFromLeft(100);
-  auto buttonsBounds = infoBounds.removeFromLeft(200).removeFromTop(20);
-  m_addMinerBtn->setBounds(buttonsBounds.removeFromLeft(80));
-  buttonsBounds.removeFromLeft(10);
-  m_stopMinerBtn->setBounds(buttonsBounds.removeFromLeft(80));
+  auto buttonsBounds = infoBounds.removeFromLeft(200).withTrimmedRight(10);
+  const auto buttonHeight = (infoBounds.getHeight() - 10) / 2;
+  m_addMinerBtn->setBounds(buttonsBounds.removeFromTop(buttonHeight));
+  buttonsBounds.removeFromTop(10);
+  m_stopMinerBtn->setBounds(buttonsBounds.removeFromTop(buttonHeight));
   m_minerInfoEditor->setBounds(infoBounds.removeFromLeft(300));
 
   bounds.removeFromTop(10);
