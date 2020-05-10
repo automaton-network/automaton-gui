@@ -204,10 +204,11 @@ std::shared_ptr<eth_contract> AutomatonContractData::getContract() {
 
 status AutomatonContractData::call(const std::string& f,
                                    const std::string& params,
-                                   const std::string& privateKey) {
+                                   const std::string& privateKey,
+                                   const std::string& value) {
   ScopedLock sl(m_criticalSection);
   if (auto contract = getContract())
-    return getContract()->call(f, params, privateKey);
+    return getContract()->call(f, params, privateKey, value);
 
   return status::internal("Contract is NULL.");
 }

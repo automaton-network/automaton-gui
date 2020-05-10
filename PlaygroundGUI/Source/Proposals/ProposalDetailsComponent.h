@@ -39,6 +39,7 @@ class ProposalDetailsComponent : public Component
   ~ProposalDetailsComponent();
 
   void setProposal(Proposal::Ptr proposal);
+  void updateComponentForProposal();
   void updateButtonsForProposal();
   void updateVotesView();
 

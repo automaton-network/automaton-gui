@@ -95,6 +95,10 @@
       <GROUP id="{D62FB906-6D23-F538-9E50-51D60BE97FA9}" name="Components">
         <FILE id="PjEPSz" name="FormMaker.cpp" compile="1" resource="0" file="Source/Components/FormMaker.cpp"/>
         <FILE id="TI8gpa" name="FormMaker.h" compile="0" resource="0" file="Source/Components/FormMaker.h"/>
+        <FILE id="FEK7bk" name="HistoricalChart.cpp" compile="1" resource="0"
+              file="Source/Components/HistoricalChart.cpp"/>
+        <FILE id="RgL7Ic" name="HistoricalChart.h" compile="0" resource="0"
+              file="Source/Components/HistoricalChart.h"/>
         <FILE id="fO3u2Y" name="SlotsGrid.cpp" compile="1" resource="0" file="Source/Components/SlotsGrid.cpp"/>
         <FILE id="fj2djX" name="SlotsGrid.h" compile="0" resource="0" file="Source/Components/SlotsGrid.h"/>
         <FILE id="YkvQZA" name="ValidatorGrid.cpp" compile="1" resource="0"
@@ -135,7 +139,7 @@
                extraCompilerFlags="-I $(SRCROOT)/../../../../automaton-core/src/local_third_party/include&#10;-I ../../Source&#10;"
                externalLibraries="LDAP">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="1" name="Debug" defines="AUTOMATON_JUCE_UNIT_TESTS=1"/>
         <CONFIGURATION isDebug="0" name="Release" headerPath="../automaton/src/local_third_party/include"
                        libraryPath="../automaton/src/local_third_party/lib"/>
       </CONFIGURATIONS>
@@ -153,7 +157,7 @@
                 extraLinkerFlags="../../../../automaton-core/src/local_third_party/lib/libblockchain_cpp_node.a&#10;../../../../automaton-core/src/local_third_party/lib/libautomaton-core.a&#10;../../../../automaton-core/src/local_third_party/lib/libsecp256k1.a&#10;../../../../automaton-core/src/local_third_party/lib/libboost_filesystem.a&#10;../../../../automaton-core/src/local_third_party/lib/libboost_iostreams.a&#10;../../../../automaton-core/src/local_third_party/lib/libboost_system.a&#10;../../../../automaton-core/src/local_third_party/lib/libssl.a&#10;../../../../automaton-core/src/local_third_party/lib/libcrypto.a&#10;../../../../automaton-core/src/local_third_party/lib/libcryptopp.a&#10;../../../../automaton-core/src/local_third_party/lib/libcurl.a&#10;../../../../automaton-core/src/local_third_party/lib/libg3logger.a&#10;../../../../automaton-core/src/local_third_party/lib/libgmp.a&#10;../../../../automaton-core/src/local_third_party/lib/liblua.a&#10;../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a&#10;../../../../automaton-core/src/local_third_party/lib/libprotobuf-lite.a&#10;../../../../automaton-core/src/local_third_party/lib/libprotobuf.a&#10;../../../../automaton-core/src/local_third_party/lib/libreplxx.a&#10;../../../../automaton-core/src/local_third_party/lib/libz.a"
                 externalLibraries="gmp">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="1" name="Debug" defines="AUTOMATON_JUCE_UNIT_TESTS=1"/>
         <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
@@ -169,7 +173,7 @@
             extraCompilerFlags="-I$(SolutionDir)/../../../../automaton/src/local_third_party/include&#10;-I$(SolutionDir)../../Source&#10;"
             extraLinkerFlags="$(SolutionDir)/../../../../automaton/src/local_third_party/lib/blockchain_cpp_node.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/automaton-core.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/secp256k1.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_filesystem.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_iostreams.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libboost_system.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/cryptopp-static.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libcurl-d.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/g3logger.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/lua.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libprotobufd.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/replxx-d.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/zlibstaticd.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libssl.lib&#10;$(SolutionDir)/../../../../automaton/src/local_third_party/lib/libcrypto.lib&#10;crypt32.lib">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="1" name="Debug" defines="AUTOMATON_JUCE_UNIT_TESTS=1"/>
         <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

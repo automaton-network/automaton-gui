@@ -17,11 +17,54 @@
  * along with Automaton Playground.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Components/HistoricalChart.h>
 #include "ProposalsPage.h"
 #include "ProposalsManager.h"
 #include "../Utils/Utils.h"
 #include "../Data/AutomatonContractData.h"
 #include "ProposalDetailsComponent.h"
+
+static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
+  Array<Point<float>> series;
+  auto votingHistory = proposal->getVotingHistory();
+
+  series.add(Point<float>(0, 100));
+  for (int i = 0; i < votingHistory.size(); ++i) {
+    series.add(Point<float>(i + 1, votingHistory[i]));
+  }
+
+  series.add(Point<float>(series.size(), proposal->getApprovalRating() + 100));
+  return series;
+}
+
+class VotingChart : public Component, public Button::Listener {
+ public:
+  VotingChart() : m_backBtn("Back") {
+    m_chart.setMargins(0, 10, 0, 10);
+    m_backBtn.addListener(this);
+    addAndMakeVisible(m_backBtn);
+    addAndMakeVisible(m_chart);
+  }
+
+  void paint(Graphics& g) override {
+    g.setColour(Colour(0xff404040));
+    g.fillRect(getLocalBounds());
+  }
+
+  void resized() override {
+    auto bounds = getLocalBounds();
+    m_backBtn.setBounds(bounds.removeFromBottom(30).removeFromLeft(100));
+    m_chart.setBounds(bounds);
+  }
+
+  void buttonClicked(Button* button) override {
+    if (button == &m_backBtn)
+      setVisible(false);
+  }
+
+  TextButton m_backBtn;
+  HistoricalChart m_chart;
+};
 
 //==============================================================================
 ProposalsPage::ProposalsPage(Account::Ptr accountData)
@@ -30,7 +73,7 @@ ProposalsPage::ProposalsPage(Account::Ptr accountData)
   m_proposalsManager = m_accountData->getProposalsManager();
 
   m_proposalsListBox = std::make_unique<TableListBox>();
-  m_proposalsListBox->setRowHeight(50);
+  m_proposalsListBox->setRowHeight(75);
   m_proposalsListBox->setRowSelectedOnMouseDown(true);
   m_proposalsListBox->setClickingTogglesRowSelection(true);
 
@@ -75,6 +118,8 @@ ProposalsPage::ProposalsPage(Account::Ptr accountData)
   m_filterByStatusComboBox->addItem(translate("Rejected"), static_cast<int>(ProposalFilter::Rejected));
   m_filterByStatusComboBox->addItem(translate("Contested"), static_cast<int>(ProposalFilter::Contested));
   m_filterByStatusComboBox->addItem(translate("Completed"), static_cast<int>(ProposalFilter::Completed));
+  m_filterByStatusComboBox->setSelectedId(static_cast<int>(ProposalFilter::All),
+      NotificationType::dontSendNotification);
   m_filterByStatusComboBox->addListener(this);
 
   m_proxyModel = std::make_shared<ProposalsProxyModel>();
@@ -94,6 +139,9 @@ ProposalsPage::ProposalsPage(Account::Ptr accountData)
 
   m_proposalDetailslView = std::make_unique<ProposalDetailsComponent>(m_accountData);
   addChildComponent(m_proposalDetailslView.get());
+
+  m_votingChart = std::make_unique<VotingChart>();
+  addChildComponent(m_votingChart.get());
 
   addAndMakeVisible(m_fetchProposalsBtn.get());
   addAndMakeVisible(m_createProposalBtn.get());
@@ -142,6 +190,8 @@ void ProposalsPage::resized() {
   bounds.removeFromBottom(buttonsSpacing * 2);
   m_proposalsListBox->setBounds(bounds);
   m_proposalsListBox->getHeader().resizeAllColumnsToFit(bounds.getWidth());
+
+  m_votingChart->setBounds(getLocalBounds());
 }
 
 void ProposalsPage::setModel(std::shared_ptr<ProposalsModel> model) {
@@ -273,6 +323,12 @@ void ProposalsPage::openProposalDetails(Proposal::Ptr proposal) {
   m_proposalDetailslView->setAlwaysOnTop(true);
 }
 
+void ProposalsPage::openHistoricalChart(Proposal::Ptr proposal) {
+  m_votingChart->m_chart.setSeries(getProposalVotingSeries(proposal), {Point<float>(0, 0), Point<float>{0, 200}});
+  m_votingChart->setVisible(true);
+  m_votingChart->setAlwaysOnTop(true);
+}
+
 // TableListBoxModel
 //==============================================================================
 int ProposalsPage::getNumRows() {
@@ -313,15 +369,13 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     }
     case Spent: {
       sorter = [=](Proposal* p1, Proposal* p2) {
-        return direction
-                * DefaultElementComparator<String>::compareElements(p1->getAmountSpent(), p2->getAmountSpent());
+        return direction * p1->getAmountSpent().compareNatural(p2->getAmountSpent());
       };
       break;
     }
     case Budget: {
       sorter = [=](Proposal* p1, Proposal* p2) {
-        return direction
-                * DefaultElementComparator<String>::compareElements(p1->getBudgetPerPeriod(), p2->getBudgetPerPeriod());
+        return direction * p1->getBudgetPerPeriod().compareNatural(p2->getBudgetPerPeriod());
       };
       break;
     }
@@ -342,8 +396,7 @@ void ProposalsPage::sortOrderChanged(int columnId, bool isForwards) {
     }
     case Bonus: {
       sorter = [=](Proposal* p1, Proposal* p2) {
-        return direction
-                * DefaultElementComparator<String>::compareElements(p1->getTargetBonus(), p2->getTargetBonus());
+        return direction * p1->getTargetBonus().compareNatural(p2->getTargetBonus());
       };
       break;
     }
@@ -479,6 +532,63 @@ void ProposalsPage::paintCell(Graphics& g,
   }
 }
 
+class ApprovalRatingCell : public Component {
+ public:
+  ApprovalRatingCell(ProposalsPage* owner, int row, int column) : m_owner(owner), m_row(row), m_column(column) {
+    addAndMakeVisible(m_chart);
+    addMouseListener(this, true);
+  }
+
+  void setData(Proposal::Ptr proposal) {
+    m_proposal = proposal;
+    m_chart.setSeries(getProposalVotingSeries(proposal));
+    m_chart.setMargins(10, 3, 10, 3);
+  }
+
+  void paint(Graphics& g) override {
+    if (m_proposal->getApprovalRating() < 0)
+      g.setColour(Colours::red);
+    else
+      g.setColour(Colours::green);
+
+    g.drawText(String(m_proposal->getApprovalRating()) + "%", 0, 13, getWidth(),
+               static_cast<int>(getHeight() * 0.35f), Justification::centredTop);
+  }
+
+  void resized() override {
+    m_chart.setBounds(getLocalBounds().removeFromBottom(static_cast<int>(getHeight() * 0.65f)));
+  }
+
+  void mouseDoubleClick(const MouseEvent& event) override {
+    m_owner->cellDoubleClicked(m_row, m_column, event);
+  }
+
+ private:
+  HistoricalChart m_chart;
+  ProposalsPage* m_owner;
+  int m_row;
+  int m_column;
+  Proposal::Ptr m_proposal;
+};
+
+Component* ProposalsPage::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected,
+                                    Component* existingComponentToUpdate) {
+  if (columnId == Columns::ApprovalRating) {
+    std::unique_ptr<ApprovalRatingCell> comp(dynamic_cast<ApprovalRatingCell*>(existingComponentToUpdate));
+    if (comp == nullptr)
+      comp = std::make_unique<ApprovalRatingCell>(this, rowNumber, columnId);
+
+    auto item = m_proxyModel->getAt(rowNumber);
+    if (!item)
+      return nullptr;
+
+    comp->setData(item);
+    return comp.release();
+  }
+
+  return nullptr;
+}
+
 void ProposalsPage::paintRowBackground(Graphics& g,
                                        int rowNumber,
                                        int width, int height,
@@ -497,6 +607,9 @@ void ProposalsPage::selectedRowsChanged(int lastRowSelected) {
 
 void ProposalsPage::cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) {
   if (e.mods.isLeftButtonDown()) {
-    openProposalDetails(m_proxyModel->getAt(rowNumber));
+    if (columnId == Columns::ApprovalRating)
+      openHistoricalChart(m_proxyModel->getAt(rowNumber));
+    else
+      openProposalDetails(m_proxyModel->getAt(rowNumber));
   }
 }

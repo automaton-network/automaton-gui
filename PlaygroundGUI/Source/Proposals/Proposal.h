@@ -46,6 +46,7 @@ class Proposal {
 
   Proposal();
   Proposal(uint32_t id, const String& infoJsonString, const String& dataJsonString);
+  void setData(const String& infoJsonString, const String& dataJsonString);
 
   static String getStatusStr(Proposal::Status status);
 
@@ -96,6 +97,7 @@ class Proposal {
   String getDocumentHash() const noexcept     { return m_documentHash; }
   Proposal::Status getStatus() const noexcept { return m_status; }
 
+  Array<int> getVotingHistory() { return m_votingHistory; }
   Array<uint64> getSlots() const { return m_slots; }
 
   Time getInitialVotingEndDate() const noexcept     { return m_initialVotingEndDate; }
@@ -146,6 +148,7 @@ class Proposal {
 
   Proposal::Status m_status;
   Array<uint64> m_slots;
+  Array<int> m_votingHistory;
 
   ListenerList<Listener> m_listeners;
 };

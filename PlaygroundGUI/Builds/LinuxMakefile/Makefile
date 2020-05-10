@@ -35,7 +35,7 @@ ifeq ($(CONFIG),Debug)
     TARGET_ARCH := 
   endif
 
-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=0.0.1 -DJUCE_APP_VERSION_HEX=0x1 $(shell pkg-config --cflags x11 xinerama xext freetype2 libcurl) -pthread -I../../JuceLibraryCode -I../../../../automaton-core/src/local_third_party/JUCE/modules $(CPPFLAGS)
+  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DAUTOMATON_JUCE_UNIT_TESTS=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=0.0.1 -DJUCE_APP_VERSION_HEX=0x1 $(shell pkg-config --cflags x11 xinerama xext freetype2 libcurl) -pthread -I../../JuceLibraryCode -I../../../../automaton-core/src/local_third_party/JUCE/modules $(CPPFLAGS)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := PlaygroundGUI
 
@@ -88,6 +88,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/ProposalsPage_2056ab63.o \
   $(JUCE_OBJDIR)/Config_ddf25eb0.o \
   $(JUCE_OBJDIR)/FormMaker_de6ddb10.o \
+  $(JUCE_OBJDIR)/HistoricalChart_884d2c24.o \
   $(JUCE_OBJDIR)/SlotsGrid_c0f7e2cb.o \
   $(JUCE_OBJDIR)/ValidatorGrid_67967568.o \
   $(JUCE_OBJDIR)/AutomatonContractData_2dae4430.o \
@@ -217,6 +218,11 @@ $(JUCE_OBJDIR)/Config_ddf25eb0.o: ../../Source/Config/Config.cpp
 $(JUCE_OBJDIR)/FormMaker_de6ddb10.o: ../../Source/Components/FormMaker.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling FormMaker.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/HistoricalChart_884d2c24.o: ../../Source/Components/HistoricalChart.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling HistoricalChart.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/SlotsGrid_c0f7e2cb.o: ../../Source/Components/SlotsGrid.cpp

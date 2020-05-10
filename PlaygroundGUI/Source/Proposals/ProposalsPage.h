@@ -26,13 +26,14 @@
 
 class ProposalsManager;
 class ProposalDetailsComponent;
+class VotingChart;
 
 class ProposalsPage : public Component
                     , public AbstractListModelBase::Listener
                     , private CreateProposalComponent::Listener
                     , private Button::Listener
                     , private ComboBox::Listener
-                    , private TableListBoxModel {
+                    , public TableListBoxModel {
  public:
   ProposalsPage(Account::Ptr accountData);
   ~ProposalsPage();
@@ -43,7 +44,9 @@ class ProposalsPage : public Component
   void resized() override;
 
   // AbstractListModelBase::Listener
-  void modelChanged(AbstractListModelBase*);
+  void modelChanged(AbstractListModelBase*) override;
+
+  void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) override;
 
  private:
   void createProposalViewActionHappened(CreateProposalComponent* componentInWhichActionHappened,
@@ -53,6 +56,7 @@ class ProposalsPage : public Component
   void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
   void updateButtonsForSelectedProposal(Proposal::Ptr selectedProposal);
   void openProposalDetails(Proposal::Ptr proposal);
+  void openHistoricalChart(Proposal::Ptr proposal);
 
   // TableListBoxModel
   // ==============================================================================
@@ -75,12 +79,13 @@ class ProposalsPage : public Component
                  int rowNumber, int columnId,
                  int width, int height,
                  bool rowIsSelected) override;
+  Component* refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected,
+                                     Component* existingComponentToUpdate);
   void paintRowBackground(Graphics& g,
                           int rowNumber,
                           int width, int height,
                           bool rowIsSelected) override;
   void selectedRowsChanged(int lastRowSelected) override;
-  void cellDoubleClicked(int rowNumber, int columnId, const MouseEvent& e) override;
   // ==============================================================================
   TooltipWindow m_tooltipWindow;
 
@@ -94,6 +99,7 @@ class ProposalsPage : public Component
   std::unique_ptr<TextButton> m_claimRewardBtn;
   std::unique_ptr<TextButton> m_fetchProposalsBtn;
   std::unique_ptr<ComboBox> m_filterByStatusComboBox;
+  std::unique_ptr<VotingChart> m_votingChart;
 
   std::unique_ptr<CreateProposalComponent> m_createProposalView;
   std::unique_ptr<ProposalDetailsComponent> m_proposalDetailslView;

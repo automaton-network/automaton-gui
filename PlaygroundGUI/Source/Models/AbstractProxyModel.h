@@ -83,8 +83,8 @@ class AbstractProxyModel : public AbstractListModel<T>
   }
 
   int compareElements(const int first, const int second) const {
-    return compareData(m_model->getAt(m_proxyArray[first]),
-                       m_model->getAt(m_proxyArray[second]));
+    return compareData(m_model->getAt(first),
+                       m_model->getAt(second));
   }
 
 

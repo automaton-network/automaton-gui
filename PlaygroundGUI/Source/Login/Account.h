@@ -44,6 +44,7 @@ class Account : public std::enable_shared_from_this<Account> {
   std::string getPrivateKey() const noexcept;
   std::string getAlias() const noexcept;
   std::string getEthBalance() const noexcept;
+  std::string getDexEthBalance() const noexcept;
   std::string getAutoBalance() const noexcept;
 
   bool operator==(const Account& other) const noexcept;
@@ -52,9 +53,11 @@ class Account : public std::enable_shared_from_this<Account> {
 
  private:
   void setBalance(const std::string& ethBalance, const std::string& autoBalance);
+  void setDexEthBalance(const std::string& dexEthBalance);
 
   int64 m_accountId;
   std::string m_ethBalance;
+  std::string m_dexEthBalance;
   std::string m_autoBalance;
   std::string m_address;
   AccountConfig* m_config;
