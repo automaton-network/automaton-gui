@@ -110,7 +110,7 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
   setSize(1024, 768);
 
   updateContractState();
-  startTimer(60 * 1000); // Refresh contract data every minute
+  startTimer(60 * 1000);  // Refresh contract data every minute
 }
 
 DemosMainComponent::~DemosMainComponent() {
