@@ -61,6 +61,7 @@ void AutomatonContractData::setData(const std::string& _eth_url,
                                     const std::string& _min_difficulty,
                                     uint32_t _slots_number,
                                     uint32_t _slots_claimed,
+                                    int64 approvalPercentage,
                                     const std::vector<ValidatorSlot>& _slots) {
   ScopedLock sl(m_criticalSection);
   m_ethUrl = _eth_url;
@@ -69,6 +70,7 @@ void AutomatonContractData::setData(const std::string& _eth_url,
   m_minDifficulty = _min_difficulty;
   m_slotsNumber = _slots_number;
   m_slotsClaimed = _slots_claimed;
+  m_approvalPercentage = approvalPercentage;
   m_slots = _slots;
 
   m_config.set_string("eth_url", m_ethUrl);
@@ -184,6 +186,14 @@ bool AutomatonContractData::readContract() {
     auto minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     task->setStatusMessage("MinDifficulty: " + minDifficulty);
 
+    s = contract->call("proposalsData", "");
+    if (!s.is_ok())
+      return false;
+
+    j_output = json::parse(s.msg);
+    const int64 approvalPercentage = j_output.size() > 0 ?
+        String(j_output[0].get<std::string>()).getLargeIntValue() : 0;
+
     s = contract->call("numTakeOvers", "");
     j_output = json::parse(s.msg);
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
@@ -192,7 +202,7 @@ bool AutomatonContractData::readContract() {
     task->setProgress(1.0);
 
     s = status::ok();
-    setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, validatorSlots);
+    setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, approvalPercentage, validatorSlots);
 
     return true;
   }, nullptr, "Reading Contract...");
@@ -259,6 +269,11 @@ uint32_t AutomatonContractData::getSlotsNumber() const noexcept {
 uint32_t AutomatonContractData::getSlotsClaimed() const noexcept {
   ScopedLock sl(m_criticalSection);
   return m_slotsClaimed;
+}
+
+int64 AutomatonContractData::getApprovalPercentage() const noexcept {
+  ScopedLock sl(m_criticalSection);
+  return m_approvalPercentage;
 }
 
 std::vector<ValidatorSlot> AutomatonContractData::getSlots() const {

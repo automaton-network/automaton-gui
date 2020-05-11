@@ -43,6 +43,7 @@ class AutomatonContractData : public ChangeBroadcaster {
                const std::string& _min_difficulty,
                uint32_t _slots_number,
                uint32_t _slots_claimed,
+               int64 approvalPercentage,
                const std::vector<ValidatorSlot>& _slots);
 
   bool readContract();
@@ -60,6 +61,7 @@ class AutomatonContractData : public ChangeBroadcaster {
   std::string getMinDifficulty() const noexcept;
   uint32_t getSlotsNumber() const noexcept;
   uint32_t getSlotsClaimed() const noexcept;
+  int64 getApprovalPercentage() const noexcept;
   std::vector<ValidatorSlot> getSlots() const;
   bool isLoaded() const noexcept;
 
@@ -70,6 +72,7 @@ class AutomatonContractData : public ChangeBroadcaster {
   std::string m_minDifficulty;
   uint32_t m_slotsNumber;
   uint32_t m_slotsClaimed;
+  int64 m_approvalPercentage;
   std::vector<ValidatorSlot> m_slots;
 
   CriticalSection m_criticalSection;

@@ -24,6 +24,9 @@
 #include "../Data/AutomatonContractData.h"
 #include "ProposalDetailsComponent.h"
 
+static const Colour APPROVE_THRESHOLD_COLOUR = Colour(0xff4CAF50);
+static const std::pair<Point<float>, Point<float>> VOTING_CHART_LIMITS = {Point<float>(0, 0), Point<float>(0, 200)};
+
 static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
   Array<Point<float>> series;
   auto votingHistory = proposal->getVotingHistory();
@@ -34,6 +37,14 @@ static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
   }
 
   series.add(Point<float>(series.size(), proposal->getApprovalRating() + 100));
+  return series;
+}
+
+static Array<Point<float>> getApproveThresholdSeries(Account::Ptr accountData) {
+  Array<Point<float>> series;
+  const auto approvalPercentage = accountData->getContractData()->getApprovalPercentage() + 100;
+  series.add(Point<float>(0, approvalPercentage));
+  series.add(Point<float>(1, approvalPercentage));
   return series;
 }
 
@@ -324,7 +335,12 @@ void ProposalsPage::openProposalDetails(Proposal::Ptr proposal) {
 }
 
 void ProposalsPage::openHistoricalChart(Proposal::Ptr proposal) {
-  m_votingChart->m_chart.setSeries(getProposalVotingSeries(proposal), {Point<float>(0, 0), Point<float>{0, 200}});
+  m_votingChart->m_chart.clear();
+  m_votingChart->m_chart.addSeries(getApproveThresholdSeries(m_accountData),
+                                   VOTING_CHART_LIMITS, APPROVE_THRESHOLD_COLOUR);
+  m_votingChart->m_chart.addSeries(getProposalVotingSeries(proposal), VOTING_CHART_LIMITS, Colours::yellow);
+  m_votingChart->m_chart.update();
+
   m_votingChart->setVisible(true);
   m_votingChart->setAlwaysOnTop(true);
 }
@@ -534,14 +550,19 @@ void ProposalsPage::paintCell(Graphics& g,
 
 class ApprovalRatingCell : public Component {
  public:
-  ApprovalRatingCell(ProposalsPage* owner, int row, int column) : m_owner(owner), m_row(row), m_column(column) {
+  ApprovalRatingCell(ProposalsPage* owner) : m_owner(owner) {
     addAndMakeVisible(m_chart);
     addMouseListener(this, true);
   }
 
-  void setData(Proposal::Ptr proposal) {
+  void setData(int row, int column, Proposal::Ptr proposal, Account::Ptr accountData) {
+    m_row = row;
+    m_column = column;
     m_proposal = proposal;
-    m_chart.setSeries(getProposalVotingSeries(proposal));
+    m_chart.clear();
+    m_chart.addSeries(getApproveThresholdSeries(accountData), VOTING_CHART_LIMITS, APPROVE_THRESHOLD_COLOUR);
+    m_chart.addSeries(getProposalVotingSeries(proposal), VOTING_CHART_LIMITS, Colours::yellow);
+    m_chart.update();
     m_chart.setMargins(10, 3, 10, 3);
   }
 
@@ -576,13 +597,13 @@ Component* ProposalsPage::refreshComponentForCell(int rowNumber, int columnId, b
   if (columnId == Columns::ApprovalRating) {
     std::unique_ptr<ApprovalRatingCell> comp(dynamic_cast<ApprovalRatingCell*>(existingComponentToUpdate));
     if (comp == nullptr)
-      comp = std::make_unique<ApprovalRatingCell>(this, rowNumber, columnId);
+      comp = std::make_unique<ApprovalRatingCell>(this);
 
     auto item = m_proxyModel->getAt(rowNumber);
     if (!item)
       return nullptr;
 
-    comp->setData(item);
+    comp->setData(rowNumber, columnId, item, m_accountData);
     return comp.release();
   }
 
