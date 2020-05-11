@@ -110,9 +110,11 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
   setSize(1024, 768);
 
   updateContractState();
+  startTimer(60 * 1000); // Refresh contract data every minute
 }
 
 DemosMainComponent::~DemosMainComponent() {
+  stopTimer();
   m_accountData->getContractData()->removeChangeListener(this);
   m_accountData->clearManagers();
   m_tabbedComponent = nullptr;
@@ -155,4 +157,9 @@ void DemosMainComponent::updateContractState() {
     m_accountData->getProposalsManager()->fetchProposals();
     m_accountData->getDexManager()->fetchOrders();
   }
+}
+
+void DemosMainComponent::timerCallback() {
+  if (m_accountData)
+    m_accountData->getContractData()->readContract();
 }

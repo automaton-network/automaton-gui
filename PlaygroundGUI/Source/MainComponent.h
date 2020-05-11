@@ -33,7 +33,8 @@ class DemosMainComponent:
   public ApplicationCommandTarget,
   public MenuBarModel,
   public Button::Listener,
-  public ChangeListener {
+  public ChangeListener,
+  private Timer {
  public:
   enum CommandIDs {
   };
@@ -75,6 +76,8 @@ class DemosMainComponent:
 
  private:
   void updateContractState();
+
+  void timerCallback() override;
 
   std::unique_ptr<MenuBarComponent> m_menuBar;
   std::unique_ptr<TabbedComponent> m_tabbedComponent;
