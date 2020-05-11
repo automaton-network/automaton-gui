@@ -37,6 +37,11 @@ void AsyncTaskModel::removeItem(AsyncTask* item, NotificationType notification) 
   notifyModelChanged(notification);
 }
 
+void AsyncTaskModel::clear(NotificationType notification) {
+  m_items.clear();
+  notifyModelChanged(notification);
+}
+
 JUCE_IMPLEMENT_SINGLETON(TasksManager)
 
 TasksManager::TasksManager() : m_activeTasksModel(std::make_shared<AsyncTaskModel>()),
@@ -44,6 +49,20 @@ TasksManager::TasksManager() : m_activeTasksModel(std::make_shared<AsyncTaskMode
 }
 
 TasksManager::~TasksManager() {
+  Array<AsyncTask::Ptr> runningTasks;
+  for (int i = 0; i < m_activeTasksModel->size(); ++i) {
+    if (auto task = m_activeTasksModel->getAt(i)) {
+        runningTasks.add(task);
+    }
+  }
+
+  m_activeTasksModel->clear(NotificationType::dontSendNotification);
+
+  for (auto task : runningTasks) {
+    task->signalThreadShouldExit();
+    task->waitForThreadToExit(-1);
+  }
+
   clearSingletonInstance();
 }
 

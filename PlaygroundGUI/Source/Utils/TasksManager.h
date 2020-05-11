@@ -31,6 +31,7 @@ class AsyncTaskModel : public AbstractListModel<AsyncTask::Ptr> {
   AsyncTask::Ptr& getReferenceAt(int index) override;
   void addItem(AsyncTask::Ptr item, NotificationType notification);
   void removeItem(AsyncTask* item, NotificationType notification);
+  void clear(NotificationType notification);
 
  private:
   Array<AsyncTask::Ptr> m_items;
