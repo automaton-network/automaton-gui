@@ -35,6 +35,7 @@ class ValidatorSlotsLegend;
 class Miner : public Component,
               public Button::Listener,
               public TextEditor::Listener,
+              public ChangeListener,
               private Timer {
  public:
   //==============================================================================
@@ -51,6 +52,8 @@ class Miner : public Component,
 
   // TextEditor::Listener overrides.
   void textEditorTextChanged(TextEditor &) override;
+
+  void changeListenerCallback(ChangeBroadcaster* source) override;
 
   // Mining
   struct mined_slot {

@@ -52,7 +52,7 @@ AsyncTask::Ptr TasksManager::launchTask(std::function<bool(AsyncTask*)> fun,
                                         const String& title,
                                         Account::Ptr account,
                                         bool isQueued) {
-  auto task = std::make_shared<AsyncTask> (fun, postAsyncAction, title, account->getAccountId());
+  auto task = std::make_shared<AsyncTask> (fun, postAsyncAction, title, account ? account->getAccountId() : 0);
   TasksManager::getInstance()->addTask(task, isQueued);
   return task;
 }

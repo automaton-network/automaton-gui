@@ -31,11 +31,11 @@ struct ValidatorSlot {
   std::string last_claim_time;
 };
 
-class AutomatonContractData : public std::enable_shared_from_this<AutomatonContractData> {
+class AutomatonContractData : public ChangeBroadcaster {
  public:
   using Ptr = std::shared_ptr<AutomatonContractData>;
 
-  AutomatonContractData(const Config& _config);
+  AutomatonContractData(const Config& config);
   ~AutomatonContractData();
   void setData(const std::string& _eth_url,
                const std::string& _contractAddress,
@@ -61,6 +61,7 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
   uint32_t getSlotsNumber() const noexcept;
   uint32_t getSlotsClaimed() const noexcept;
   std::vector<ValidatorSlot> getSlots() const;
+  bool isLoaded() const noexcept;
 
   std::string m_contractAbi;
   std::string m_ethUrl;
@@ -76,5 +77,6 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
   Config& getConfig();
 
  private:
-  Config config;
+  bool m_isLoaded = false;
+  Config m_config;
 };

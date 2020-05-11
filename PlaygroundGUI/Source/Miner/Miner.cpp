@@ -538,6 +538,7 @@ static std::unique_ptr<Label> createLabel(const String& text, Component* parent)
 
 //==============================================================================
 Miner::Miner(Account::Ptr accountData) : m_accountData(accountData) {
+  m_accountData->getContractData()->addChangeListener(this);
   private_key = m_accountData->getPrivateKey();
   eth_address = m_accountData->getAddress();
 
@@ -622,6 +623,7 @@ void Miner::updateContractData() {
 }
 
 Miner::~Miner() {
+  m_accountData->getContractData()->removeChangeListener(this);
   stopMining();
 }
 
@@ -682,6 +684,12 @@ void Miner::initSlots() {
 void Miner::textEditorTextChanged(TextEditor & txt) {
   if (m_slotsNumEditor.get() == &txt) {
     setSlotsNumber(m_slotsNumEditor->getText().getIntValue());
+  }
+}
+
+void Miner::changeListenerCallback(ChangeBroadcaster* source) {
+  if (m_accountData->getContractData().get() == source) {
+    updateContractData();
   }
 }
 
@@ -806,7 +814,6 @@ void Miner::claimMinedSlots() {
 
 void Miner::timerCallback() {
   claimMinedSlots();
-  updateContractData();
   update();
   repaint();
 }

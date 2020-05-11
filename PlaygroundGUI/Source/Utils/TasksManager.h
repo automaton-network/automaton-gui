@@ -44,7 +44,7 @@ class TasksManager : public DeletedAtShutdown {
   static AsyncTask::Ptr launchTask(std::function<bool(AsyncTask*)> fun,
                                    std::function<void(AsyncTask*)> postAsyncAction,
                                    const String& title,
-                                   Account::Ptr account,
+                                   Account::Ptr account = nullptr,
                                    bool isQueued = true);
 
   static bool launchTask(std::function<bool(TaskWithProgressWindow*)> fun,

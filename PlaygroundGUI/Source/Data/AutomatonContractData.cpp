@@ -41,15 +41,15 @@ using automaton::core::io::hex2bin;
 using automaton::core::io::hex2dec;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
 
-AutomatonContractData::AutomatonContractData(const Config& _config) {
+AutomatonContractData::AutomatonContractData(const Config& config) {
   loadAbi();
-  config  = _config;
-  m_ethUrl = config.get_string("eth_url");
-  m_contractAddress = config.get_string("contract_address");
-  m_mask = config.get_string("mask");
-  m_minDifficulty = config.get_string("min_difficulty");
-  m_slotsNumber = static_cast<uint32_t>(config.get_number("slots_number"));
-  m_slotsClaimed = static_cast<uint32_t>(config.get_number("slots_claimed"));
+  m_config  = config;
+  m_ethUrl = m_config.get_string("eth_url");
+  m_contractAddress = m_config.get_string("contract_address");
+  m_mask = m_config.get_string("mask");
+  m_minDifficulty = m_config.get_string("min_difficulty");
+  m_slotsNumber = static_cast<uint32_t>(m_config.get_number("slots_number"));
+  m_slotsClaimed = static_cast<uint32_t>(m_config.get_number("slots_claimed"));
 }
 
 AutomatonContractData::~AutomatonContractData() {
@@ -71,19 +71,21 @@ void AutomatonContractData::setData(const std::string& _eth_url,
   m_slotsClaimed = _slots_claimed;
   m_slots = _slots;
 
-  config.set_string("eth_url", m_ethUrl);
-  config.set_string("contract_address", m_contractAddress);
-  config.set_string("mask", m_mask);
-  config.set_string("min_difficulty", m_minDifficulty);
-  config.set_number("slots_number", m_slotsNumber);
-  config.set_number("slots_claimed", m_slotsClaimed);
+  m_config.set_string("eth_url", m_ethUrl);
+  m_config.set_string("contract_address", m_contractAddress);
+  m_config.set_string("mask", m_mask);
+  m_config.set_string("min_difficulty", m_minDifficulty);
+  m_config.set_number("slots_number", m_slotsNumber);
+  m_config.set_number("slots_claimed", m_slotsClaimed);
+  m_isLoaded = true;
+  sendChangeMessage();
 }
 
 bool AutomatonContractData::readContract() {
   const std::string& url = m_ethUrl;
   const std::string& contractAddress = m_contractAddress;
 
-  auto result = TasksManager::launchTask([&](TaskWithProgressWindow* task){
+  TasksManager::launchTask([&](AsyncTask* task){
     auto& s = task->m_status;
     eth_contract::register_contract(url, contractAddress, getAbi());
     auto contract = eth_contract::get_contract(contractAddress);
@@ -195,7 +197,7 @@ bool AutomatonContractData::readContract() {
     return true;
   }, nullptr, "Reading Contract...");
 
-  return result;
+  return true;
 }
 
 std::shared_ptr<eth_contract> AutomatonContractData::getContract() {
@@ -264,6 +266,10 @@ std::vector<ValidatorSlot> AutomatonContractData::getSlots() const {
   return m_slots;
 }
 
+bool AutomatonContractData::isLoaded() const noexcept {
+  return m_isLoaded;
+}
+
 Config& AutomatonContractData::getConfig() {
-  return config;
+  return m_config;
 }
