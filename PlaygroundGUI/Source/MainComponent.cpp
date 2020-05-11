@@ -139,8 +139,6 @@ void DemosMainComponent::resized() {
 void DemosMainComponent::buttonClicked(Button* button) {
   if (m_refreshButton.get() == button) {
     m_accountData->getContractData()->readContract();
-    m_accountData->getProposalsManager()->fetchProposals();
-    m_accountData->getDexManager()->fetchOrders();
   }
 }
 
