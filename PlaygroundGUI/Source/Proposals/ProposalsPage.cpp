@@ -25,6 +25,7 @@
 #include "ProposalDetailsComponent.h"
 
 static const Colour APPROVE_THRESHOLD_COLOUR = Colour(0xff4CAF50);
+static const Colour REJECT_THRESHOLD_COLOUR = Colours::red;
 static const std::pair<Point<float>, Point<float>> VOTING_CHART_LIMITS = {Point<float>(0, 0), Point<float>(0, 200)};
 
 static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
@@ -42,7 +43,16 @@ static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
 
 static Array<Point<float>> getApproveThresholdSeries(Account::Ptr accountData) {
   Array<Point<float>> series;
-  const auto approvalPercentage = accountData->getContractData()->getApprovalPercentage() + 100;
+  const auto approvalPercentage = accountData->getContractData()->getProposalData().approvalPercentage + 100;
+  series.add(Point<float>(0, approvalPercentage));
+  series.add(Point<float>(1, approvalPercentage));
+  return series;
+}
+
+
+static Array<Point<float>> getRejectThresholdSeries(Account::Ptr accountData) {
+  Array<Point<float>> series;
+  const auto approvalPercentage = accountData->getContractData()->getProposalData().contestPercentage + 100;
   series.add(Point<float>(0, approvalPercentage));
   series.add(Point<float>(1, approvalPercentage));
   return series;
@@ -337,9 +347,9 @@ void ProposalsPage::openProposalDetails(Proposal::Ptr proposal) {
 
 void ProposalsPage::openHistoricalChart(Proposal::Ptr proposal) {
   m_votingChart->m_chart.clear();
-  m_votingChart->m_chart.addSeries(getApproveThresholdSeries(m_accountData),
-                                   VOTING_CHART_LIMITS, APPROVE_THRESHOLD_COLOUR);
-  m_votingChart->m_chart.addSeries(getProposalVotingSeries(proposal), VOTING_CHART_LIMITS, Colours::yellow);
+  m_votingChart->m_chart.addSeries(getApproveThresholdSeries(m_accountData), APPROVE_THRESHOLD_COLOUR, true);
+  m_votingChart->m_chart.addSeries(getRejectThresholdSeries(m_accountData), REJECT_THRESHOLD_COLOUR, true);
+  m_votingChart->m_chart.addSeries(getProposalVotingSeries(proposal), Colours::yellow, false);
   m_votingChart->m_chart.update();
 
   m_votingChart->setVisible(true);
@@ -561,8 +571,9 @@ class ApprovalRatingCell : public Component {
     m_column = column;
     m_proposal = proposal;
     m_chart.clear();
-    m_chart.addSeries(getApproveThresholdSeries(accountData), VOTING_CHART_LIMITS, APPROVE_THRESHOLD_COLOUR);
-    m_chart.addSeries(getProposalVotingSeries(proposal), VOTING_CHART_LIMITS, Colours::yellow);
+    m_chart.addSeries(getApproveThresholdSeries(accountData), APPROVE_THRESHOLD_COLOUR, true);
+    m_chart.addSeries(getRejectThresholdSeries(accountData), REJECT_THRESHOLD_COLOUR, true);
+    m_chart.addSeries(getProposalVotingSeries(proposal), Colours::yellow, false);
     m_chart.update();
     m_chart.setMargins(10, 3, 10, 3);
   }

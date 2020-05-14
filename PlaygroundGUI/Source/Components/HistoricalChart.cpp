@@ -28,17 +28,23 @@ class ChartView : public Component {
   }
 
   void paint(Graphics& g) override {
+    const auto bounds = m_owner->m_margins.subtractedFrom(getLocalBounds()).toFloat();
+    const auto minMaxByY = m_owner->m_minMaxByY;
+    const float moveY = minMaxByY.first.y <= 0 ? 0 : -1 * minMaxByY.first.y;
+    const float maxY = minMaxByY.second.y + moveY;
+    const float scalePathY = maxY == 0 ? 1 : bounds.getHeight() / maxY;
+
     for (const auto& series : m_owner->m_seriesList) {
       g.setColour(series.m_colour);
+      const auto minMaxByX = series.m_minMaxByX;
 
       Path path;
-      const auto bounds = m_owner->m_margins.subtractedFrom(getLocalBounds()).toFloat();
-      const float moveY = series.m_minMaxByY.first.y < 0 ? std::fabs(series.m_minMaxByY.first.y) : 0;
-      const float moveX = series.m_minMaxByX.first.x < 0 ?
-          std::fabs(series.m_minMaxByX.first.x) : -1 * series.m_minMaxByX.first.x;
+      const auto origin = bounds.getHeight() - minMaxByY.first.y;
+      const float moveX = minMaxByX.first.x < 0 ?
+          std::fabs(minMaxByX.first.x) : -1 * minMaxByX.first.x;
+      const float maxX = minMaxByX.second.x + moveX;
 
-      const float scalePathY = bounds.getHeight() / (series.m_minMaxByY.second.y + moveY);
-      const float scalePathX = bounds.getWidth() / (series.m_minMaxByX.second.x + moveX);
+      const float scalePathX = maxX == 0 ? 1 : bounds.getWidth() / maxX;
       const Point<float> margin(m_owner->m_margins.getLeft(), m_owner->m_margins.getBottom());
       auto scalePoint = [&](const Point<float>& point) {
         auto p = Point<float>((point.x + moveX) * scalePathX, (point.y + moveY) * scalePathY) + margin;
@@ -51,7 +57,13 @@ class ChartView : public Component {
         path.lineTo(scalePoint(series.m_series[i]));
       }
 
-      g.strokePath(path, PathStrokeType(1, PathStrokeType::curved), AffineTransform::verticalFlip(getHeight()));
+      PathStrokeType strokeType(1, PathStrokeType::curved);
+
+      if (series.m_isDashed) {
+        const Array<float> dashLengths = { 2.0f, 3.0f, 4.0f, 5.0f };
+        strokeType.createDashedStroke(path, path, dashLengths.getRawDataPointer(), dashLengths.size());
+      }
+      g.strokePath(path, strokeType, AffineTransform::verticalFlip(getHeight()));
     }
   }
 
@@ -90,11 +102,12 @@ void HistoricalChart::clear() {
   m_seriesList.clearQuick();
 }
 
-void HistoricalChart::addSeries(const Array<Point<float>>& series, Colour colour) {
+void HistoricalChart::addSeries(const Array<Point<float>>& series, Colour colour, bool isDashed) {
   m_seriesList.resize(m_seriesList.size() + 1);
   SeriesData& seriesData = m_seriesList.getReference(m_seriesList.size() - 1);
   seriesData.m_series = series;
   seriesData.m_colour = colour;
+  seriesData.m_isDashed = isDashed;
 
   auto minMaxByY = std::minmax_element(seriesData.m_series.begin(), seriesData.m_series.end()
       , [](const Point<float>& p1, const Point<float>& p2){
@@ -107,18 +120,16 @@ void HistoricalChart::addSeries(const Array<Point<float>>& series, Colour colour
     return p1.x < p2.x;
   });
   seriesData.m_minMaxByX = {*minMaxByX.first, *minMaxByX.second};
-
-  m_seriesList.add(seriesData);
 }
 
-void HistoricalChart::addSeries(const Array<Point<float>>& series,
-                               std::pair<Point<float>, Point<float>> minMaxByY,
-                               Colour colour) {
+void HistoricalChart::addSeries(const Array<Point<float>>& series, Colour colour, bool isDashed,
+                                const std::pair<Point<float>, Point<float>>& minMaxByY) {
   m_seriesList.resize(m_seriesList.size() + 1);
   SeriesData& seriesData = m_seriesList.getReference(m_seriesList.size() - 1);
   seriesData.m_series = series;
   seriesData.m_minMaxByY = minMaxByY;
   seriesData.m_colour = colour;
+  seriesData.m_isDashed = isDashed;
 
   auto minMaxByX = std::minmax_element(seriesData.m_series.begin(), seriesData.m_series.end()
       , [](const Point<float>& p1, const Point<float>& p2){
@@ -128,5 +139,16 @@ void HistoricalChart::addSeries(const Array<Point<float>>& series,
 }
 
 void HistoricalChart::update() {
+  auto minByY = std::min_element(m_seriesList.begin(), m_seriesList.end()
+      , [](const SeriesData& s1, const SeriesData& s2){
+        return s1.m_minMaxByY.first.y < s2.m_minMaxByY.first.y;
+      })->m_minMaxByY.first;
+
+  auto maxByY = std::max_element(m_seriesList.begin(), m_seriesList.end()
+      , [](const SeriesData& s1, const SeriesData& s2){
+        return s1.m_minMaxByY.second.y < s2.m_minMaxByY.second.y;
+      })->m_minMaxByY.second;
+
+  m_minMaxByY = {minByY, maxByY};
   resized();
 }

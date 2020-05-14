@@ -32,6 +32,11 @@ struct ValidatorSlot {
   std::string last_claim_time;
 };
 
+struct ProposalsData {
+  int64 approvalPercentage;
+  int64 contestPercentage;
+};
+
 class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
  public:
   using Ptr = std::shared_ptr<AutomatonContractData>;
@@ -44,7 +49,7 @@ class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
                const std::string& _min_difficulty,
                uint32_t _slots_number,
                uint32_t _slots_claimed,
-               int64 approvalPercentage,
+               const ProposalsData& proposalsData,
                const std::vector<ValidatorSlot>& _slots);
 
   bool readContract();
@@ -62,7 +67,7 @@ class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
   std::string getMinDifficulty() const noexcept;
   uint32_t getSlotsNumber() const noexcept;
   uint32_t getSlotsClaimed() const noexcept;
-  int64 getApprovalPercentage() const noexcept;
+  ProposalsData getProposalData() const noexcept;
   std::vector<ValidatorSlot> getSlots() const;
   bool isLoaded() const noexcept;
 
@@ -73,7 +78,7 @@ class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
   std::string m_minDifficulty;
   uint32_t m_slotsNumber;
   uint32_t m_slotsClaimed;
-  int64 m_approvalPercentage;
+  ProposalsData m_proposalsData;
   std::vector<ValidatorSlot> m_slots;
 
   CriticalSection m_criticalSection;
