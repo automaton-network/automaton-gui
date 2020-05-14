@@ -1362,6 +1362,7 @@
     <ClInclude Include="..\..\Source\Debug\DebugPage.h"/>
     <ClInclude Include="..\..\Source\Utils\AsyncTask.h"/>
     <ClInclude Include="..\..\Source\Utils\TasksManager.h"/>
+    <ClInclude Include="..\..\Source\Utils\TasksOwner.h"/>
     <ClInclude Include="..\..\Source\Utils\TasksPanel.h"/>
     <ClInclude Include="..\..\Source\Utils\Utils.h"/>
     <ClInclude Include="..\..\Source\Login\Account.h"/>

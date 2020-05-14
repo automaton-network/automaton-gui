@@ -733,6 +733,13 @@
 			path = ../../Source/Components/HistoricalChart.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		C2E73F3D819BA7A9B5770AAC = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = TasksOwner.h;
+			path = ../../Source/Utils/TasksOwner.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		C2F43D9037B8E387725FF91E = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.nib;
@@ -923,6 +930,7 @@
 				5DA8E9EC8390C21FB637ABF0,
 				340CD4D56FDFE7CD6BBEBD50,
 				B0C9B78D5FA95CB19E6291D7,
+				C2E73F3D819BA7A9B5770AAC,
 				C4EEBAFDBAAB75BD83825F8E,
 				B8A150687955BD42A2977BD1,
 				B0900C36AF07AFF88A422DF2,

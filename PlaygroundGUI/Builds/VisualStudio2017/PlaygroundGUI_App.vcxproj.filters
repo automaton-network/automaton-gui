@@ -1647,6 +1647,9 @@
     <ClInclude Include="..\..\Source\Utils\TasksManager.h">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Utils\TasksOwner.h">
+      <Filter>PlaygroundGUI\Source\Utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Utils\TasksPanel.h">
       <Filter>PlaygroundGUI\Source\Utils</Filter>
     </ClInclude>
