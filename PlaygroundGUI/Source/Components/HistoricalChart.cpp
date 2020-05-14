@@ -60,7 +60,7 @@ class ChartView : public Component {
       PathStrokeType strokeType(1, PathStrokeType::curved);
 
       if (series.m_isDashed) {
-        const Array<float> dashLengths = { 2.0f, 3.0f, 4.0f, 5.0f };
+        const Array<float> dashLengths = { 5.0f, 8.0f };
         strokeType.createDashedStroke(path, path, dashLengths.getRawDataPointer(), dashLengths.size());
       }
       g.strokePath(path, strokeType, AffineTransform::verticalFlip(getHeight()));
