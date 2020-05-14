@@ -623,6 +623,7 @@ void Miner::updateContractData() {
 }
 
 Miner::~Miner() {
+  stopOwnedTasks();
   m_accountData->getContractData()->removeChangeListener(this);
   stopMining();
 }
@@ -776,7 +777,7 @@ void Miner::claimMinedSlots() {
 
     auto mined_key = ms.private_key;
 
-    TasksManager::launchTask([=](AsyncTask* task) {
+    launchTask([=](AsyncTask* task) {
       auto& s = task->m_status;
 
       task->setStatusMessage("Generating signature...");

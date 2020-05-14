@@ -143,7 +143,7 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
 }
 
 LoginComponent::~LoginComponent() {
-  TasksManager::deleteInstance();
+  m_accountWindows.clear();
 
   json contracts;
   for (auto& iter : m_contracts) {

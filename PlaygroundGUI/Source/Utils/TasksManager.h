@@ -30,6 +30,7 @@ class AsyncTaskModel : public AbstractListModel<AsyncTask::Ptr> {
   AsyncTask::Ptr getAt(int index) override;
   AsyncTask::Ptr& getReferenceAt(int index) override;
   void addItem(AsyncTask::Ptr item, NotificationType notification);
+  void removeItemsIn(const Array<AsyncTask::Ptr>& items, NotificationType notification);
   void removeItem(AsyncTask* item, NotificationType notification);
   void clear(NotificationType notification);
 
@@ -48,11 +49,8 @@ class TasksManager : public DeletedAtShutdown {
                                    Account::Ptr account = nullptr,
                                    bool isQueued = true);
 
-  static bool launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
-                         std::function<void(TaskWithProgressWindow*)> postAction,
-                         const String& title);
-
   void addTask(AsyncTask::Ptr task, bool isQueued);
+  void removeTasksAndWait(const Array<AsyncTask::Ptr>& tasks);
   void runQueuedTask();
   std::shared_ptr<AsyncTaskModel> getActiveTasksModel();
   std::shared_ptr<AsyncTaskModel> getTasksModel();

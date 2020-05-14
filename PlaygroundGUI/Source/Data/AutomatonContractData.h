@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <Utils/OwnedTasks.h>
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Config/Config.h"
 #include "../Login/AccountsModel.h"
@@ -31,7 +32,7 @@ struct ValidatorSlot {
   std::string last_claim_time;
 };
 
-class AutomatonContractData : public ChangeBroadcaster {
+class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
  public:
   using Ptr = std::shared_ptr<AutomatonContractData>;
 

@@ -32,6 +32,12 @@ void AsyncTaskModel::addItem(AsyncTask::Ptr item, NotificationType notification)
   m_items.add(item);
   notifyModelChanged(notification);
 }
+
+void AsyncTaskModel::removeItemsIn(const Array<AsyncTask::Ptr>& items, NotificationType notification) {
+  m_items.removeValuesNotIn(items);
+  notifyModelChanged(notification);
+}
+
 void AsyncTaskModel::removeItem(AsyncTask* item, NotificationType notification) {
   m_items.removeIf([&](AsyncTask::Ptr itemPtr){return itemPtr.get() == item;});
   notifyModelChanged(notification);
@@ -49,17 +55,22 @@ TasksManager::TasksManager() : m_activeTasksModel(std::make_shared<AsyncTaskMode
 }
 
 TasksManager::~TasksManager() {
+  m_queuedTasks.clear();
+
   Array<AsyncTask::Ptr> runningTasks;
   for (int i = 0; i < m_activeTasksModel->size(); ++i) {
     if (auto task = m_activeTasksModel->getAt(i)) {
+        task->signalThreadShouldExit();
         runningTasks.add(task);
     }
   }
 
+  jassert(runningTasks.size() == 0);  // It's strongly recommended to stop all tasks manually or use OwnedTasks
+
   m_activeTasksModel->clear(NotificationType::dontSendNotification);
 
   for (auto task : runningTasks) {
-    task->signalThreadShouldExit();
+    DBG("Active task: " + task->getTitle());
     task->waitForThreadToExit(-1);
   }
 
@@ -76,32 +87,6 @@ AsyncTask::Ptr TasksManager::launchTask(std::function<bool(AsyncTask*)> fun,
   return task;
 }
 
-bool TasksManager::launchTask(std::function<bool(TaskWithProgressWindow*)> fun,
-                              std::function<void(TaskWithProgressWindow*)> postAction,
-                              const String& title) {
-  TaskWithProgressWindow task(fun, title);
-
-  if (task.runThread()) {
-    if (postAction != nullptr)
-      postAction(&task);
-
-    auto& s = task.m_status;
-    if (!s.is_ok()) {
-      AlertWindow::showMessageBoxAsync(
-          AlertWindow::WarningIcon,
-          "ERROR",
-          String("(") + String(s.code) + String(") :") + s.msg);
-    }
-  } else {
-    AlertWindow::showMessageBoxAsync(
-        AlertWindow::WarningIcon,
-        "Canceled!",
-        "Operation aborted.");
-  }
-
-  return task.m_status.is_ok();
-}
-
 void TasksManager::addTask(AsyncTask::Ptr task, bool isQueued) {
   ScopedLock sl(m_lock);
   m_model->addItem(task, NotificationType::sendNotification);
@@ -116,6 +101,19 @@ void TasksManager::addTask(AsyncTask::Ptr task, bool isQueued) {
       m_activeTasksModel->removeItem(task, NotificationType::sendNotification);
     });
   }
+}
+
+void TasksManager::removeTasksAndWait(const Array<AsyncTask::Ptr>& tasks) {
+  ScopedLock sl(m_lock);
+  m_queuedTasks.removeValuesIn(tasks);
+
+  for (auto task : tasks)
+    task->signalThreadShouldExit();
+
+  for (auto task : tasks)
+    task->waitForThreadToExit(-1);
+
+  m_activeTasksModel->removeItemsIn(tasks, NotificationType::sendNotificationAsync);
 }
 
 void TasksManager::runQueuedTask() {

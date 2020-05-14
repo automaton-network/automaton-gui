@@ -56,6 +56,7 @@ ProposalsManager::ProposalsManager(Account::Ptr accountData)
 }
 
 ProposalsManager::~ProposalsManager() {
+  stopOwnedTasks();
 }
 
 static Proposal::Ptr createOrUpdateProposal(int64 id,
@@ -116,7 +117,7 @@ static Proposal::Ptr createOrUpdateProposal(int64 id,
 }
 
 bool ProposalsManager::fetchProposals() {
-  TasksManager::launchTask([&](AsyncTask* task) {
+  launchTask([&](AsyncTask* task) {
     auto& s = task->m_status;
 
     m_model->clear(NotificationType::dontSendNotification);
@@ -155,7 +156,7 @@ bool ProposalsManager::fetchProposalVotes(Proposal::Ptr proposal) {
     return false;
 
   const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Fetch votes";
-  TasksManager::launchTask([&, proposal](AsyncTask* task) {
+  launchTask([&, proposal](AsyncTask* task) {
     auto& s = task->m_status;
     const int numOfSlots = m_accountData->getContractData()->getSlotsNumber();
     task->setStatusMessage("Fetching " + String(numOfSlots) + " votes for proposal "
@@ -195,7 +196,7 @@ bool ProposalsManager::updateProposal(Proposal::Ptr proposal) {
     return false;
 
   const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Update";
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
     task->setStatusMessage("Updating proposal " + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
 
@@ -212,7 +213,7 @@ bool ProposalsManager::updateProposal(Proposal::Ptr proposal) {
 
 bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& contributor) {
   const auto topicName = proposal->getTitle() + " (" + String(proposal->getId()) + ") " + "Create proposal";
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);
@@ -265,7 +266,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
   }
 
   const auto topicName = "(" + String(proposal->getId()) + ") " + "Pay for gas";
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);
@@ -386,7 +387,7 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
   // TODO(Kirill) fetch choices names
   const auto choiceName = choice == 1 ? "YES" : choice == 2 ? "NO" : "Unspecified";
   const auto topicName = "(" + String(proposal->getId()) + ") " + "Vote " + choiceName;
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.01);
@@ -448,7 +449,7 @@ bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardA
   }
   const auto topicName = "(" + String(proposal->getId()) + ") " + "Claim reward";
 
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);

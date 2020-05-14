@@ -135,7 +135,9 @@ class AsyncTask : public Thread
 
  private:
   void run() override {
-    m_fun(this);
+    if (!threadShouldExit())
+      m_fun(this);
+
     triggerAsyncUpdate();
   }
 
@@ -154,23 +156,4 @@ class AsyncTask : public Thread
   std::function<bool(AsyncTask*)> m_fun;
   std::function<void(AsyncTask*)> m_postAsyncAction;
   std::function<void(AsyncTask*)> m_onComplete;
-};
-
-
-class TaskWithProgressWindow : public ThreadWithProgressWindow {
- public:
-  TaskWithProgressWindow(std::function<bool(TaskWithProgressWindow*)> fun, const String& title)
-      : ThreadWithProgressWindow(title, true, true)
-      , m_status(status::ok()) {
-    m_fun = fun;
-  }
-
-  void run() {
-    m_fun(this);
-  }
-
-  status m_status;
-
- private:
-  std::function<bool(TaskWithProgressWindow*)> m_fun;
 };

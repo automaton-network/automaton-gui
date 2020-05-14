@@ -238,62 +238,63 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_createProposalView->setVisible(true);
     m_createProposalView->setAlwaysOnTop(true);
   } else if (buttonThatWasClicked == m_voteYesBtn.get()) {
-    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    m_proposalsManager->castVote(proposal, 1);
+    if (auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow()))
+      m_proposalsManager->castVote(proposal, 1);
   } else if (buttonThatWasClicked == m_voteNoBtn.get()) {
-    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    m_proposalsManager->castVote(proposal, 2);
+    if (auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow()))
+      m_proposalsManager->castVote(proposal, 2);
   } else if (buttonThatWasClicked == m_payForGasBtn.get()) {
-    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
-    const auto numSlotsPaid = proposal->getNumSlotsPaid();
-    const String slotsMsg = String(numSlotsPaid) + String("/") + String(numSlots) + String(" are paid. ")
-                              + String("Enter num of slots to pay");
-    AlertWindow w("Pay for gas for " + proposal->getTitle() + " proposal",
-                  slotsMsg,
-                  AlertWindow::QuestionIcon);
+    if (auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow())) {
+      const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
+      const auto numSlotsPaid = proposal->getNumSlotsPaid();
+      const String slotsMsg = String(numSlotsPaid) + String("/") + String(numSlots) + String(" are paid. ")
+          + String("Enter num of slots to pay");
+      AlertWindow w("Pay for gas for " + proposal->getTitle() + " proposal",
+                    slotsMsg,
+                    AlertWindow::QuestionIcon);
 
-    w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
-    w.getTextEditor("slotsToPay")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
-    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+      w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
+      w.getTextEditor("slotsToPay")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
+      w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+      w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
-    if (w.runModalLoop() == 1) {
-      auto slotsToPay = w.getTextEditorContents("slotsToPay").getLargeIntValue();
-      if (slotsToPay > 0) {
-        m_proposalsManager->payForGas(proposal, slotsToPay);
-      } else {
-        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                         "Invalid data",
-                                         "Enter correct number of slots");
+      if (w.runModalLoop() == 1) {
+        auto slotsToPay = w.getTextEditorContents("slotsToPay").getLargeIntValue();
+        if (slotsToPay > 0) {
+          m_proposalsManager->payForGas(proposal, slotsToPay);
+        } else {
+          AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                           "Invalid data",
+                                           "Enter correct number of slots");
+        }
       }
     }
   } else if (buttonThatWasClicked == m_fetchProposalsBtn.get()) {
     m_proposalsManager->fetchProposals();
   } else if (buttonThatWasClicked == m_claimRewardBtn.get()) {
-    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    const auto budget = Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod());
-    const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
-    AlertWindow w("Claim reward for " + proposal->getTitle() + " proposal",
-                  rewardMsg,
-                  AlertWindow::QuestionIcon);
+    if (auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow())) {
+      const auto budget = Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod());
+      const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
+      AlertWindow w("Claim reward for " + proposal->getTitle() + " proposal",
+                    rewardMsg,
+                    AlertWindow::QuestionIcon);
 
-    w.addTextEditor("rewardAmount", "", "Reward Amount:", false);
-    w.getTextEditor("rewardAmount")->setInputRestrictions(8, Utils::numericalFloatAllowed);
-    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+      w.addTextEditor("rewardAmount", "", "Reward Amount:", false);
+      w.getTextEditor("rewardAmount")->setInputRestrictions(8, Utils::numericalFloatAllowed);
+      w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+      w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
-
-    if (w.runModalLoop() == 1) {
-      const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
-      std::cout << "Reward amount: " << rewardAmount << std::endl;
-      if (rewardAmount > 0.0) {
-        const auto rewardAmountWei = Utils::toWei(CoinUnit::AUTO, w.getTextEditorContents("rewardAmount"));
-        m_proposalsManager->claimReward(proposal, rewardAmountWei);
-      } else {
-        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                         "Invalid data",
-                                         "Enter correct amount of reward to claim");
+      if (w.runModalLoop() == 1) {
+        const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
+        std::cout << "Reward amount: " << rewardAmount << std::endl;
+        if (rewardAmount > 0.0) {
+          const auto rewardAmountWei = Utils::toWei(CoinUnit::AUTO, w.getTextEditorContents("rewardAmount"));
+          m_proposalsManager->claimReward(proposal, rewardAmountWei);
+        } else {
+          AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                           "Invalid data",
+                                           "Enter correct amount of reward to claim");
+        }
       }
     }
   }

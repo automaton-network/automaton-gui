@@ -45,6 +45,7 @@ DEXManager::DEXManager(Account::Ptr accountData)
 }
 
 DEXManager::~DEXManager() {
+  stopOwnedTasks();
 }
 
 std::shared_ptr<OrdersModel> DEXManager::getModel() {
@@ -92,7 +93,7 @@ static std::string getAutoBalance(AutomatonContractData::Ptr contract,
 }
 
 bool DEXManager::fetchOrders() {
-  TasksManager::launchTask([&](AsyncTask* task) {
+  launchTask([&](AsyncTask* task) {
     auto& s = task->m_status;
 
     auto ethBalance = getEthBalance(m_contractData, m_accountData->getAddress(), &s);
@@ -144,7 +145,7 @@ bool DEXManager::fetchOrders() {
 bool DEXManager::createSellOrder(const String& amountAUTOwei, const String& amountETHwei) {
   const auto orderName = Order::getOrderDescription(Order::Type::Sell, amountAUTOwei, amountETHwei, true);
   const auto topicName = "Create sell order + " + orderName;
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);
@@ -174,7 +175,7 @@ bool DEXManager::createSellOrder(const String& amountAUTOwei, const String& amou
 bool DEXManager::createBuyOrder(const String& amountAUTOwei, const String& amountETHwei) {
   const auto orderName = Order::getOrderDescription(Order::Type::Buy, amountAUTOwei, amountETHwei, true);
   const auto topicName = "Create buy order + " + orderName;
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);
@@ -229,7 +230,7 @@ bool DEXManager::createBuyOrder(const String& amountAUTOwei, const String& amoun
 
 bool DEXManager::cancelOrder(Order::Ptr order) {
   const auto topicName = "Cancel order + " + order->getDescription();
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);
@@ -261,7 +262,7 @@ bool DEXManager::acquireBuyOrder(Order::Ptr order) {
   }
 
   const auto topicName = "Acquire order + " + order->getDescription();
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);
@@ -299,7 +300,7 @@ bool DEXManager::acquireSellOrder(Order::Ptr order) {
   }
 
   const auto topicName = "Acquire order + " + order->getDescription();
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);
@@ -332,7 +333,7 @@ bool DEXManager::acquireSellOrder(Order::Ptr order) {
 bool DEXManager::withdrawEthFromDEX(const String& amountETHwei) {
   const auto amountETH = Utils::fromWei(CoinUnit::ether, amountETHwei);
   const auto topicName = "Withdraw " + amountETH + " ETH from DEX.";
-  TasksManager::launchTask([=](AsyncTask* task) {
+  launchTask([=](AsyncTask* task) {
     auto& s = task->m_status;
 
     task->setProgress(0.1);

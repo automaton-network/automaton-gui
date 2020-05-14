@@ -53,6 +53,7 @@ AutomatonContractData::AutomatonContractData(const Config& config) {
 }
 
 AutomatonContractData::~AutomatonContractData() {
+  stopOwnedTasks();
 }
 
 void AutomatonContractData::setData(const std::string& _eth_url,
@@ -87,7 +88,7 @@ bool AutomatonContractData::readContract() {
   const std::string& url = m_ethUrl;
   const std::string& contractAddress = m_contractAddress;
 
-  TasksManager::launchTask([&](AsyncTask* task){
+  launchTask([&](AsyncTask* task){
     auto& s = task->m_status;
     eth_contract::register_contract(url, contractAddress, getAbi());
     auto contract = eth_contract::get_contract(contractAddress);
@@ -99,10 +100,9 @@ bool AutomatonContractData::readContract() {
 
     task->setProgress(0.1);
     s = contract->call("numSlots", "");
-    if (!s.is_ok()) {
-      std::cout << "ERROR: " << s.msg << std::endl;
+    if (!s.is_ok() || task->threadShouldExit())
       return false;
-    }
+
     if (s.msg.empty()) {
       s = status::internal("Invalid contract address!");
       std::cout << "ERROR: Invalid contract address" << std::endl;
@@ -134,7 +134,7 @@ bool AutomatonContractData::readContract() {
 
       // Fetch owners.
       s = contract->call("getOwners", params);
-      if (!s.is_ok()) {
+      if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
         return false;
       }
@@ -148,7 +148,7 @@ bool AutomatonContractData::readContract() {
 
       // Fetch difficulties.
       s = contract->call("getDifficulties", params);
-      if (!s.is_ok()) {
+      if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
         return false;
       }
@@ -162,7 +162,7 @@ bool AutomatonContractData::readContract() {
 
       // Fetch last claim times.
       s = contract->call("getLastClaimTimes", params);
-      if (!s.is_ok()) {
+      if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
         return false;
       }
@@ -187,7 +187,7 @@ bool AutomatonContractData::readContract() {
     task->setStatusMessage("MinDifficulty: " + minDifficulty);
 
     s = contract->call("proposalsData", "");
-    if (!s.is_ok())
+    if (!s.is_ok() || task->threadShouldExit())
       return false;
 
     j_output = json::parse(s.msg);
@@ -200,6 +200,9 @@ bool AutomatonContractData::readContract() {
     auto slotsClaimed = String(slots_claimed_string).getLargeIntValue();
     task->setStatusMessage("Number of slot claims: " + slots_claimed_string);
     task->setProgress(1.0);
+
+    if (task->threadShouldExit())
+      return false;
 
     s = status::ok();
     setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, approvalPercentage, validatorSlots);

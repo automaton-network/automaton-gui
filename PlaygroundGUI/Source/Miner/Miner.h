@@ -36,6 +36,7 @@ class Miner : public Component,
               public Button::Listener,
               public TextEditor::Listener,
               public ChangeListener,
+              public OwnedTasks,
               private Timer {
  public:
   //==============================================================================
