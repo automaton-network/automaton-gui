@@ -65,7 +65,7 @@ TasksManager::~TasksManager() {
     }
   }
 
-  jassert(runningTasks.size() == 0);  // It's strongly recommended to stop all tasks manually or use OwnedTasks
+  jassert(runningTasks.size() == 0);  // It's strongly recommended to stop all tasks manually or use TasksOwner
 
   m_activeTasksModel->clear(NotificationType::dontSendNotification);
 

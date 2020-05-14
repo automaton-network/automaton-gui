@@ -62,7 +62,7 @@ void AutomatonContractData::setData(const std::string& _eth_url,
                                     const std::string& _min_difficulty,
                                     uint32_t _slots_number,
                                     uint32_t _slots_claimed,
-                                    const ProposalsData& proposalsData,
+                                    const ProposalThresholdData& proposalThresholdData,
                                     const std::vector<ValidatorSlot>& _slots) {
   ScopedLock sl(m_criticalSection);
   m_ethUrl = _eth_url;
@@ -71,7 +71,7 @@ void AutomatonContractData::setData(const std::string& _eth_url,
   m_minDifficulty = _min_difficulty;
   m_slotsNumber = _slots_number;
   m_slotsClaimed = _slots_claimed;
-  m_proposalsData = proposalsData;
+  m_proposalThresholdData = proposalThresholdData;
   m_slots = _slots;
 
   m_config.set_string("eth_url", m_ethUrl);
@@ -191,8 +191,8 @@ bool AutomatonContractData::readContract() {
       return false;
 
     j_output = json::parse(s.msg);
-    ProposalsData proposalsData = {String(j_output[0].get<std::string>()).getLargeIntValue(),
-                                   String(j_output[1].get<std::string>()).getLargeIntValue()};
+    ProposalThresholdData proposalThresholdData = {String(j_output[0].get<std::string>()).getLargeIntValue(),
+                                                   String(j_output[1].get<std::string>()).getLargeIntValue()};
 
     s = contract->call("numTakeOvers", "");
     j_output = json::parse(s.msg);
@@ -205,7 +205,8 @@ bool AutomatonContractData::readContract() {
       return false;
 
     s = status::ok();
-    setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, proposalsData, validatorSlots);
+    setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed,
+            proposalThresholdData, validatorSlots);
 
     return true;
   }, nullptr, "Reading Contract...");
@@ -274,9 +275,9 @@ uint32_t AutomatonContractData::getSlotsClaimed() const noexcept {
   return m_slotsClaimed;
 }
 
-ProposalsData AutomatonContractData::getProposalData() const noexcept {
+ProposalThresholdData AutomatonContractData::getThresholdData() const noexcept {
   ScopedLock sl(m_criticalSection);
-  return m_proposalsData;
+  return m_proposalThresholdData;
 }
 
 std::vector<ValidatorSlot> AutomatonContractData::getSlots() const {

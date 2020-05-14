@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <Utils/OwnedTasks.h>
+#include <Utils/TasksOwner.h>
 #include "../Login/Account.h"
 #include "ProposalsModel.h"
 
-class ProposalsManager : public OwnedTasks {
+class ProposalsManager : public TasksOwner {
  public:
   std::shared_ptr<ProposalsModel> getModel() const { return m_model; }
 

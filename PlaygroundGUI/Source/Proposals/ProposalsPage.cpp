@@ -43,7 +43,7 @@ static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
 
 static Array<Point<float>> getApproveThresholdSeries(Account::Ptr accountData) {
   Array<Point<float>> series;
-  const auto approvalPercentage = accountData->getContractData()->getProposalData().approvalPercentage + 100;
+  const auto approvalPercentage = accountData->getContractData()->getThresholdData().approvalPercentage + 100;
   series.add(Point<float>(0, approvalPercentage));
   series.add(Point<float>(1, approvalPercentage));
   return series;
@@ -52,9 +52,9 @@ static Array<Point<float>> getApproveThresholdSeries(Account::Ptr accountData) {
 
 static Array<Point<float>> getRejectThresholdSeries(Account::Ptr accountData) {
   Array<Point<float>> series;
-  const auto approvalPercentage = accountData->getContractData()->getProposalData().contestPercentage + 100;
-  series.add(Point<float>(0, approvalPercentage));
-  series.add(Point<float>(1, approvalPercentage));
+  const auto rejectPercentage = accountData->getContractData()->getThresholdData().contestPercentage + 100;
+  series.add(Point<float>(0, rejectPercentage));
+  series.add(Point<float>(1, rejectPercentage));
   return series;
 }
 

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <Utils/OwnedTasks.h>
+#include <Utils/TasksOwner.h>
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Config/Config.h"
 #include "../Login/AccountsModel.h"
@@ -32,12 +32,12 @@ struct ValidatorSlot {
   std::string last_claim_time;
 };
 
-struct ProposalsData {
+struct ProposalThresholdData {
   int64 approvalPercentage;
   int64 contestPercentage;
 };
 
-class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
+class AutomatonContractData : public ChangeBroadcaster, public TasksOwner {
  public:
   using Ptr = std::shared_ptr<AutomatonContractData>;
 
@@ -49,7 +49,7 @@ class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
                const std::string& _min_difficulty,
                uint32_t _slots_number,
                uint32_t _slots_claimed,
-               const ProposalsData& proposalsData,
+               const ProposalThresholdData& proposalThresholdData,
                const std::vector<ValidatorSlot>& _slots);
 
   bool readContract();
@@ -67,7 +67,7 @@ class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
   std::string getMinDifficulty() const noexcept;
   uint32_t getSlotsNumber() const noexcept;
   uint32_t getSlotsClaimed() const noexcept;
-  ProposalsData getProposalData() const noexcept;
+  ProposalThresholdData getThresholdData() const noexcept;
   std::vector<ValidatorSlot> getSlots() const;
   bool isLoaded() const noexcept;
 
@@ -78,7 +78,7 @@ class AutomatonContractData : public ChangeBroadcaster, public OwnedTasks {
   std::string m_minDifficulty;
   uint32_t m_slotsNumber;
   uint32_t m_slotsClaimed;
-  ProposalsData m_proposalsData;
+  ProposalThresholdData m_proposalThresholdData;
   std::vector<ValidatorSlot> m_slots;
 
   CriticalSection m_criticalSection;

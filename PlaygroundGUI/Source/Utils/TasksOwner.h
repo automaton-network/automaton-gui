@@ -23,9 +23,9 @@
 #include <Login/Account.h>
 #include "AsyncTask.h"
 
-class OwnedTasks {
+class TasksOwner {
  public:
-  virtual ~OwnedTasks() = default;
+  virtual ~TasksOwner() = default;
 
   void launchTask(std::function<bool(AsyncTask*)> fun,
                   std::function<void(AsyncTask*)> postAsyncAction,
