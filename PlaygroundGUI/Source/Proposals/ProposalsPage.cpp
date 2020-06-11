@@ -24,6 +24,10 @@
 #include "../Data/AutomatonContractData.h"
 #include "ProposalDetailsComponent.h"
 
+static const Colour APPROVE_THRESHOLD_COLOUR = Colour(0xff4CAF50);
+static const Colour REJECT_THRESHOLD_COLOUR = Colours::red;
+static const std::pair<Point<float>, Point<float>> VOTING_CHART_LIMITS = {Point<float>(0, 0), Point<float>(0, 200)};
+
 static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
   Array<Point<float>> series;
   auto votingHistory = proposal->getVotingHistory();
@@ -34,6 +38,23 @@ static Array<Point<float>> getProposalVotingSeries(Proposal::Ptr proposal) {
   }
 
   series.add(Point<float>(series.size(), proposal->getApprovalRating() + 100));
+  return series;
+}
+
+static Array<Point<float>> getApproveThresholdSeries(Account::Ptr accountData) {
+  Array<Point<float>> series;
+  const auto approvalPercentage = accountData->getContractData()->getThresholdData().approvalPercentage + 100;
+  series.add(Point<float>(0, approvalPercentage));
+  series.add(Point<float>(1, approvalPercentage));
+  return series;
+}
+
+
+static Array<Point<float>> getRejectThresholdSeries(Account::Ptr accountData) {
+  Array<Point<float>> series;
+  const auto rejectPercentage = accountData->getContractData()->getThresholdData().contestPercentage + 100;
+  series.add(Point<float>(0, rejectPercentage));
+  series.add(Point<float>(1, rejectPercentage));
   return series;
 }
 
@@ -227,62 +248,63 @@ void ProposalsPage::buttonClicked(Button* buttonThatWasClicked) {
     m_createProposalView->setVisible(true);
     m_createProposalView->setAlwaysOnTop(true);
   } else if (buttonThatWasClicked == m_voteYesBtn.get()) {
-    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    m_proposalsManager->castVote(proposal, 1);
+    if (auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow()))
+      m_proposalsManager->castVote(proposal, 1);
   } else if (buttonThatWasClicked == m_voteNoBtn.get()) {
-    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    m_proposalsManager->castVote(proposal, 2);
+    if (auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow()))
+      m_proposalsManager->castVote(proposal, 2);
   } else if (buttonThatWasClicked == m_payForGasBtn.get()) {
-    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
-    const auto numSlotsPaid = proposal->getNumSlotsPaid();
-    const String slotsMsg = String(numSlotsPaid) + String("/") + String(numSlots) + String(" are paid. ")
-                              + String("Enter num of slots to pay");
-    AlertWindow w("Pay for gas for " + proposal->getTitle() + " proposal",
-                  slotsMsg,
-                  AlertWindow::QuestionIcon);
+    if (auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow())) {
+      const auto numSlots = m_accountData->getContractData()->getSlotsNumber();
+      const auto numSlotsPaid = proposal->getNumSlotsPaid();
+      const String slotsMsg = String(numSlotsPaid) + String("/") + String(numSlots) + String(" are paid. ")
+          + String("Enter num of slots to pay");
+      AlertWindow w("Pay for gas for " + proposal->getTitle() + " proposal",
+                    slotsMsg,
+                    AlertWindow::QuestionIcon);
 
-    w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
-    w.getTextEditor("slotsToPay")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
-    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+      w.addTextEditor("slotsToPay", "", "Slots to pay:", false);
+      w.getTextEditor("slotsToPay")->setInputRestrictions(5, Utils::numericalIntegerAllowed);
+      w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+      w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
-    if (w.runModalLoop() == 1) {
-      auto slotsToPay = w.getTextEditorContents("slotsToPay").getLargeIntValue();
-      if (slotsToPay > 0) {
-        m_proposalsManager->payForGas(proposal, slotsToPay);
-      } else {
-        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                         "Invalid data",
-                                         "Enter correct number of slots");
+      if (w.runModalLoop() == 1) {
+        auto slotsToPay = w.getTextEditorContents("slotsToPay").getLargeIntValue();
+        if (slotsToPay > 0) {
+          m_proposalsManager->payForGas(proposal, slotsToPay);
+        } else {
+          AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                           "Invalid data",
+                                           "Enter correct number of slots");
+        }
       }
     }
   } else if (buttonThatWasClicked == m_fetchProposalsBtn.get()) {
     m_proposalsManager->fetchProposals();
   } else if (buttonThatWasClicked == m_claimRewardBtn.get()) {
-    auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow());
-    const auto budget = Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod());
-    const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
-    AlertWindow w("Claim reward for " + proposal->getTitle() + " proposal",
-                  rewardMsg,
-                  AlertWindow::QuestionIcon);
+    if (auto proposal = m_proxyModel->getAt(m_proposalsListBox->getSelectedRow())) {
+      const auto budget = Utils::fromWei(CoinUnit::AUTO, proposal->getBudgetPerPeriod());
+      const String rewardMsg = budget + String(" AUTO is available. \nEnter reward of amount to claim");
+      AlertWindow w("Claim reward for " + proposal->getTitle() + " proposal",
+                    rewardMsg,
+                    AlertWindow::QuestionIcon);
 
-    w.addTextEditor("rewardAmount", "", "Reward Amount:", false);
-    w.getTextEditor("rewardAmount")->setInputRestrictions(8, Utils::numericalFloatAllowed);
-    w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-    w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+      w.addTextEditor("rewardAmount", "", "Reward Amount:", false);
+      w.getTextEditor("rewardAmount")->setInputRestrictions(8, Utils::numericalFloatAllowed);
+      w.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+      w.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 
-
-    if (w.runModalLoop() == 1) {
-      const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
-      std::cout << "Reward amount: " << rewardAmount << std::endl;
-      if (rewardAmount > 0.0) {
-        const auto rewardAmountWei = Utils::toWei(CoinUnit::AUTO, w.getTextEditorContents("rewardAmount"));
-        m_proposalsManager->claimReward(proposal, rewardAmountWei);
-      } else {
-        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
-                                         "Invalid data",
-                                         "Enter correct amount of reward to claim");
+      if (w.runModalLoop() == 1) {
+        const auto rewardAmount = w.getTextEditorContents("rewardAmount").getDoubleValue();
+        std::cout << "Reward amount: " << rewardAmount << std::endl;
+        if (rewardAmount > 0.0) {
+          const auto rewardAmountWei = Utils::toWei(CoinUnit::AUTO, w.getTextEditorContents("rewardAmount"));
+          m_proposalsManager->claimReward(proposal, rewardAmountWei);
+        } else {
+          AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                           "Invalid data",
+                                           "Enter correct amount of reward to claim");
+        }
       }
     }
   }
@@ -324,7 +346,12 @@ void ProposalsPage::openProposalDetails(Proposal::Ptr proposal) {
 }
 
 void ProposalsPage::openHistoricalChart(Proposal::Ptr proposal) {
-  m_votingChart->m_chart.setSeries(getProposalVotingSeries(proposal), {Point<float>(0, 0), Point<float>{0, 200}});
+  m_votingChart->m_chart.clear();
+  m_votingChart->m_chart.addSeries(getApproveThresholdSeries(m_accountData), APPROVE_THRESHOLD_COLOUR, true);
+  m_votingChart->m_chart.addSeries(getRejectThresholdSeries(m_accountData), REJECT_THRESHOLD_COLOUR, true);
+  m_votingChart->m_chart.addSeries(getProposalVotingSeries(proposal), Colours::yellow, false);
+  m_votingChart->m_chart.update();
+
   m_votingChart->setVisible(true);
   m_votingChart->setAlwaysOnTop(true);
 }
@@ -534,14 +561,20 @@ void ProposalsPage::paintCell(Graphics& g,
 
 class ApprovalRatingCell : public Component {
  public:
-  ApprovalRatingCell(ProposalsPage* owner, int row, int column) : m_owner(owner), m_row(row), m_column(column) {
+  ApprovalRatingCell(ProposalsPage* owner) : m_owner(owner) {
     addAndMakeVisible(m_chart);
     addMouseListener(this, true);
   }
 
-  void setData(Proposal::Ptr proposal) {
+  void setData(int row, int column, Proposal::Ptr proposal, Account::Ptr accountData) {
+    m_row = row;
+    m_column = column;
     m_proposal = proposal;
-    m_chart.setSeries(getProposalVotingSeries(proposal));
+    m_chart.clear();
+    m_chart.addSeries(getApproveThresholdSeries(accountData), APPROVE_THRESHOLD_COLOUR, true);
+    m_chart.addSeries(getRejectThresholdSeries(accountData), REJECT_THRESHOLD_COLOUR, true);
+    m_chart.addSeries(getProposalVotingSeries(proposal), Colours::yellow, false);
+    m_chart.update();
     m_chart.setMargins(10, 3, 10, 3);
   }
 
@@ -576,13 +609,13 @@ Component* ProposalsPage::refreshComponentForCell(int rowNumber, int columnId, b
   if (columnId == Columns::ApprovalRating) {
     std::unique_ptr<ApprovalRatingCell> comp(dynamic_cast<ApprovalRatingCell*>(existingComponentToUpdate));
     if (comp == nullptr)
-      comp = std::make_unique<ApprovalRatingCell>(this, rowNumber, columnId);
+      comp = std::make_unique<ApprovalRatingCell>(this);
 
     auto item = m_proxyModel->getAt(rowNumber);
     if (!item)
       return nullptr;
 
-    comp->setData(item);
+    comp->setData(rowNumber, columnId, item, m_accountData);
     return comp.release();
   }
 

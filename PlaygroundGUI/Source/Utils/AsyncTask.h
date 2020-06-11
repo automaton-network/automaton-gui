@@ -49,6 +49,9 @@ class AsyncTask : public Thread
       , m_postAsyncAction(postAsyncAction)
       , m_ownerId(ownerId)
       , Thread(title) {
+    static uint64 globalTaskId = 0;
+    ++globalTaskId;
+    m_taskId = globalTaskId;
   }
 
   virtual ~AsyncTask() {
@@ -69,7 +72,9 @@ class AsyncTask : public Thread
   void setStatusMessage(const String& newStatusMessage) {
     const ScopedLock sl(m_messageLock);
     m_message = newStatusMessage;
-    DBG(m_message);
+    m_taskLog.add(newStatusMessage);
+    Logger::writeToLog(newStatusMessage);
+
     m_listeners.call(&Listener::taskMessageChanged, shared_from_this());
   }
 
@@ -86,7 +91,19 @@ class AsyncTask : public Thread
   }
 
   void writeStatusToLog() {
-    Logger::writeToLog(String("(") + String(m_status.code) + String(") :") + m_status.msg);
+    const auto logMessage = Time::getCurrentTime().toString(true, true, true, true)
+        + String(" code(") + String(m_status.code) + String(") :") + m_status.msg;
+    m_taskLog.add(logMessage);
+    Logger::writeToLog(logMessage);
+  }
+
+  uint64 getTaskId() const noexcept {
+    return m_taskId;
+  }
+
+  StringArray getTaskLog() const noexcept {
+    const ScopedLock sl(m_messageLock);
+    return m_taskLog;
   }
 
   int64 getOwnerId() const noexcept {
@@ -118,37 +135,25 @@ class AsyncTask : public Thread
 
  private:
   void run() override {
-    m_fun(this);
+    if (!threadShouldExit())
+      m_fun(this);
+
     triggerAsyncUpdate();
   }
 
  private:
+  uint64 m_taskId;
   int64 m_ownerId;
-  String m_title;
   double m_progress;
+
+  String m_title;
   String m_message;
+  StringArray m_taskLog;
+
   ListenerList<Listener> m_listeners;
   CriticalSection m_messageLock;
+
   std::function<bool(AsyncTask*)> m_fun;
   std::function<void(AsyncTask*)> m_postAsyncAction;
   std::function<void(AsyncTask*)> m_onComplete;
-};
-
-
-class TaskWithProgressWindow : public ThreadWithProgressWindow {
- public:
-  TaskWithProgressWindow(std::function<bool(TaskWithProgressWindow*)> fun, const String& title)
-      : ThreadWithProgressWindow(title, true, true)
-      , m_status(status::ok()) {
-    m_fun = fun;
-  }
-
-  void run() {
-    m_fun(this);
-  }
-
-  status m_status;
-
- private:
-  std::function<bool(TaskWithProgressWindow*)> m_fun;
 };

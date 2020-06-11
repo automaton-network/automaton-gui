@@ -31,9 +31,9 @@ class LoggerTest {
   std::unique_ptr<g3::LogWorker> logworker;
   std::unique_ptr<g3::FileSinkHandle> l_handler;
  public:
-  LoggerTest() {
+  LoggerTest(const File& logDir) {
     logworker = g3::LogWorker::createLogWorker();
-    l_handler = logworker->addDefaultLogger("demo", "./");
+    l_handler = logworker->addDefaultLogger("demo", logDir.getFullPathName().toStdString());
     g3::initializeLogging(logworker.get());
   }
 };
@@ -66,8 +66,6 @@ class PlaygroundGUIApplication: public JUCEApplication {
 
   //==============================================================================
   void initialise(const String& commandLine) override {
-    new LoggerTest();
-
 #if AUTOMATON_JUCE_UNIT_TESTS
     UnitTestRunner testRunner;
     testRunner.runAllTests();
@@ -78,6 +76,7 @@ class PlaygroundGUIApplication: public JUCEApplication {
     m_fileLogger.reset(FileLogger::createDefaultAppLogger("automaton",
                                                           "automaton_log.txt",
                                                           "Automaton App Log"));
+    static LoggerTest loggerTest(m_fileLogger->getLogFile().getParentDirectory());
     FileLogger::setCurrentLogger(m_fileLogger.get());
     mainWindow.reset(new MainWindow(getApplicationName(), ConfigFile::getInstance()));
 

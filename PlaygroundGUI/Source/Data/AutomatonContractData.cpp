@@ -41,18 +41,19 @@ using automaton::core::io::hex2bin;
 using automaton::core::io::hex2dec;
 using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
 
-AutomatonContractData::AutomatonContractData(const Config& _config) {
+AutomatonContractData::AutomatonContractData(const Config& config) {
   loadAbi();
-  config  = _config;
-  m_ethUrl = config.get_string("eth_url");
-  m_contractAddress = config.get_string("contract_address");
-  m_mask = config.get_string("mask");
-  m_minDifficulty = config.get_string("min_difficulty");
-  m_slotsNumber = static_cast<uint32_t>(config.get_number("slots_number"));
-  m_slotsClaimed = static_cast<uint32_t>(config.get_number("slots_claimed"));
+  m_config  = config;
+  m_ethUrl = m_config.get_string("eth_url");
+  m_contractAddress = m_config.get_string("contract_address");
+  m_mask = m_config.get_string("mask");
+  m_minDifficulty = m_config.get_string("min_difficulty");
+  m_slotsNumber = static_cast<uint32_t>(m_config.get_number("slots_number"));
+  m_slotsClaimed = static_cast<uint32_t>(m_config.get_number("slots_claimed"));
 }
 
 AutomatonContractData::~AutomatonContractData() {
+  stopOwnedTasks();
 }
 
 void AutomatonContractData::setData(const std::string& _eth_url,
@@ -61,6 +62,7 @@ void AutomatonContractData::setData(const std::string& _eth_url,
                                     const std::string& _min_difficulty,
                                     uint32_t _slots_number,
                                     uint32_t _slots_claimed,
+                                    const ProposalThresholdData& proposalThresholdData,
                                     const std::vector<ValidatorSlot>& _slots) {
   ScopedLock sl(m_criticalSection);
   m_ethUrl = _eth_url;
@@ -69,21 +71,24 @@ void AutomatonContractData::setData(const std::string& _eth_url,
   m_minDifficulty = _min_difficulty;
   m_slotsNumber = _slots_number;
   m_slotsClaimed = _slots_claimed;
+  m_proposalThresholdData = proposalThresholdData;
   m_slots = _slots;
 
-  config.set_string("eth_url", m_ethUrl);
-  config.set_string("contract_address", m_contractAddress);
-  config.set_string("mask", m_mask);
-  config.set_string("min_difficulty", m_minDifficulty);
-  config.set_number("slots_number", m_slotsNumber);
-  config.set_number("slots_claimed", m_slotsClaimed);
+  m_config.set_string("eth_url", m_ethUrl);
+  m_config.set_string("contract_address", m_contractAddress);
+  m_config.set_string("mask", m_mask);
+  m_config.set_string("min_difficulty", m_minDifficulty);
+  m_config.set_number("slots_number", m_slotsNumber);
+  m_config.set_number("slots_claimed", m_slotsClaimed);
+  m_isLoaded = true;
+  sendChangeMessage();
 }
 
 bool AutomatonContractData::readContract() {
   const std::string& url = m_ethUrl;
   const std::string& contractAddress = m_contractAddress;
 
-  auto result = TasksManager::launchTask([&](TaskWithProgressWindow* task){
+  launchTask([&](AsyncTask* task){
     auto& s = task->m_status;
     eth_contract::register_contract(url, contractAddress, getAbi());
     auto contract = eth_contract::get_contract(contractAddress);
@@ -95,10 +100,9 @@ bool AutomatonContractData::readContract() {
 
     task->setProgress(0.1);
     s = contract->call("numSlots", "");
-    if (!s.is_ok()) {
-      std::cout << "ERROR: " << s.msg << std::endl;
+    if (!s.is_ok() || task->threadShouldExit())
       return false;
-    }
+
     if (s.msg.empty()) {
       s = status::internal("Invalid contract address!");
       std::cout << "ERROR: Invalid contract address" << std::endl;
@@ -130,7 +134,7 @@ bool AutomatonContractData::readContract() {
 
       // Fetch owners.
       s = contract->call("getOwners", params);
-      if (!s.is_ok()) {
+      if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
         return false;
       }
@@ -144,7 +148,7 @@ bool AutomatonContractData::readContract() {
 
       // Fetch difficulties.
       s = contract->call("getDifficulties", params);
-      if (!s.is_ok()) {
+      if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
         return false;
       }
@@ -158,7 +162,7 @@ bool AutomatonContractData::readContract() {
 
       // Fetch last claim times.
       s = contract->call("getLastClaimTimes", params);
-      if (!s.is_ok()) {
+      if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
         return false;
       }
@@ -182,6 +186,14 @@ bool AutomatonContractData::readContract() {
     auto minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     task->setStatusMessage("MinDifficulty: " + minDifficulty);
 
+    s = contract->call("proposalsData", "");
+    if (!s.is_ok() || task->threadShouldExit())
+      return false;
+
+    j_output = json::parse(s.msg);
+    ProposalThresholdData proposalThresholdData = {String(j_output[0].get<std::string>()).getLargeIntValue(),
+                                                   String(j_output[1].get<std::string>()).getLargeIntValue()};
+
     s = contract->call("numTakeOvers", "");
     j_output = json::parse(s.msg);
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
@@ -189,13 +201,17 @@ bool AutomatonContractData::readContract() {
     task->setStatusMessage("Number of slot claims: " + slots_claimed_string);
     task->setProgress(1.0);
 
+    if (task->threadShouldExit())
+      return false;
+
     s = status::ok();
-    setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed, validatorSlots);
+    setData(url, contractAddress, mask, minDifficulty, slotsNumber, slotsClaimed,
+            proposalThresholdData, validatorSlots);
 
     return true;
   }, nullptr, "Reading Contract...");
 
-  return result;
+  return true;
 }
 
 std::shared_ptr<eth_contract> AutomatonContractData::getContract() {
@@ -259,11 +275,20 @@ uint32_t AutomatonContractData::getSlotsClaimed() const noexcept {
   return m_slotsClaimed;
 }
 
+ProposalThresholdData AutomatonContractData::getThresholdData() const noexcept {
+  ScopedLock sl(m_criticalSection);
+  return m_proposalThresholdData;
+}
+
 std::vector<ValidatorSlot> AutomatonContractData::getSlots() const {
   ScopedLock sl(m_criticalSection);
   return m_slots;
 }
 
+bool AutomatonContractData::isLoaded() const noexcept {
+  return m_isLoaded;
+}
+
 Config& AutomatonContractData::getConfig() {
-  return config;
+  return m_config;
 }

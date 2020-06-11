@@ -19,6 +19,7 @@
 
 #include <JuceHeader.h>
 #include <Components/HistoricalChart.h>
+#include <Utils/TasksManager.h>
 #include "LoginComponent.h"
 #include "../MainComponent.h"
 #include "../Utils/Utils.h"
@@ -142,6 +143,8 @@ LoginComponent::LoginComponent(ConfigFile* configFile) : m_configFile(configFile
 }
 
 LoginComponent::~LoginComponent() {
+  m_accountWindows.clear();
+
   json contracts;
   for (auto& iter : m_contracts) {
     for (auto& item : iter.second)

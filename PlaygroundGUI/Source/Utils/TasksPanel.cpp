@@ -230,7 +230,7 @@ class TaskComponent : public Component
 TasksPanel::TasksPanel(Account::Ptr accountData)
     : m_tasksProxyModel(std::make_shared<TasksProxyModel>(accountData->getAccountId()))
     , m_statusBar(std::make_unique<TaskStatusBar>()) {
-  m_tasksProxyModel->setModel(TasksManager::getInstance()->getModel());
+  m_tasksProxyModel->setModel(TasksManager::getInstance()->getActiveTasksModel());
   m_tasksProxyModel->addListener(this);
 
   m_statusBar->setOwner(this);

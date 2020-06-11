@@ -32,7 +32,9 @@ class DemosMainComponent:
   public Component,
   public ApplicationCommandTarget,
   public MenuBarModel,
-  public Button::Listener {
+  public Button::Listener,
+  public ChangeListener,
+  private Timer {
  public:
   enum CommandIDs {
   };
@@ -43,6 +45,7 @@ class DemosMainComponent:
   void paint(Graphics& g) override;
   void resized() override;
   void buttonClicked(Button* button) override;
+  void changeListenerCallback(ChangeBroadcaster* source) override;
 
   StringArray getMenuBarNames() override {
     return { "Menu Position", "Outer Colour", "Inner Colour" };
@@ -72,10 +75,15 @@ class DemosMainComponent:
   }
 
  private:
+  void updateContractState();
+
+  void timerCallback() override;
+
   std::unique_ptr<MenuBarComponent> m_menuBar;
   std::unique_ptr<TabbedComponent> m_tabbedComponent;
   std::unique_ptr<TasksPanel> m_tasksPanel;
   std::unique_ptr<TextButton> m_refreshButton;
+  std::unique_ptr<Component> m_loadingComponent;
   Account::Ptr m_accountData;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DemosMainComponent)

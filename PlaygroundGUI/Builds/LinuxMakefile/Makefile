@@ -68,6 +68,7 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS_APP := \
+  $(JUCE_OBJDIR)/DebugPage_e6081c07.o \
   $(JUCE_OBJDIR)/TasksManager_3dcc4806.o \
   $(JUCE_OBJDIR)/TasksPanel_654cf7dd.o \
   $(JUCE_OBJDIR)/Utils_13f97694.o \
@@ -119,6 +120,11 @@ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
 	-$(V_AT)mkdir -p $(JUCE_LIBDIR)
 	-$(V_AT)mkdir -p $(JUCE_OUTDIR)
 	$(V_AT)$(CXX) -o $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) $(OBJECTS_APP) $(JUCE_LDFLAGS) $(JUCE_LDFLAGS_APP) $(RESOURCES) $(TARGET_ARCH)
+
+$(JUCE_OBJDIR)/DebugPage_e6081c07.o: ../../Source/Debug/DebugPage.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling DebugPage.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/TasksManager_3dcc4806.o: ../../Source/Utils/TasksManager.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)

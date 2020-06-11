@@ -19,13 +19,14 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include <Utils/TasksOwner.h>
 #include "Order.h"
 #include "Login/Account.h"
 #include "Config/Config.h"
 
 class OrdersModel;
 
-class DEXManager {
+class DEXManager : public TasksOwner {
  public:
   DEXManager(Account::Ptr accountData);
   ~DEXManager();

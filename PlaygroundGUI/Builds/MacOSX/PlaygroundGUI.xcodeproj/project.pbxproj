@@ -41,6 +41,10 @@
 			isa = PBXBuildFile;
 			fileRef = 05DA0D453EDBFC5819828842;
 		};
+		EA16F8851DE41A7A1068EEE8 = {
+			isa = PBXBuildFile;
+			fileRef = A9B49395FB2DE10CEB22691C;
+		};
 		0B490FE0296395CA08CE442B = {
 			isa = PBXBuildFile;
 			fileRef = 340CD4D56FDFE7CD6BBEBD50;
@@ -286,6 +290,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = DEXPage.h;
 			path = ../../Source/DEX/DEXPage.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		1988A3C6C4CEBD1C15CDEF92 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = DebugPage.h;
+			path = ../../Source/Debug/DebugPage.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		1A80FDC4B88D61C0AAB5D81D = {
@@ -638,6 +649,13 @@
 			path = ../../Source/Components/HistoricalChart.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		A9B49395FB2DE10CEB22691C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = DebugPage.cpp;
+			path = ../../Source/Debug/DebugPage.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		AC725974DA4D5A793B592A09 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -713,6 +731,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = HistoricalChart.h;
 			path = ../../Source/Components/HistoricalChart.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C2E73F3D819BA7A9B5770AAC = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = TasksOwner.h;
+			path = ../../Source/Utils/TasksOwner.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C2F43D9037B8E387725FF91E = {
@@ -890,12 +915,22 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		33D9B06A156F38CFDA0ECAD1 = {
+			isa = PBXGroup;
+			children = (
+				A9B49395FB2DE10CEB22691C,
+				1988A3C6C4CEBD1C15CDEF92,
+			);
+			name = Debug;
+			sourceTree = "<group>";
+		};
 		94893703525D205935444A39 = {
 			isa = PBXGroup;
 			children = (
 				5DA8E9EC8390C21FB637ABF0,
 				340CD4D56FDFE7CD6BBEBD50,
 				B0C9B78D5FA95CB19E6291D7,
+				C2E73F3D819BA7A9B5770AAC,
 				C4EEBAFDBAAB75BD83825F8E,
 				B8A150687955BD42A2977BD1,
 				B0900C36AF07AFF88A422DF2,
@@ -1031,6 +1066,7 @@
 		883895BF3FD94AEF68720830 = {
 			isa = PBXGroup;
 			children = (
+				33D9B06A156F38CFDA0ECAD1,
 				94893703525D205935444A39,
 				A5F3935FE58429F9F2E04941,
 				687803636958C453C18D7987,
@@ -1360,6 +1396,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA16F8851DE41A7A1068EEE8,
 				0B490FE0296395CA08CE442B,
 				01CBC7278473FE18C0FE6558,
 				512118B6F16E9FE6A26E5333,

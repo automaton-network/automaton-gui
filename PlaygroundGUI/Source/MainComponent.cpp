@@ -30,6 +30,7 @@
 #include "MainComponent.h"
 #include "Utils/TasksPanel.h"
 #include "Data/AutomatonContractData.h"
+#include "Debug/DebugPage.h"
 
 class DemoBlank: public Component {
  public:
@@ -47,11 +48,30 @@ class DemoBlank: public Component {
 };
 
 
+class LoadingComponent : public Component {
+ public:
+  LoadingComponent() {
+    m_message.setText("Loading contract data.....", NotificationType::dontSendNotification);
+    m_message.setJustificationType(Justification::centred);
+    addAndMakeVisible(m_message);
+  }
+  ~LoadingComponent() {}
+
+  void paint(Graphics& g) override {
+    g.fillAll(Colour(0xff404040));
+  }
+
+  void resized() override {
+    m_message.setBounds(getLocalBounds());
+  }
+
+ private:
+  Label m_message;
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoadingComponent)
+};
+
 DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData(accountData) {
   accountData->initManagers();
-
-  m_accountData->getProposalsManager()->fetchProposals();
-  m_accountData->getDexManager()->fetchOrders();
 
   m_tabbedComponent.reset(new TabbedComponent(TabbedButtonBar::TabsAtTop));
   addAndMakeVisible(m_tabbedComponent.get());
@@ -66,6 +86,7 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
   m_tabbedComponent->addTab(TRANS("Proposals Actions"), Colour(0xff404040),
                             new ProposalsActionsPage(m_accountData->getProposalsManager()), true);
   m_tabbedComponent->addTab(TRANS("DEX"), Colour(0xff404040), new DEXPage(m_accountData), true);
+  m_tabbedComponent->addTab(TRANS("Debug"), Colour(0xff404040), new DebugPage(), true);
 
   // m_tabbedComponent->addTab(TRANS("Treasury"), Colour(0xff404040), new DemoBlank(), true);
   // m_tabbedComponent->addTab(TRANS("Protocols"), Colour(0xff404040), new DemoBlank(), true);
@@ -82,10 +103,19 @@ DemosMainComponent::DemosMainComponent(Account::Ptr accountData) : m_accountData
   m_refreshButton->addListener(this);
   addAndMakeVisible(m_refreshButton.get());
 
+  m_loadingComponent = std::make_unique<LoadingComponent>();
+  addAndMakeVisible(m_loadingComponent.get());
+  m_accountData->getContractData()->addChangeListener(this);
+
   setSize(1024, 768);
+
+  updateContractState();
+  startTimer(60 * 1000);  // Refresh contract data every minute
 }
 
 DemosMainComponent::~DemosMainComponent() {
+  stopTimer();
+  m_accountData->getContractData()->removeChangeListener(this);
   m_accountData->clearManagers();
   m_tabbedComponent = nullptr;
 }
@@ -104,12 +134,32 @@ void DemosMainComponent::resized() {
   m_tabbedComponent->setBounds(8, 8,
                                bounds.getWidth() - 16, getLocalBounds().getHeight() - 8 - statusBarBounds.getHeight());
   m_tasksPanel->getStatusBarComponent()->setBounds(statusBarBounds);
+
+  m_loadingComponent->setBounds(getLocalBounds());
 }
 
 void DemosMainComponent::buttonClicked(Button* button) {
   if (m_refreshButton.get() == button) {
     m_accountData->getContractData()->readContract();
+  }
+}
+
+void DemosMainComponent::changeListenerCallback(ChangeBroadcaster* source) {
+  if (m_accountData->getContractData().get() == source) {
+    updateContractState();
+  }
+}
+
+void DemosMainComponent::updateContractState() {
+  auto contract = m_accountData->getContractData();
+  if (contract->isLoaded()) {
+    m_loadingComponent->setVisible(false);
     m_accountData->getProposalsManager()->fetchProposals();
     m_accountData->getDexManager()->fetchOrders();
   }
+}
+
+void DemosMainComponent::timerCallback() {
+  if (m_accountData)
+    m_accountData->getContractData()->readContract();
 }

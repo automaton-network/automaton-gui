@@ -21,6 +21,7 @@
 
 #include <Login/Account.h>
 #include <Utils/AsyncTask.h>
+#include <Data/AutomatonContractData.h>
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "Components/FormMaker.h"
 
@@ -28,9 +29,15 @@
 #include "automaton/core/crypto/cryptopp/SHA256_cryptopp.h"
 #include "automaton/core/io/io.h"
 
-class Miner:
-  public FormMaker,
-  private Timer {
+class ValidatorSlotsGrid;
+class ValidatorSlotsLegend;
+
+class Miner : public Component,
+              public Button::Listener,
+              public TextEditor::Listener,
+              public ChangeListener,
+              public TasksOwner,
+              private Timer {
  public:
   //==============================================================================
   Miner(Account::Ptr accountData);
@@ -47,6 +54,8 @@ class Miner:
   // TextEditor::Listener overrides.
   void textEditorTextChanged(TextEditor &) override;
 
+  void changeListenerCallback(ChangeBroadcaster* source) override;
+
   // Mining
   struct mined_slot {
     std::string difficulty;
@@ -60,12 +69,11 @@ class Miner:
 
   void addMinerThread();
   void stopMining();
-  void createSignature();
 
   size_t getMinedSlotsNumber() { return mined_slots.size(); }
   mined_slot& getMinedSlot(int _slot) { return mined_slots[_slot]; }
-  unsigned char * getMask() { return mask; }
-  unsigned char * getDifficulty() { return difficulty; }
+  unsigned char* getMask() { return mask; }
+  unsigned char* getDifficulty() { return difficulty; }
 
   // void setMinDifficulty(unsigned int _minDifficulty);
 
@@ -95,18 +103,28 @@ class Miner:
   std::string eth_address;
 
   // UI
-  TextEditor* txtRpcServer;
-  Button* btnContract;
-  TextEditor* txtContract;
-  // TextEditor* txtMask;
-  TextEditor* txtMaskHex;
-  TextEditor* txtMinerInfo;
-  // TextEditor* txtMinDifficulty;
-  TextEditor* txtMinDifficultyHex;
-  TextEditor* txtSlotsNum;
-  TableListBox* tblSlots;
-  TextEditor* txtClaim;
+  std::unique_ptr<Label> m_ownedSlotsNumEditor;
+  std::unique_ptr<Label> m_timeLabel;
+  std::unique_ptr<Label> m_slotsLabel;
+  std::unique_ptr<Label> m_maskHexLabel;
+  std::unique_ptr<Label> m_minDifficultyHexLabel;
+  std::unique_ptr<Label> m_validatorSlotsLabel;
+  std::unique_ptr<Label> m_claimSlotsLabel;
 
+  std::unique_ptr<TextEditor> m_slotsNumEditor;
+  std::unique_ptr<TextEditor> m_maskHexEditor;
+  std::unique_ptr<TextEditor> m_minDifficultyHexEditor;
+  std::unique_ptr<TextEditor> m_minerInfoEditor;
+  std::unique_ptr<TextEditor> m_claimEditor;
+
+  std::unique_ptr<TextButton> m_addMinerBtn;
+  std::unique_ptr<TextButton> m_stopMinerBtn;
+
+  std::unique_ptr<TableListBox> m_tblSlots;
+  std::unique_ptr<ValidatorSlotsGrid> m_validatorSlotsGrid;
+  std::unique_ptr<ValidatorSlotsLegend> m_validatorSlotsLegend;
+
+  void setNumOfOwnedSlots(const std::vector<ValidatorSlot>& validatorSlots);
   void updateContractData();
   void claimMinedSlots();
 

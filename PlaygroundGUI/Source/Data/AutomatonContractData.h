@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <Utils/TasksOwner.h>
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Config/Config.h"
 #include "../Login/AccountsModel.h"
@@ -31,11 +32,16 @@ struct ValidatorSlot {
   std::string last_claim_time;
 };
 
-class AutomatonContractData : public std::enable_shared_from_this<AutomatonContractData> {
+struct ProposalThresholdData {
+  int64 approvalPercentage;
+  int64 contestPercentage;
+};
+
+class AutomatonContractData : public ChangeBroadcaster, public TasksOwner {
  public:
   using Ptr = std::shared_ptr<AutomatonContractData>;
 
-  AutomatonContractData(const Config& _config);
+  AutomatonContractData(const Config& config);
   ~AutomatonContractData();
   void setData(const std::string& _eth_url,
                const std::string& _contractAddress,
@@ -43,6 +49,7 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
                const std::string& _min_difficulty,
                uint32_t _slots_number,
                uint32_t _slots_claimed,
+               const ProposalThresholdData& proposalThresholdData,
                const std::vector<ValidatorSlot>& _slots);
 
   bool readContract();
@@ -60,7 +67,9 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
   std::string getMinDifficulty() const noexcept;
   uint32_t getSlotsNumber() const noexcept;
   uint32_t getSlotsClaimed() const noexcept;
+  ProposalThresholdData getThresholdData() const noexcept;
   std::vector<ValidatorSlot> getSlots() const;
+  bool isLoaded() const noexcept;
 
   std::string m_contractAbi;
   std::string m_ethUrl;
@@ -69,6 +78,7 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
   std::string m_minDifficulty;
   uint32_t m_slotsNumber;
   uint32_t m_slotsClaimed;
+  ProposalThresholdData m_proposalThresholdData;
   std::vector<ValidatorSlot> m_slots;
 
   CriticalSection m_criticalSection;
@@ -76,5 +86,6 @@ class AutomatonContractData : public std::enable_shared_from_this<AutomatonContr
   Config& getConfig();
 
  private:
-  Config config;
+  bool m_isLoaded = false;
+  Config m_config;
 };

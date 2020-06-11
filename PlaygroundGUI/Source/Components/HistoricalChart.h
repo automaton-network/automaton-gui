@@ -37,16 +37,25 @@ class HistoricalChart : public Component {
 
   void setMargins(int leftMargin, int topMargin, int rightMargin, int bottomMargin);
   void scale(float scaleValue);
-  void setSeries(const Array<Point<float>>& series);
-  void setSeries(const Array<Point<float>>& series, std::pair<Point<float>, Point<float>> minMaxByY);
+  void clear();
+  void addSeries(const Array<Point<float>>& series, Colour colour, bool isDashed);
+  void addSeries(const Array<Point<float>>& series, Colour colour, bool isDashed,
+                 const std::pair<Point<float>, Point<float>>& minMaxByY);
+  void update();
 
  private:
+  struct SeriesData {
+    bool m_isDashed;
+    Array<Point<float>> m_series;
+    Colour m_colour;
+    std::pair<Point<float>, Point<float>> m_minMaxByY;
+    std::pair<Point<float>, Point<float>> m_minMaxByX;
+  };
+
+  Array<SeriesData> m_seriesList;
+  std::pair<Point<float>, Point<float>> m_minMaxByY;
   std::unique_ptr<ChartView> m_chartView;
   std::unique_ptr<Viewport> m_viewPort;
-  Array<Point<float>> m_series;
-  std::pair<Point<float>, Point<float>> m_minMaxByY;
-  std::pair<Point<float>, Point<float>> m_minMaxByX;
-
 
   float m_scale = 1.0f;
   BorderSize<int> m_margins;
