@@ -66,7 +66,6 @@ class PlaygroundGUIApplication: public JUCEApplication {
 
   //==============================================================================
   void initialise(const String& commandLine) override {
-
 #if AUTOMATON_JUCE_UNIT_TESTS
     UnitTestRunner testRunner;
     testRunner.runAllTests();
