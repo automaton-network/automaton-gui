@@ -30,8 +30,8 @@ class ConfigFile;
 struct RPCConfig {
   RPCConfig() {}
   RPCConfig(std::string url, std::string alias) {
-    m_url = url;
-    m_alias = alias;
+    m_url = String(url).trim().toStdString();
+    m_alias = String(alias).trim().toStdString();
   }
 
   bool operator==(const RPCConfig& other) const noexcept {
