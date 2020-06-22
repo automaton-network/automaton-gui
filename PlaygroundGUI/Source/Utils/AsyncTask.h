@@ -82,7 +82,7 @@ class AsyncTask : public Thread
     if (m_postAsyncAction != nullptr)
       m_postAsyncAction(this);
 
-    writeStatusToLog();
+    logStatus(m_status);
 
     m_listeners.call(&Listener::taskFinished, shared_from_this());
 
@@ -90,9 +90,10 @@ class AsyncTask : public Thread
       m_onComplete(this);
   }
 
-  void writeStatusToLog() {
+  void logStatus(status _status, const String& description = String()) {
+    const auto descriptionBlock = description.isNotEmpty() ? "[" + description + "]" : "";
     const auto logMessage = Time::getCurrentTime().toString(true, true, true, true)
-        + String(" code(") + String(m_status.code) + String(") :") + m_status.msg;
+        + String(" code(") + String(_status.code) + String(") ") + descriptionBlock + String(": ") + _status.msg;
     m_taskLog.add(logMessage);
     Logger::writeToLog(logMessage);
   }
