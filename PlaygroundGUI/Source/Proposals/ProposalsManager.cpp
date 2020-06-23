@@ -97,6 +97,7 @@ static Proposal::Ptr createOrUpdateProposal(int64 id,
   proposal->setApprovalRating(approvalRating);
 
   const auto numSlotsPaid = getNumSlotsPaid(contractData, id, &s);
+  *resStatus = s;
   if (!s.is_ok())
     return nullptr;
 
@@ -123,6 +124,7 @@ bool ProposalsManager::fetchProposals() {
     m_model->clear(NotificationType::dontSendNotification);
 
     const auto lastProposalId = getLastProposalId(m_contractData, &s);
+    task->logStatus(s, "getLastProposalId");
     if (!s.is_ok())
       return false;
 
@@ -134,6 +136,7 @@ bool ProposalsManager::fetchProposals() {
 
     for (int i = PROPOSAL_START_ID; i <= lastProposalId; ++i) {
       auto proposal = createOrUpdateProposal(i, nullptr, m_accountData, m_contractData, &s);
+      task->logStatus(s, "createOrUpdateProposal");
       if (proposal == nullptr)
         return false;
 
@@ -170,6 +173,7 @@ bool ProposalsManager::fetchProposalVotes(Proposal::Ptr proposal) {
       std::string params = jInput.dump();
 
       s = m_contractData->call("getVote", params);
+      task->logStatus(s, String::formatted("getVote id:%llu slot:%d", proposal->getId(), i));
 
       if (!s.is_ok())
         return false;
@@ -201,6 +205,7 @@ bool ProposalsManager::updateProposal(Proposal::Ptr proposal) {
     task->setStatusMessage("Updating proposal " + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
 
     createOrUpdateProposal(proposal->getId(), proposal, m_accountData, m_contractData, &s);
+    task->logStatus(s, String::formatted("createOrUpdateProposal id:%llu", proposal->getId()));
 
     task->setStatusMessage("Updated proposal " + proposal->getTitle() + " (" + String(proposal->getId()) + ")");
 
@@ -219,6 +224,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     task->setProgress(0.1);
 
     const auto lastProposalId = getLastProposalId(m_contractData, &s);
+    task->logStatus(s, "getLastProposalId");
     proposal->setId(lastProposalId + 1);
     task->setProgress(0.25);
 
@@ -237,6 +243,7 @@ bool ProposalsManager::createProposal(Proposal::Ptr proposal, const String& cont
     task->setProgress(0.5);
 
     s = m_contractData->call("createProposal", jProposal.dump(), m_accountData->getPrivateKey());
+    task->logStatus(s, "createProposal contributor:" + contributor + " title:" + proposal->getTitle());
     if (!s.is_ok())
       return false;
 
@@ -278,6 +285,7 @@ bool ProposalsManager::payForGas(Proposal::Ptr proposal, uint64 slotsToPay) {
     task->setProgress(0.5);
     task->setStatusMessage("Pay gas for " + String(slotsToPay) + " slots");
     s = m_contractData->call("payForGas", jInput.dump(), m_accountData->getPrivateKey());
+    task->logStatus(s, String::formatted("payForGas proposalId:%llu", proposal->getId()));
 
     if (!s.is_ok())
       return false;
@@ -393,11 +401,13 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
     task->setProgress(0.01);
 
     const auto numOfSlots = getNumSlots(m_contractData, &s);
+    task->logStatus(s, "getNumSlots");
 
     if (!s.is_ok())
       return false;
 
     const auto owners = getOwners(m_contractData, numOfSlots, &s);
+    task->logStatus(s, "getOwners");
 
     if (!s.is_ok())
       return false;
@@ -415,6 +425,8 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
         task->setStatusMessage("Voting for slot " + String(slot) + "...");
         voteWithSlot(m_contractData, proposal->getId(), slot,
             choice, m_accountData->getPrivateKey(), &s);
+        task->logStatus(s,
+            String::formatted("voteWithSlot proposalId:%llu slot:%lu vote:%s", proposal->getId(), slot, choiceName));
 
         if (!s.is_ok() || task->threadShouldExit())
           return false;
@@ -425,6 +437,7 @@ bool ProposalsManager::castVote(Proposal::Ptr proposal, uint64 choice) {
 
     if (!isOwnerForAnySlot) {
       s = status::internal("You own no single slot. Voting is impossible");
+      task->logStatus(s);
       return false;
     }
     task->setStatusMessage("Successfully voted for " + String(numOwnedSlots) + " slots!");
@@ -460,6 +473,7 @@ bool ProposalsManager::claimReward(Proposal::Ptr proposal, const String& rewardA
     jInput.push_back(rewardAmount.toStdString());
 
     s = m_contractData->call("claimReward", jInput.dump(), m_accountData->getPrivateKey());
+    task->logStatus(s, "claimReward proposalId:" + String(proposal->getId()) + " amount:" + rewardAmount);
     DBG("Call result: " << s.msg << "\n");
 
     if (!s.is_ok())

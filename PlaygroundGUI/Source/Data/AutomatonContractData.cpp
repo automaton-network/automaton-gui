@@ -44,9 +44,9 @@ using automaton::core::crypto::cryptopp::Keccak_256_cryptopp;
 AutomatonContractData::AutomatonContractData(const Config& config) {
   loadAbi();
   m_config  = config;
-  m_ethUrl = m_config.get_string("eth_url");
-  m_contractAddress = m_config.get_string("contract_address");
-  m_mask = m_config.get_string("mask");
+  m_ethUrl = String(m_config.get_string("eth_url")).trim().toStdString();
+  m_contractAddress = String(m_config.get_string("contract_address")).trim().toStdString();
+  m_mask = String(m_config.get_string("mask")).trim().toStdString();
   m_minDifficulty = m_config.get_string("min_difficulty");
   m_slotsNumber = static_cast<uint32_t>(m_config.get_number("slots_number"));
   m_slotsClaimed = static_cast<uint32_t>(m_config.get_number("slots_claimed"));
@@ -100,6 +100,7 @@ bool AutomatonContractData::readContract() {
 
     task->setProgress(0.1);
     s = contract->call("numSlots", "");
+    task->logStatus(s, "numSlots");
     if (!s.is_ok() || task->threadShouldExit())
       return false;
 
@@ -136,6 +137,7 @@ bool AutomatonContractData::readContract() {
       s = contract->call("getOwners", params);
       if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
+        task->logStatus(s, "getOwners");
         return false;
       }
 
@@ -150,6 +152,7 @@ bool AutomatonContractData::readContract() {
       s = contract->call("getDifficulties", params);
       if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
+        task->logStatus(s, "getDifficulties");
         return false;
       }
 
@@ -164,6 +167,7 @@ bool AutomatonContractData::readContract() {
       s = contract->call("getLastClaimTimes", params);
       if (!s.is_ok() || task->threadShouldExit()) {
         std::cout << "ERROR: " << s.msg << std::endl;
+        task->logStatus(s, "getLastClaimTimes");
         return false;
       }
 
@@ -177,24 +181,30 @@ bool AutomatonContractData::readContract() {
     task->setProgress(0);
 
     s = contract->call("mask", "");
+    task->logStatus(s, "mask");
+
     j_output = json::parse(s.msg);
     auto mask = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     task->setStatusMessage("Mask: " + mask);
 
     s = contract->call("minDifficulty", "");
+    task->logStatus(s, "minDifficulty");
     j_output = json::parse(s.msg);
     auto minDifficulty = bin2hex(dec_to_i256(false, (*j_output.begin()).get<std::string>()));
     task->setStatusMessage("MinDifficulty: " + minDifficulty);
 
     s = contract->call("proposalsData", "");
-    if (!s.is_ok() || task->threadShouldExit())
+    if (!s.is_ok() || task->threadShouldExit()) {
+      task->logStatus(s, "proposalsData");
       return false;
+    }
 
     j_output = json::parse(s.msg);
     ProposalThresholdData proposalThresholdData = {String(j_output[0].get<std::string>()).getLargeIntValue(),
                                                    String(j_output[1].get<std::string>()).getLargeIntValue()};
 
     s = contract->call("numTakeOvers", "");
+    task->logStatus(s, "numTakeOvers");
     j_output = json::parse(s.msg);
     std::string slots_claimed_string = (*j_output.begin()).get<std::string>();
     auto slotsClaimed = String(slots_claimed_string).getLargeIntValue();
