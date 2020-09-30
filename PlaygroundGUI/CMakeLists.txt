@@ -110,7 +110,6 @@ else()
   set(REPLXX_LIB ${automaton_PATH}/lib/libreplxx.a)
   set(OPENSSL_LIBS ${automaton_PATH}/lib/libssl.a;${automaton_PATH}/lib/libcrypto.a)
   set(Z_LIB ${automaton_PATH}/lib/libz.a)
-  set(GMP_LIB ${automaton_PATH}/lib/libgmp.a)
   set(G3LOGGER_LIB ${automaton_PATH}/lib/libg3logger.a)
   set(LUA_LIB ${automaton_PATH}/lib/liblua.a)
   set(AUTOMATON_CORE_LIB "${automaton_PATH}/lib/libblockchain_cpp_node.a;${automaton_PATH}/lib/libautomaton-core.a;${automaton_PATH}/lib/libsecp256k1.a;${automaton_PATH}/lib/libed25519.a")
@@ -159,7 +158,6 @@ target_link_libraries(
   ${Z_LIB}
   ${GTEST_LIBS}
   ${CMAKE_DL_LIBS}
-  ${GMP_LIB}
 )
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
