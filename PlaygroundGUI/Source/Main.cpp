@@ -25,8 +25,6 @@
 
 #include <curl/curl.h>
 
-#include <sol.hpp>
-
 class LoggerTest {
   std::unique_ptr<g3::LogWorker> logworker;
   std::unique_ptr<g3::FileSinkHandle> l_handler;
