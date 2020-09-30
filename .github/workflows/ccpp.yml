@@ -3,10 +3,12 @@ name: C/C++ CI
 on:
   push:
     paths:
+      - 'CMakeLists.txt'
       - 'PlaygroundGUI/**'
       - '.github/workflows/ccpp.yml'
   pull_request:
     paths:
+      - 'CMakeLists.txt'
       - 'PlaygroundGUI/**'
       - '.github/workflows/ccpp.yml'
   schedule:
